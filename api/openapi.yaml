@@ -1,0 +1,1300 @@
+openapi: 3.1.0
+info:
+  title: Emissary - OpenAPI 3.1
+  description: |-
+    This is a Emissary Platform API specification.
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: contact@withemissary.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.1.0
+security:
+  - api_key: []
+servers:
+  - url: https://api.withemissary.com
+    description: Emissary API server
+tags:
+  - name: Base Model
+    description: Deals with base models
+  - name: Project
+    description: Deals with projects (workspace)
+  - name: Dataset
+    description: Datasets are used to upload documents that can be used for fine-tuning
+  - name: Training Job
+    description: Deals with training jobs
+  - name: Deployment
+    description: Deals with deployments
+paths:
+  '/v1/models':
+    get:
+      tags:
+        - Base Model
+      summary: List of Base Models
+      description: Fetching a list of base models
+      operationId: listBaseModels
+      responses:
+        '200':
+          description: List of base models
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/BaseModelSummary"
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  '/v1/models/{base_model_name}':
+    get:
+      tags:
+        - Base Model
+      summary: Retrieve a base model
+      description: Retrieve a base model by its name.
+      operationId: retrieveBaseModelByName
+      parameters:
+        - name: base_model_name
+          in: path
+          required: true
+          description: The name of the base model to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/BaseModelSummary"
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/v1/projects': # path parameter in curly braces
+    post:
+      tags:
+        - Project
+      summary: Create a new project
+      description: Create a new project which will be used as an your Fine-Tuning workspace.
+      operationId: createProject
+      requestBody:
+        description: Provide your project name if you want to specify it.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: my_project
+                  description: The name of the project
+        required: false
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProjectSummary"
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+    get:
+      tags:
+        - Project
+      # documentation for GET operation for this path
+      summary: List of Projects
+      # you can use GFM in operation description too: https://guides.github.com/features/mastering-markdown
+      description: |
+        Fetching a list of projects,
+      # operationId should be unique across the whole specification
+      operationId: listProjects
+      # security schemas applied to this operation
+      responses:
+        '200':
+          description: List of projects with their ID and name
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/ProjectSummary"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  '/v1/projects/{project_id}':
+    get:
+      tags:
+        - Project
+      summary: Retrieve a project by ID
+      description: Retrieve a project by its unique identifier.
+      operationId: retrieveProjectById
+      parameters:
+        - name: project_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProjectDetail"
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Project
+      summary: Delete a project by ID
+      description: Delete a project by its unique identifier.
+      operationId: deleteProjectById
+      parameters:
+        - name: project_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: Project deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/v1/projects/{project_id}/datasets':
+    post:
+      tags:
+        - Dataset
+      summary: Create a new Dataset
+      description: Create a new dataset which will be used in the project.
+      operationId: createDataset
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        description: Provide your project name if you want to specify it.
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The dataset file to upload
+                name:
+                  type: string
+                  example: my_dataset
+                  description: The name of the dataset (optional)
+              required:
+                - file
+      responses:
+        '201':
+          description: Dataset created successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DatasetSummary"
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+    get:
+      tags:
+        - Dataset
+      summary: List of Datasets
+      description: Fetching a list of datasets
+      operationId: listDatasets
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: List of datasets with their ID and name
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/DatasetSummary"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  '/v1/projects/{project_id}/datasets/{dataset_id}':
+    get:
+      tags:
+        - Dataset
+      summary: Retrieve a dataset by ID
+      description: Retrieve a dataset by its unique identifier.
+      operationId: retrieveDatasetById
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: dataset_id
+          in: path
+          required: true
+          description: The ID of the dataset to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DatasetDetail"
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Dataset
+      summary: Delete a dataset by ID
+      description: Delete a dataset by its unique identifier.
+      operationId: deleteDatasetById
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: The ID of the project to retrieve datasets for
+          schema:
+            type: string
+        - name: dataset_id
+          in: path
+          required: true
+          description: The ID of the dataset to delete
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dataset deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/v1/projects/{project_id}/training-jobs':
+    post:
+      tags:
+        - Training Job
+      summary: Create a new Training Job
+      description: Create a new training job for the project.
+      operationId: createTrainingJob
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        description: Provide your training job details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_model:
+                  type: string
+                  example: "Llama-3.2-1B-Instruct"
+                  description: The base model to fine-tune. To see full list of supported base model please visit [Base Models](https://docs.withemissary.com/models)
+                train_dataset_id:
+                  type: string
+                  example: "ds-12345"
+                  description: The dataset ID to use for training
+                test_dataset_id:
+                  type: string
+                  example: "ds-67890"
+                  description: The test dataset ID to use for validation
+                train_test_split_ratio:
+                  type: number
+                  example: 0.2
+                  description: The ratio of training to testing data
+                name:
+                  type: string
+                  example: "training-1"
+                  description: The name of the training job
+                description:
+                  type: string
+                  example: "Fine-tuning the model on my dataset"
+                  description: A description of the training job
+                task_type:
+                  type: string
+                  enum:
+                    - text-generation
+                    - classification
+                    - embedding
+                  example: "text-generation"
+                  description: The task type for the training job
+                parameters:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: number
+                      - type: integer
+                  description: Additional parameters for the training job
+                hf_model_link:
+                  type: string
+                  example: "https://huggingface.co/my_model"
+                  description: Link to the Hugging Face model / Use only when you use the HF_MODEL as a base
+              required:
+                - base_model
+                - train_dataset_id
+      responses:
+        '201':
+          description: Training job created successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TrainingJobSummary"
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+    get:
+      tags:
+        - Training Job
+      summary: List of Training Jobs
+      description: Fetching a list of training jobs
+      operationId: listTrainingJobs
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: List of training jobs with their ID and name
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/TrainingJobSummary"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  '/v1/projects/{project_id}/training-jobs/{training_job_id}':
+    get:
+      tags:
+        - Training Job
+      summary: Retrieve a training job by ID
+      description: Retrieve a training job by its unique identifier.
+      operationId: retrieveTrainingJobById
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: training_job_id
+          in: path
+          required: true
+          description: The ID of the training job to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TrainingJobDetail"
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Training Job
+      summary: Delete a training job by ID
+      description: Delete a training job by its unique identifier.
+      operationId: deleteTrainingJobById
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: training_job_id
+          in: path
+          required: true
+          description: The ID of the training job to delete
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Training job deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/v1/projects/{project_id}/training-jobs/{training_job_id}/cancel':
+    post:
+      tags:
+        - Training Job
+      summary: Cancel a training job by ID
+      description: Cancel a training job by its unique identifier.
+      operationId: cancelTrainingJobById
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: training_job_id
+          in: path
+          required: true
+          description: The ID of the training job to cancel
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Training job canceled successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/v1/projects/{project_id}/training-jobs/{training_job_id}/checkpoints':
+    get:
+      tags:
+        - Training Job
+      summary: List of Checkpoints
+      description: Fetching a list of checkpoints for a training job
+      operationId: listCheckpoints
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: training_job_id
+          in: path
+          required: true
+          description: The ID of the training job to retrieve checkpoints for
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of checkpoints for the training job
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/TrainingJobCheckpoint"
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/v1/projects/{project_id}/deployments':
+    post:
+      tags:
+        - Deployment
+      summary: Create a new Deployment
+      description: Create a new deployment for the project.
+      operationId: createDeployment
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        description: Provide you deployment details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                training_job_id:
+                  type: string
+                  example: "tr-12345"
+                  description: The training job ID to use for deployment
+                checkpoint:
+                  type: integer
+                  example: 4
+                  description: The checkpoint number to use for deployment
+                server_type:
+                  type: string
+                  enum:
+                    - serverless
+                    - on-demand
+                  example: "on-demand"
+                name:
+                  type: string
+                  example: "deployment-1"
+                  description: The name of the deployment
+                description:
+                  type: string
+                  example: "Deployment for my training job"
+                  description: A description of the deployment
+              required:
+                - training_job_id
+                - checkpoint
+      responses:
+        '201':
+          description: Deployment created successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DeploymentSummary"
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+    get:
+      tags:
+        - Deployment
+      summary: List of Deployments
+      description: Fetching a list of deployments
+      operationId: listDeployments
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: List of deployments with their ID and name
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/DeploymentSummary"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  '/v1/projects/{project_id}/deployments/{deployment_id}':
+    get:
+      tags:
+        - Deployment
+      summary: Retrieve a deployment by ID
+      description: Retrieve a deployment by its unique identifier.
+      operationId: retrieveDeploymentById
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: deployment_id
+          in: path
+          required: true
+          description: The ID of the deployment to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DeploymentDetail"
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Deployment
+      summary: Delete a deployment by ID
+      description: Delete a deployment by its unique identifier.
+      operationId: deleteDeploymentById
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: deployment_id
+          in: path
+          required: true
+          description: The ID of the deployment to delete
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deployment deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/v1/projects/{project_id}/deployments/{deployment_id}/cancel':
+    post:
+      tags:
+        - Deployment
+      summary: Cancel a deployment by ID
+      description: Cancel a deployment by its unique identifier.
+      operationId: cancelDeploymentById
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: deployment_id
+          in: path
+          required: true
+          description: The ID of the deployment to cancel
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deployment canceled successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/v1/projects/{project_id}/deployments/{deployment_id}/completions':
+    post:
+      tags:
+        - Deployment
+      summary: Get Completions from a Deployment
+      description: Get completions from a deployment using the provided input.
+      operationId: getCompletionsFromDeployment
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: deployment_id
+          in: path
+          required: true
+          description: The ID of the deployment to get completions from
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: Provide you prompt input for completions
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input:
+                  type: string
+                  example: "What is the capital of France?"
+                  description: The input prompt for the deployment
+                do_sample:
+                  type: boolean
+                  example: true
+                  description: Whether to use sampling or not
+                temperature:
+                  type: number
+                  example: 0.7
+                  description: The sampling temperature to use
+                max_new_tokens:
+                  type: integer
+                  format: int32
+                  example: 500
+                  description: The maximum number of new tokens to generate
+                top_p:
+                  type: number
+                  example: 0.9
+                  description: The cumulative probability for token selection
+                top_k:
+                  type: integer
+                  example: 50
+                  description: The number of highest probability tokens to keep for top-k-filtering
+                no_repeat_ngram_size:
+                  type: integer
+                  example: 2
+                  description: The size of n-grams to avoid repeating
+              required:
+                - input
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "completion-12345"
+                    description: The unique identifier for the completion
+                  response:
+                    type: string
+                    example: "The capital of France is Paris."
+                    description: The generated completion from the deployment
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+  '/v1/projects/{project_id}/deployments/{deployment_id}/chat/completions':
+    post:
+      tags:
+        - Deployment
+      summary: Get Chat Completions from a Deployment
+      description: Get chat completions from a deployment using the provided input.
+      operationId: getChatCompletionsFromDeployment
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: deployment_id
+          in: path
+          required: true
+          description: The ID of the deployment to get chat completions from
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: Provide your chat input for completions
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        enum:
+                          - system
+                          - user
+                          - assistant
+                        example: "user"
+                        description: The role of the message sender
+                      content:
+                        type: string
+                        example: "Hello, how are you?"
+                        description: The content of the message
+                  required:
+                    - role
+                    - content
+                streaming:
+                  type: boolean
+                  example: false
+                  description: Whether to stream the response
+                temperature:
+                  type: number
+                  example: 0.7
+                  description: The sampling temperature to use
+                max_new_tokens:
+                  type: integer
+                  example: 500
+                  description: The maximum number of new tokens to generate
+                top_p:
+                  type: number
+                  example: 0.9
+                  description: The cumulative probability for token selection
+                top_k:
+                  type: integer
+                  example: 50
+                  description: The number of highest probability tokens to keep for top-k-filtering
+                no_repeat_ngram_size:
+                  type: integer
+                  example: 2
+                  description: The size of n-grams to avoid repeating
+                do_sample:
+                  type: boolean
+                  example: true
+                  description: Whether to use sampling or not
+              required:
+                - messages
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "chat-completion-12345"
+                    description: The unique identifier for the chat completion
+                  response:
+                    type: string
+                    example: "I'm doing well, thank you!"
+                    description: The generated chat completion from the deployment
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+  '/v1/projects/{project_id}/deployments/{deployment_id}/embeddings':
+    post:
+      tags:
+        - Deployment
+      summary: Get Embeddings from a Deployment
+      description: Get embeddings from a deployment using the provided input.
+      operationId: getEmbeddingsFromDeployment
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: deployment_id
+          in: path
+          required: true
+          description: The ID of the deployment to get embeddings from
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: Provide your input for embeddings
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input:
+                  type: string
+                  example: "What is the capital of France?"
+                  description: The input for which to get embeddings
+                target:
+                  type: string
+                  example: "Paris is the capital of France."
+                  description: The target sentence for comparison
+                cosine:
+                  type: boolean
+                  example: true
+                  description: Whether to return cosine similarity
+                manhattan:
+                  type: boolean
+                  example: false
+                  description: Whether to return Manhattan distance
+                euclidean:
+                  type: boolean
+                  example: false
+                  description: Whether to return Euclidean distance
+              required:
+                - input
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "embedding-12345"
+                    description: The unique identifier for the embedding
+                  response:
+                    type: object
+                    properties:
+                      input_embedding:
+                        type: array
+                        items:
+                          type: number
+                        description: The embedding vector for the input
+                      target_embedding:
+                        type: array
+                        items:
+                          type: number
+                        description: The embedding vector for the target
+                      cosine_score:
+                        type: number
+                        description: The cosine similarity between the embeddings if target not none
+                      manhattan_distance:
+                        type: number
+                        description: The Manhattan distance between the embeddings if manhattan = true
+                      euclidean_distance:
+                        type: number
+                        description: The Euclidean distance between the embeddings if euclidean = true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+  '/v1/projects/{project_id}/deployments/{deployment_id}/classification':
+    post:
+      tags:
+        - Deployment
+      summary: Get Classification from a Deployment
+      description: Get classification from a deployment using the provided input.
+      operationId: getClassificationFromDeployment
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: deployment_id
+          in: path
+          required: true
+          description: The ID of the deployment to get classification from
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: Provide your input for classification
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input:
+                  type: string
+                  example: "What is the capital of France?"
+                  description: The input for which to get classification
+              required:
+                - input
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "classification-12345"
+                    description: The unique identifier for the classification
+                  response:
+                    type: string
+                    example: "Paris"
+                    description: The predicted classification from the deployment
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+
+
+# An object to hold reusable parts that can be used across the definition
+components:
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      schema:
+        type: string
+      required: true
+  schemas:
+    BaseModelSummary:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Llama-3.2-1B-Instruct"
+        type:
+          type: string
+          enum:
+            - completion
+            - classification
+            - embeddings
+            - chat
+          example: "completion"
+        parameter_template:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: number
+              - type: integer
+        support_serverless:
+          type: boolean
+          example: false
+    ProjectSummary:
+      type: object
+      description: Project Summary Object
+      properties:
+        id:
+          type: string
+          example: "ms-12345"
+          description: The unique identifier for the project
+        name:
+          type: string
+          example: "my_project"
+          description: The name of the project
+    ProjectDetail:
+      type: object
+      description: Project Object
+      properties:
+        id:
+          type: string
+          example: "ms-12345"
+          description: The unique identifier for the project
+        name:
+          type: string
+          example: "my_project"
+          description: The name of the project
+        datasets:
+          type: array
+          items:
+            "$ref": '#/components/schemas/DatasetSummary'
+        training_jobs:
+          type: array
+          items:
+            "$ref": "#/components/schemas/TrainingJobSummary"
+        deployments:
+          type: array
+          items:
+            "$ref": "#/components/schemas/DeploymentSummary"
+    DatasetSummary:
+      type: object
+      description: Dataset Summary Object
+      properties:
+        id:
+          type: string
+          example: "ds-12345"
+          description: The unique identifier for the dataset
+        name:
+          type: string
+          example: "my_dataset"
+          description: The name of the dataset
+        created_at:
+          type: integer
+          example: 1633036800
+          description: The UNIX timestamp when the dataset was created
+        is_uploaded:
+          type: boolean
+          example: true
+    DatasetDetail:
+      type: object
+      description: Dataset Object
+      properties:
+        id:
+          type: string
+          example: "ds-12345"
+          description: The unique identifier for the dataset
+        name:
+          type: string
+          example: "my_dataset"
+          description: The name of the dataset
+        is_uploaded:
+          type: boolean
+          example: true
+          description: Whether the dataset has been uploaded
+        dataset_download_url:
+          type: string
+          example: "s3:/my_dataset"
+          description: The URL to download the dataset
+        upload_by:
+          type: string
+          example: "user-12345"
+          description: The user ID who uploaded the dataset
+        created_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the dataset was created
+        updated_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the dataset was last updated
+    TrainingJobSummary:
+      type: object
+      description: Training Job Summary Object
+      properties:
+        id:
+          type: string
+          example: "tr-12345"
+          description: The unique identifier for the training job
+        name:
+          type: string
+          example: "training-1"
+          description: The name of the training job
+        base_model:
+          type: string
+          example: "Llama-3.2-1B-Instruct"
+          description: The base model used for training
+        status:
+          type: string
+          enum:
+            - Pending
+            - Running
+            - Success
+            - Failed
+            - TimedOut
+            - Cancelled
+          example: "Running"
+          description: The current status of the training job
+        progress:
+          type: integer
+          example: 75
+          description: The current progress of the training job
+        created_by:
+          type: string
+          example: "user-12345"
+          description: The user ID who created the training job
+        created_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the TrainingJob was created
+        updated_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the TrainingJob was last updated
+    TrainingJobDetail:
+      type: object
+      description: Training Job Object
+      properties:
+        id:
+          type: string
+          example: "tr-12345"
+          description: The unique identifier for the training job
+        name:
+          type: string
+          example: "training-1"
+          description: The name of the training job
+        description:
+          type: string
+          example: "Fine-tuning the model on my dataset"
+          description: A description of the training job
+        base_model:
+          type: string
+          example: "Llama-3.2-1B-Instruct"
+          description: The base model used for training
+        status:
+          type: string
+          enum:
+            - Pending
+            - Running
+            - Success
+            - Failed
+            - TimedOut
+            - Cancelled
+          example: "Running"
+          description: The current status of the training job
+        progress:
+          type: integer
+          example: 75
+          description: The current progress of the training job
+        train_dataset:
+          "$ref": "#/components/schemas/DatasetSummary"
+        test_dataset:
+          "$ref": "#/components/schemas/DatasetSummary"
+        training_loss:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: number
+                example: 1633036800.0
+              loss:
+                type: number
+                example: 0.1234
+        hyper_parameters:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: number
+              - type: integer
+        created_by:
+          type: string
+          example: "user-12345"
+          description: The user ID who created the training job
+        created_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the TrainingJob was created
+        updated_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the TrainingJob was last updated
+    TrainingJobCheckpoint:
+      type: object
+      description: Training Job Checkpoint Object
+      properties:
+        checkpoint:
+          type: integer
+          example: 3
+          description: The checkpoint number
+        model_download_url:
+          type: string
+          example: "s3:/my_model"
+          description: The URL to download the model checkpoint
+        test_results:
+          type: object
+          properties:
+            general_test_result:
+              type: string
+              example: "s3://"
+            aggregated_test_result:
+              type: object
+              additionalProperties:
+                type: string
+        created_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the checkpoint was created
+        updated_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the checkpoint was created
+    DeploymentSummary:
+      type: object
+      description: Deployment Summary Object
+      properties:
+        id:
+          type: string
+          example: "dp-12345"
+          description: The unique identifier for the deployment
+        name:
+          type: string
+          example: "deployment-1"
+          description: The name of the deployment
+        status:
+          type: string
+          enum:
+            - Pending
+            - Deploying
+            - Deployed
+            - Failed
+            - Cancelled
+            - TimedOut
+          example: "Deployed"
+          description: The current status of the deployment
+        created_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the deployment was created
+    DeploymentDetail:
+      type: object
+      description: Deployment Object
+      properties:
+        id:
+          type: string
+          example: "dp-12345"
+          description: The unique identifier for the deployment
+        name:
+          type: string
+          example: "deployment-1"
+          description: The name of the deployment
+        description:
+          type: string
+          example: "Deployment for my training job"
+          description: A description of the deployment
+        base_model:
+          type: string
+          example: "Llama-3.2-1B-Instruct"
+          description: The base model used for deployment
+        status:
+          type: string
+          enum:
+            - Pending
+            - Deploying
+            - Deployed
+            - Failed
+            - Cancelled
+            - TimedOut
+          example: "Deployed"
+          description: The current status of the deployment
+        training_id:
+          type: string
+          example: "tr-12345"
+          description: The training job ID used for deployment
+        checkpoint:
+          type: integer
+          example: 4
+          description: The checkpoint number used for deployment
+        created_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the deployment was created
+        updated_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the deployment was last updated
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+    ApiErrorInvalidInput:
+      type: object
+      required:
+        - status
+        - error
+      properties:
+        status:
+          type: integer
+          format: int32
+          example: 400
+        error:
+          type: string
+          example: Bad request
+    ApiErrorNotFound:
+      type: object
+      required:
+        - status
+        - error
+        - code
+      properties:
+        status:
+          type: integer
+          format: int32
+          example: 404
+        error:
+          type: string
+          example: Not found
+        code:
+          type: string
+          example: object_not_found
+    ApiErrorUnauthorized:
+      type: object
+      required:
+        - status
+        - error
+      properties:
+        status:
+          type: integer
+          format: int32
+          example: 401
+        error:
+          type: string
+          example: Unauthorized
+  responses:
+    Unauthorized:
+      description: Unauthorized error
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ApiErrorUnauthorized"
+    NotFound:
+      description: Not Found error
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ApiErrorNotFound"
+    InvalidInput:
+      description: Invalid Input error
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ApiErrorInvalidInput"
+  headers:
+    ExpiresAfter:
+      description: date in UTC when token expires
+      schema:
+        type: string
+        format: date-time
+  # Security scheme definitions that can be used across the definition.
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-API-Key
+      in: header
