@@ -91,6 +91,10 @@ const config: Config = {
                 label: "Tutorial",
                 to: "/docs/intro",
               },
+              {
+                label: "API",
+                to: "/docs/category/emissary-api",
+              },
             ],
           },
           {
@@ -196,7 +200,7 @@ const config: Config = {
         id: "openapi",
         docsPluginId: "classic",
         config: {
-          petstore: {
+          emissary: {
             specPath: "api/openapi.yaml",
             outputDir: "docs/emissary-api",
             downloadUrl:
