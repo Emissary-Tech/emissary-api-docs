@@ -7,13 +7,13 @@ import type * as Plugin from "@docusaurus/types/src/plugin";
 import type * as OpenApiPlugin from "docusaurus-plugin-openapi-docs";
 
 const config: Config = {
-  title: "My Site",
-  tagline: "Dinosaurs are cool",
+  title: "Emissary Tutorial",
+  tagline: "Start your first Fine-Tuning project with Emissary",
   url: "https://your-docusaurus-test-site.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "img/emissary.svg",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -56,10 +56,10 @@ const config: Config = {
         },
       },
       navbar: {
-        title: "My Site",
+        title: "Emissary",
         logo: {
-          alt: "My Site Logo",
-          src: "img/logo.svg",
+          alt: "emissary-logo",
+          src: "img/emissary.svg",
         },
         items: [
           {
@@ -70,12 +70,12 @@ const config: Config = {
           },
           { to: "/blog", label: "Blog", position: "left" },
           {
-            label: "Petstore API",
+            label: "API",
             position: "left",
-            to: "/docs/category/petstore-api",
+            to: "/docs/category/emissary-api",
           },
           {
-            href: "https://github.com/facebook/docusaurus",
+            href: "https://github.com/Emissary-Tech/emissary-api-docs",
             label: "GitHub",
             position: "right",
           },
@@ -119,7 +119,7 @@ const config: Config = {
               },
               {
                 label: "GitHub",
-                href: "https://github.com/facebook/docusaurus",
+                href: "https://github.com/Emissary-Tech/emissary-api-docs",
               },
             ],
           },
@@ -197,10 +197,10 @@ const config: Config = {
         docsPluginId: "classic",
         config: {
           petstore: {
-            specPath: "examples/petstore.yaml",
-            outputDir: "docs/petstore",
+            specPath: "api/openapi.yaml",
+            outputDir: "docs/emissary-api",
             downloadUrl:
-              "https://raw.githubusercontent.com/PaloAltoNetworks/docusaurus-template-openapi-docs/main/examples/petstore.yaml",
+              "https://raw.githubusercontent.com/Emissary-Tech/emissary-api-docs/refs/heads/main/api/openapi.yaml",
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "tag",
