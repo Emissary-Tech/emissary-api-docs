@@ -1,0 +1,211 @@
+---
+title: 'Quickstart'
+sidebar_position: 1
+---
+
+## Overview
+Once you have a clear idea of your AI use-case, you'll want to develop systems that 'adapt' to your specific needs.
+This can be achieved through finetuning your own AI models. At its core, all AI is about matrix multiplication, expressed by the simple equation **Ax = y** where **A** is your AI model weights, **x** your input and **y** output.
+In the case of prompting, we modify **x**, having no control over **A**. In finetuning, you modify and control **A**, allowing greater control and stability over your AI.
+Finetuning allows you to be more than just another prompt wrapper and have differentiated AI capabilities. 
+
+See [Finetuning your first AI model](#finetuning-your-first-ai-model) to get started, or learn more about each stage by clicking on a card below
+
+
+## Finetuning your first AI model
+
+### **1. Create Model Service**
+Click **Model Services** on the services panel and then **+ NEW SERVICE** button in the dashboard.
+![model_services](/img/quickstart/model_services.png)
+### **2. Enter Model Service Name** <br></br>
+  In the pop-up, enter a new model service name, and click **CREATE**.
+
+![new_model_service](/img/quickstart/new_model_service.png)
+
+
+[//]: # (### **3. Manage Model Service** <br></br>)
+
+[//]: # (  A tile is created for your task. Click **Manage** to enter the task workspace.)
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/manage_model_service.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # (### **4. Manage Datasets** <br></br>)
+
+[//]: # (  Click **MANAGE** in the **Datasets Available** tile.)
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/manage_datasets.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # (### **5. Upload Datasets** <br></br>)
+
+[//]: # (  Click **+UPLOAD DATASET**. You can upload as many datasets as you want.)
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/upload_dataset.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # (  Remember to select a file and name each dataset. We recommend naming datasets to reflect what’s distinct about them.)
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/naming_dataset.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # (### **6. Finetune Model** <br></br>)
+
+[//]: # (  Now, go back one panel by clicking **OVERVIEW** and then click **MANAGE** in the **Training Jobs** tile. )
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/manage_fine_tuning.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (  Here, we’ll kick off finetunes. The shortest path to finetuning a model is by clicking **+NEW TRAINING JOB**, naming the output model, picking a backbone &#40;base model&#41;, selecting the training dataset &#40;you must have uploaded it in the step before&#41;, and finally hitting **START NEW TRAINING JOB.** )
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/training_job.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (  You can optionally upload a test data set too. )
+
+[//]: # (  Once you select a model, you will also be able to see and modify advanced **Hyper Parameters** such as number of epochs, learning rate, batch size and downsample size. )
+
+[//]: # (  <br></br>Furthermore, you also have the option to control and customize your own **Training Script and Testing Script**. )
+
+[//]: # (  <br></br>To test on a random fraction of your data, simply change downsample size to the relevant percentage &#40;10 —> training on 10% of data&#41;. By default, values are set to help you have the highest probability of successful outcome.)
+
+[//]: # ()
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/hyperparameters.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (  Note, your training job will initially show the status as **"Pending"** - at this point, we’re provisioning your instance. )
+
+[//]: # (  )
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/status_pending.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (  Once your training job has been initiated, you’ll see **Running** appear as the status. Once complete, you’ll see **Success**, as shown below.)
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/status_running.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/success_job.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (### **7. Deploy Model** <br></br>)
+
+[//]: # (  )
+[//]: # (  Once your training job is successful, as seen above, you can see the output model's attributes - **DETAILS** and **ARTIFACTS** - on clicking. )
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/details.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (  You can then deploy your models with one click, by hitting **DEPLOY**. )
+
+[//]: # (  Furthermore, you also have the option to deploy your model based on various **"Checkpoints"**, which directly correspond to your Epochs. )
+
+[//]: # ()
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/deploy_model.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (### **8. Deployment Testing and Monitoring** <br></br>)
+
+[//]: # (  By clicking **MANAGE** in the **Deployments** tile, you can view, manage and test all your models - and also see the data flowing through them. )
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/manage_deployment.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (  In the **STATUS** panel, you can hit the delete icon, as shown below, to close your deployment. )
+
+[//]: # ()
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/deployment.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (  For successful deployments, you can use the **TESTING** panel to test outputs in real time. )
+
+[//]: # ()
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/testing_deployment.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (  **API CALL EXAMPLES** contains code snippets to integrate deployments into your software. )
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/api_example.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (  View all inputs and outputs flowing through your model in the **MONITORING** panel. )
+
+[//]: # ()
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/monitoring.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # ()
+[//]: # (  From this panel, you can also deploy base models &#40;non-finetuned models&#41; for any model service. Click on **+NEW DEPLOYMENT** and select the base model that you’d like to deploy.)
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/new_deployment.png" />)
+
+[//]: # (  </Card>)
+
+[//]: # (  <Card>)
+
+[//]: # (    <img src="/img/quickstart/base_model.png" />)
+
+[//]: # (  </Card>)
