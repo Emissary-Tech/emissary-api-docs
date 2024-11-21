@@ -1,0 +1,71 @@
+---
+id: get-embeddings-from-deployment
+title: "Get Embeddings from a Deployment"
+description: "Get embeddings from a deployment using the provided input."
+sidebar_label: "Get Embeddings from a Deployment"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1V21v2zYQ/isEP22AbeVtXwwMW9o6g7GtDZoMHRAYBi2dLXaSqJFUXMPQf98dSeslcr20TQO0Ufjy3N1z95DHPbdiY/j0gb+BMlO7HArLFyOegIm1LK1UBZ/y38AyyFeQJLLYGLbWKmeCJc0OVhmcYDYFVmr1KBNImCzKyk74iKsStCCgeYJQG7CzBukGgTp2R7wUWuRgQZNLe17gH7gHMT9CbJcywSWSHCqFTfHbxCnkgk/33O5KWmmsRlxej7iGfyupAU1aXUE9asBar4d4/U1PWbjH8OZvmFq7QDvRW8U2Q4ZO+VcvvDEw9pVKdrTitO1bTyvbqUp7atla6Y5JtBarwhKNCCbKMpOxYz36aAhhP3RGrYhVYl1TjqwEQ7MOfejziMMnkZcZDX1IhWXSOB5iUUorMqLlRosihl/4MeJan7epjNMhZ5Q0KzQOnrZ9KzRa/pzxyVHjHpcZIIJicG7EKi8JChfVxB1WMHQsr5TKQBRd08fy8iEF9ENTOBpspQvmkZiRucwQ3+4IPhcFUmZFcdrCWmTmGSb+PKCxRBpLYZMNqOIMS+SFbMwOaB0bPVk9hEJZ1LWfMKUqjC+hi7Mz+tW3cVfFMRizrjBdhyPhBas2OV02TaGNzy8ur346WiZVIVGSDMMurFxL5IMKheqs2c07oT5TSst2c7tBaC12dPpYyE1nvKhwsSYrQ/caHPaIxlTrnU9Eo5/vbzDotNHN0sRKwxD1GOhAH2wFdgtQ9IlGia8Pui0U/Sugp6RlU5fPMjvUzAm7jRH2MyPV9+T1hYaHQjphuDHSGA4/I351TFPz4lHgBjZ3pytorfS3SKqrbvTVVnSteNTF09oO8y2KRKMbRwKWSS6sH7q86MoQg6gPiCfl+kokLFyQ7tyx0rrx61LOaHcIfO4rPxB0NSToLZbOjaqK5LuSQ6gJvBhHV8/jiGJbU2xeiAmcXu4DWaKYlmHXEV4R8yZMOlKxGUsV9W2lMr5Bw0ZpyqPH8yh0ZSbat/1ZHbVtEU70eq066nUrBvTjoc+rdIagqbWlmUYR3umTrURx5NIYoXeT2DVT/cTOwiS7vp0zj8WpqzIQV+7WJVxEWv4D9L3ozt1Rjn2GmhXtQVnK34FOytAv/j1GC2M/5HrFFERCxpAdKpr3bRs3O3DdNFH/3ykdWp5n9DWHHsX3IZ2WIlzpnQbAjdTk8Fq52EKaG9bG7F0JBXF3OTk/cm55VwRrNtxmwlLNer5LiPGC9NIh17Bjz8279R3mQdLB6HKJqTRbscF6n0gVuSVREKCInQBRaZIyH4Z+HWQdQ0CFQrhsQ0auS4EJZBeTM0RrSwfNbbfbiXCzE6U3Udhqoj/mr2dv72Zj3DJJbZ4RLhWfj/Zsco5QOEQ1nvv+KZiih89s8PDpPVl6zO3b4+XbHk2hGC18slGZCemaVBfrPmjwgT+e+4bDqRA/p713UkeINPf02dPRIiojJXUj5H6/Egb+0lld0zBWtnbqQbqwPMWKigh1hTcZfSfHu8kuCT+8D6fmj+xzUR10V5DC8FSv6C/8dLLsvv3oEfdVlr/84fYVjvYJrhe4IZwUxJhf89p7N74npBZjcA9RpH7HNfbMpT25dtE5pW/f3d3j4lV4U+buUuBabOn+wv+dv8qx5Y4/N7bnmSg2ldjQWo9JP/8BTdKc2g==
+sidebar_class_name: "post api-method"
+info_path: docs/emissary-api/emissary-openapi-3-1
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get Embeddings from a Deployment"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/deployments/{deployment_id}/embeddings"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Get embeddings from a deployment using the provided input.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"required":true},{"name":"deployment_id","in":"path","required":true,"description":"The ID of the deployment to get embeddings from","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"description":"Provide your input for embeddings","content":{"application/json":{"schema":{"type":"object","properties":{"input":{"type":"string","example":"What is the capital of France?","description":"The input for which to get embeddings"},"target":{"type":"string","example":"Paris is the capital of France.","description":"The target sentence for comparison"},"cosine":{"type":"boolean","example":true,"description":"Whether to return cosine similarity"},"manhattan":{"type":"boolean","example":false,"description":"Whether to return Manhattan distance"},"euclidean":{"type":"boolean","example":false,"description":"Whether to return Euclidean distance"}},"required":["input"]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful operation","content":{"application/json":{"schema":{"type":"object","properties":{"id":{"type":"string","example":"embedding-12345","description":"The unique identifier for the embedding"},"response":{"type":"object","properties":{"input_embedding":{"type":"array","items":{"type":"number"},"description":"The embedding vector for the input"},"target_embedding":{"type":"array","items":{"type":"number"},"description":"The embedding vector for the target"},"cosine_score":{"type":"number","description":"The cosine similarity between the embeddings if target not none"},"manhattan_distance":{"type":"number","description":"The Manhattan distance between the embeddings if manhattan = true"},"euclidean_distance":{"type":"number","description":"The Euclidean distance between the embeddings if euclidean = true"}}}}}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

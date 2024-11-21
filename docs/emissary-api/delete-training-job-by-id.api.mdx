@@ -1,0 +1,71 @@
+---
+id: delete-training-job-by-id
+title: "Delete a training job by ID"
+description: "Delete a training job by its unique identifier."
+sidebar_label: "Delete a training job by ID"
+hide_title: true
+hide_table_of_contents: true
+api: eJydVW1r2zAQ/itCnzZI7L59yqdlSwrZSlvWDgYlBMWWY3W2pUrnpMH4v+9OtvPirGUUCpXv/bl77lJxECvHR0/80QpVqGLFvuslnw94LF1klQGlCz7iE5lJkEww6Mye9ZItt0yBY2WhXkrJVCwLUImSNuADro20grxnMfrH3r/LgSm+blE+4EZYkaPGUg0VL/ADrY3VzzKChSITRfmNgBTfLkplLvio4rA1ZOnAYjxeD7iVL6WyEpOBLWU92AXrKl5gxacRj936sB9TyWYTphMG+DrCDpo1oN4rq55TBmd04aQj/cXZFf3rZTmM2wSNmSujSDqXlFm2JXxX//K81cCudVnETFqrLZYS6QJwDGQqjMlU5GcQPjuyr04r1Uvq9FEjnrB8AaVD4T5qLIkUOBgcK6gGTGu2D6Yw90qSQ6JtLqARXV5QpFeRmwyNEEfdBT5p2IGdx5YQNkLvC3jXvAGyKDQsWi90AwVeOTZqShkx5nWrrEmP1Ev1np+ekEiLEQ/X52HLQhdWez7WYUeCIQ4LVT121cQGadcdoUubYbQUwLhRGAqjgo1CKuXKOWG3QaRz3ufctFWy8f2MNbE48cjJqLQKtj4uRlr8kfSeH+oeaLzNcHYWu6ah5AcKBt1i/B5ihmEj8iuRShFTspq+E+1d2wbuihqyOyMLKu0yOD+p/TFVjuGfYDuH+0wAsaGBY2SEF6IhJV0J3Pzc3SUPCFNFsm0VdsptxAqZFCgdepOwpbaIPLWRw4oa24q+nDQVISD3Ja4dmbeAx0Zgf9hFcIbR9pPBdJvNJhBeG2i7CltXF97Mvk1vH6ZDdAlSyDOKS7Nt0J4F5xgKRUY7yEVxkOrNezmb9JtW7Xf2A2e2nS3IVwhNhk5Uj8dWtVx+4msaVMdmfI6O7usRoUnbP5jIrxQBUqSqWgonf9msrkmM5VjPQeyKsEosiSvIzlg5euNiJSJz/at6CPjTz/bsfGZvgenYWxBP1yIr6QufntyHPxV08z+U+T+v/Aeq67eynqNLu2bUqMZqjJfewIH/yeWmHd/dqsn0Zvo4xTX9C74BpfI=
+sidebar_class_name: "delete api-method"
+info_path: docs/emissary-api/emissary-openapi-3-1
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete a training job by ID"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/projects/{project_id}/training-jobs/{training_job_id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete a training job by its unique identifier.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"required":true},{"name":"training_job_id","in":"path","required":true,"description":"The ID of the training job to delete","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Training job deleted successfully"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

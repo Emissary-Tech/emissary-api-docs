@@ -1,0 +1,71 @@
+---
+id: delete-dataset-by-id
+title: "Delete a dataset by ID"
+description: "Delete a dataset by its unique identifier."
+sidebar_label: "Delete a dataset by ID"
+hide_title: true
+hide_table_of_contents: true
+api: eJytVW1r2zAQ/itCnzZI7L59yqdlSwphpS1rB4MSgmKfY3W2pUpy0mD833dny4mbhEK3QaHy6e65u+ceXSruxMry0ROfCCcsOD4f8BhsZKR2UhV8xCeQgQMmWNx6sOWWSWdZWciXEpiMoXAykWACPuBKgxEUOIsxNG5CPfLXLdoGXAsjcrQaylrxAj/QUxv1DJFbSHKRlFYLl+LZwEspDSCaMyUc1vaYAptNmEqYw5MHYU4xA85IWENXtGWJMghnoxRywUcVd1tNiS36FSte14NdLT7k32rpyMJaWhbeTT4ncKtVYcHS/cXZFf07GISHbPFiZssoAmuTMsu2vB7wq1NBt8qxa1UWMQNjGgoiVTgcGbkKrTMZNfMKny35V8dFqiWR+qb9J6xcuNKicY8aA2kHZ4AScLLtw7vtwSTmXgEF4Dxy4VrT5QUhvYpcZ+iEfdQd8BFXPb+mt4R6o+6bAt51bxtZFMotfBSGOemay7GWU8qImNf+sqZ7lGqq9lpuBIxiGPFwfR56wdmw2uu3DjvJhdVeSTWNH8y6k31pMsRIndN2FIZCy2AjUTa5tFaYbRCpnB/qa+ov2fh+xlosTsKxEJVGum2Di0iL30Dnef/ugYbajmTnsaMKLd/RMOj0/2uIGYatqZF/CiKmZDV9J6oJ9bTtihqyOw0FlXYZnB/V/phKy/BPsF3AfSYcaaBtR0OEO6SVIu0R3A+5vUsesE0ZgacKmbIbsUL9BFKFjUvoBS2iRtCoXEnEetOXI1KxBVQ84Dsjd9/wWAvkh10EZ4i2nwym22w2gWhuA2VWoQ+14c3s2/T2YTrEkCB1eUa4NNu227PgHKHQpJV1uSh6qU4t09nkkK9q/0g/tn79RB28ulBnAqdX+44qr9snvqbxdMrF4+jN7u3ESxe9RYhaSrEZiq+qJVp/mqyuyYxFmEZvyIAwUixJF6jEWFo649NJRGYPt2W/w08//GL5zD68z0823Om6IAWvRVbSFx4b2fd/amjp/4c6T+36vyisR3c9R2//7IjM1mGM+167XujR/qY3v9tYk+nN9HGKz/YPCmOyqA==
+sidebar_class_name: "delete api-method"
+info_path: docs/emissary-api/emissary-openapi-3-1
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete a dataset by ID"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/projects/{project_id}/datasets/{dataset_id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete a dataset by its unique identifier.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","required":true,"description":"The ID of the project to retrieve datasets for","schema":{"type":"string"}},{"name":"dataset_id","in":"path","required":true,"description":"The ID of the dataset to delete","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Dataset deleted successfully"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

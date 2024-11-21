@@ -1,0 +1,71 @@
+---
+id: delete-project-by-id
+title: "Delete a project by ID"
+description: "Delete a project by its unique identifier."
+sidebar_label: "Delete a project by ID"
+hide_title: true
+hide_table_of_contents: true
+api: eJyVVG1r2zAQ/itCnzZI7L59yqdlqwthpS1rB4MQgmKfY3W2pUpy0mD833cnK4nXdIVBIPLpuZfn7jm13Im15ZM5fzDqGVLHFyOegU2N1E6qmk/4NZTggAmmewRb7Zh0ljW1fGmAyQxqJ3MJJuIjrjQYQY6zDF0z7xoif92hbcS1MKJCq6GsLa/xA5Eh9lISRFJaLVyBZ5sWUAk+abnbaUJaZ2S95t2IG3hppAFM5EwD3YIsVqvagiX8xdkV/f1NJtTC+soyZps0BWvzpix3FPPqPac75diNauqMgTHKYFWpqh3SJqjQupSp5xw/W8K3p0Wrle/tsOY5MhGusWg8Rs2A+o/NwDY62fMIsGMwibnXQA65MpVwvenygiK9ikqXCEIe3T7wSe8GOM8tJ27E3hfwIbwnsqyVWwYvdHPS+cuplgllxJg34bKjexx3oY568CLA4U54vDmPw+Rt3B410NHgwWz2ImlMiejCOW0ncSy0jLbSYYultcLsolRV/K1qk3DJpg8z1sfiJBELaWOk2/m4GGn5G+i8GN490vj65h8Qh6ag5TsaRnvl/hpjhnFv8sItQGSUrKPvXHnX0KBDUWN2r6Gm0i6j85PanwppGf4EOzg8lMLRtHs6GlLcuF50tHW4TZW9zx+RpkwhtAo7ZbdijUqJpIo9JA7SFamXLmpUUmOD6ctJU5ECahtwowgeCE+1wP6wi+gMox0ng+m2220k/G2kzDoOrja+nX1L7h6TMbpEhatKikuz7dmeRecYCk1aWVeJepDqvadndv22X+1xHf/vsQoTdfDqYl0KnF4XGLVBoXO+ofHsNYrHyeClQskUWDPB2nYlLPw0ZdeRGXMZLyskKowUKxo/Ci6Tls64C7koLXxA5NOP8FJ8Zv+qdC/ImqS3EWVDX3j0eh2+qN0C0UGWVEUPmOLLp93A9eQlo5047O51cps8JSjrPwefHTo=
+sidebar_class_name: "delete api-method"
+info_path: docs/emissary-api/emissary-openapi-3-1
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete a project by ID"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/projects/{project_id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete a project by its unique identifier.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"required":true}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Project deleted successfully"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

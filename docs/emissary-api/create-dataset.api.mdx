@@ -1,0 +1,71 @@
+---
+id: create-dataset
+title: "Create a new Dataset"
+description: "Create a new dataset which will be used in the project."
+sidebar_label: "Create a new Dataset"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1VlFv2zYQ/isEn1rAluy4KwY/LU3zYGxogiUFCgSGQUsni51EciRl1TD033tH0bYce3kpBgQITd59x/vuu6P23IuN4/MX/ll44cDz5Yjn4DIrjZda8Tm/syA8MMEUtCzvrVhbyqxkrawqtgbWOMiZVMyXwIzV3yHzCR9xbcAKQlnkiJMFnEOYETfCiho8WAq/5wp/oFV0X8kcTSTFN8KXuHZZCbXg8z33O0OWzlupNrwbcQv/NtICBvG2gW7Z74Dzn3S+I49zg9cJPlq9lTmwnW7s4fqMrsNkQZusFcozr5kzkMlix2TILtPKg/KEXzeVl5iPTwtt6zGRRNsXV9ZrwqbcLXHjJTg6LWQFl4mNOIEJDMDXUgm7468v/ox0HwpCGHTHxlRa5MRKT+glKvwQtaGAvN6t8mM5LqEDBboIVT2EeaeDhaje8+6M+Zc+i2XX9fvOaOX69G4mU/p3HiDqgPWqyJlrsgycK5qq2p2TK4ypZBZ0lH535PwWs9ejPDV1jQyyh+sFQLG9SVTuxtOb2YffrtLUKIliY6gg5WUhwTKs25C0/6sYhBvpWwk/QJfI3QbsEH76cTabzD7+PplcA//6ZfGNeVljy6A9Njeos6q3wh0KRUGlW/UygyFva60rEGoYNbQjOnjpQ46xHLEavNfKh8nkUh4LtRWVzNlCmcYzsFbbX1HFUKeYo28cXTOgLl+LIZ5fo/PYkLg1uxlmikl0B8Q3y/xJ5CxOJz6k5tbIe/KOiYe8A0Fog1Oy1DRCjXb95MSJOOfpdprGceXS/WlwdmmsGyXpwG4PI7axFbqV3hs3T1NhZNJKLHMtncNyJJmuL6R3Hw/Z7eOC9VicBqyDrLHS7wIuIq3+AVovh2dPVI6e06PFkRrc+ROo0+Pc/zbGCON+K4z9ElBfNnAkVaGDa+TqeKkxezCg6GqzZHqlbaRj+CfY0eGxEp6K2KcTxnkUEU10fItq91A8YZoyg0gVMuVasUEBJFKnwSSNUhRZkCJqThKxceuPC1IxBdQq4Dwk85jwrRHID7tJJoh2qgyGa9s2EeE00XaTRleX/rW4u//ydD9Gl6T0dUW4VNs+20kyRSjcIpHUQg1Cnb3gn68Pmf2puX7hxY/F9fDDp6YSWMguJrePqn3h22k/f4NucTk/e/KP0kUhlSR39Njv17j31VZdR9vYPDaIDdMXVoo1iQJlmEtHa2yUQlTu9TM/TPDd33EevGf/demDTBUJEluyoV+4DCoefqV0S7SOYqVb9AZ3fazxM8GcAK59KHSjg9MtPoHGD8wvhhy113EaPD48PaPxOn7k1DonHwIOuKPTkhqz634CBE1pRA==
+sidebar_class_name: "post api-method"
+info_path: docs/emissary-api/emissary-openapi-3-1
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Create a new Dataset"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/datasets"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Create a new dataset which will be used in the project.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"required":true}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"description":"Provide your project name if you want to specify it.","content":{"multipart/form-data":{"schema":{"type":"object","properties":{"file":{"type":"string","format":"binary","description":"The dataset file to upload"},"name":{"type":"string","example":"my_dataset","description":"The name of the dataset (optional)"}},"required":["file"]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"201":{"description":"Dataset created successfully","content":{"application/json":{"schema":{"type":"object","description":"Dataset Summary Object","properties":{"id":{"type":"string","example":"ds-12345","description":"The unique identifier for the dataset"},"name":{"type":"string","example":"my_dataset","description":"The name of the dataset"},"created_at":{"type":"integer","example":1633036800,"description":"The UNIX timestamp when the dataset was created"},"is_uploaded":{"type":"boolean","example":true}},"title":"DatasetSummary"}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

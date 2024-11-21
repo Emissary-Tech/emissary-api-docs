@@ -1,0 +1,71 @@
+---
+id: cancel-deployment-by-id
+title: "Cancel a deployment by ID"
+description: "Cancel a deployment by its unique identifier."
+sidebar_label: "Cancel a deployment by ID"
+hide_title: true
+hide_table_of_contents: true
+api: eJydVW1r2zAQ/itCnzZI7L59yqdlbQphoy1LB4MSgmKfY3W2pUpy0mD833dnK7GTrGUrFCrf+3P33KXiTqwsHz3xG9CZ2uZQOD4f8BhsZKR2UhV8xK9FEUHGBIv3Rmy5ZdJZVhbypQQmY5TJRIIJ+IArDUaQ7zRG76jx7uJ/3aJ4wLUwIgcHhtJXvMAPNNZGPUPkFpJMJCXXwqX4tlEKueCjirutJkvrjCxWvB5wAy+lNIC5nCmhHuyDdeWexjt0Okb8mAKb3jCVMIevHmynWIvnvZLqOcW3WhUWLOkvzq7o32GOriM+JMTMllEE1iZllm0J2tXfHO+UY7eqLGIGxiiDlUSqcDQ5NBVaZzJquh8+W7KvTgtVS2ryQReesHrhSovCLmoMRAacCQ7UyRaLN+uCScy9AnJIlMmFa0WXFxTpVeQ6QyPEUe8Cn/SrZ9dgSwgboW8KeNe8BbIolFt4L3Rz0jXKsZYTyogxb72yJj2yLlXETK2sa5iIjBjxcH0eevrZsOqIWIfd/FFxQKo67NgAZr0jc2kyDJg6p+0oDIWWwUYikXJprTDbIFI5P2bcxCvZ+GHK2liceGQhKo102yYuRlr8BnrP+7oZzbedzt5i3zWUfEPBYLcUv4aYYdiKmoVIQcSUrKbvRDWuvoP7oobsXkNBpV0G5ye1P6bSMvwTbO/wkAlHdGjhaIjwOLSspAOBW5/b+2SGMGUEvlXYKbsRK6RSIFXYmISe2yJquI0kltRYL/py0lSEgOQHXDsy94DHWmB/2EVwhtG6yWC6zWYTiEYbKLMKvasNv0+vJ3ezyRBdgtTlGcWl2bZoz4JzDIUiok8uil6qNw7l9Oa4ZVW3sv99Xf1cHby6UGcCZ1h7XJWn8hNf05B2ZMbn6OCu9vhMuuMz6SmNBEtpQTBcVS2FhZ8mq2sSY02mISG2RRgplkQWpGcsLb1xtRKR2eOj2sf86Yc/PJ/ZW4h29C2IqGuRlfSFz4bd/d8JOvgfyvxPR/4DtR32s56jg98xalJrM8Y7r13P++Ru04LvL9XD/ewRN/QP7aajIw==
+sidebar_class_name: "post api-method"
+info_path: docs/emissary-api/emissary-openapi-3-1
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Cancel a deployment by ID"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/deployments/{deployment_id}/cancel"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Cancel a deployment by its unique identifier.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"required":true},{"name":"deployment_id","in":"path","required":true,"description":"The ID of the deployment to cancel","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Deployment canceled successfully"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

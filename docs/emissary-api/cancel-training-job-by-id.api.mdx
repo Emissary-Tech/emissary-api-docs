@@ -1,0 +1,71 @@
+---
+id: cancel-training-job-by-id
+title: "Cancel a training job by ID"
+description: "Cancel a training job by its unique identifier."
+sidebar_label: "Cancel a training job by ID"
+hide_title: true
+hide_table_of_contents: true
+api: eJydVdtq20AQ/ZVln1qwpdye/FQ3ccBtSULtQsEYs5ZW1qaSdrM7smOE/r0z0srXJpRAIKu5nLmdGVccxMrxwYxPrVCFKlbsm17yeY/H0kVWGVC64AN+K4pIZkww6Mye9ZItt0yBY2WhXkrJVCwLUImSNuA9ro20grzHMfpHjX8XA0N83aK8x42wIpcgLeVQ8QI/0NpY/SwjWCgyURTfCEjx7aJU5oIPKg5bQ5YOLOLxusetfCmVlRgMbCnr3g6sy3iBGZ8jHrudlj1NJRvfMZ0wwNdR7aBZW9R7adVziuCMLpx0pL+6uKF/J1EOcVtQGTNXRpF0LimzbEsF3vzL9UEDu9dlETNprbaYS6QLwDmQqTAmU1EzhPDZkX11nqpeUquPOjHD/AWUDoV71FgSK3AyOFdQbTXebA+mMPZKkkOibS6gFV1fEdKryE2GRlhH3QGfdezArqktodqo+iaBd83bQhaFhoX3QjdQ0CiHRo0oImLee2VNeuReqomgRjto+IisGPBwfRl6Erqw2tOxDjsO9HFWqDohVx3uOSHtuqN1aTMETQGMG4ShMCrYKCRUrpwTdhtEOuenzBt5JRs+jVmLxYlNTkalVbBtcBFp8UfSe36om9CM2wntLHadQ8l3FPS69fjdxwj9VtQsRipFTMFq+k504+q7uEuqzx6NLCi16+DyLPdpqhzDP8F2Dk+ZAKJEW46REd6Jlpl0K3D/c/eYTLBMFUnfKuyU24gV0ilQOmxMQs9vETX8RiIraqwXfTlrKpaACyBx+cjcFzw0AvvDroILRNtPBsNtNptANNpA21XoXV34Y3w7epiM+ugSpJBnhEuzbau9CC4RCkVEoVwUB6HevJrju9OmVfvF/cCx9bMF+QqhydCJ8mlqqzylZ3xNg+pIjc/B0ZU94jVpz8+mpzYSLaVlQciqWgonf9msrkmMedmGjNgeYZVYEmmQprFy9MY1S0TmTo/sYeWffvoj9Jm9VVVH44IIuxZZSV/4bFh++MtBPwEfivyfR/8D2Z32tJ6ji983alRrNcS7b+DA/+yO07LvLtfT42SK2/oXnZCqTQ==
+sidebar_class_name: "post api-method"
+info_path: docs/emissary-api/emissary-openapi-3-1
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Cancel a training job by ID"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/training-jobs/{training_job_id}/cancel"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Cancel a training job by its unique identifier.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"required":true},{"name":"training_job_id","in":"path","required":true,"description":"The ID of the training job to cancel","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Training job canceled successfully"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

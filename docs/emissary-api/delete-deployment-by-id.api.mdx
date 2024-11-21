@@ -1,0 +1,71 @@
+---
+id: delete-deployment-by-id
+title: "Delete a deployment by ID"
+description: "Delete a deployment by its unique identifier."
+sidebar_label: "Delete a deployment by ID"
+hide_title: true
+hide_table_of_contents: true
+api: eJydVVtr2zAU/itCTxskdm9PeVq2pBBW2rJ2MCghKLYcq7MtVZKTGuP/vnNkxXaStWyFQuVz+c7tOyc1tWxj6OSJzrjKZJXzwtLliMbcRFooK2RBJ6DLuOWEkbgzIuuKCGtIWYiXkhMRg0wkguuAjqhUXDP0XcTgHTvvHv9rBeIRVUyzHBQaw9e0gA8wVlo+88iuBJoIDK6YTeFtopTnjE5qaiuFlsZqUWxoM6Kav5RCc4hldcmbUQfWp3uKd+h0XPFjysliRmRCLLwGZVtJ2nreS6lZIr5RsjDcoP7i7Ar/HXe1Q20hY2LKKOLGJGWWVVjZ1d/8bqUl17IsYsK1lhoSiWRhcXBgypTKROSaHz4btK9P85Rr7PFBE54geWZLA8IeNebIBRgJzNOKthRv1oMJiL3h6JBInTPbii4vEOmV5SoDI6ij2QOftGtg52pLsDas3iXwrnlbyKqQduW9wM0K65RTJeYYETCvvbJBPZAulT0xHRWBEhMabs9Dzz8T1j0Tm7AnACgOWNUgD7je7mlc6gyQUmuVmYQhUyLYCaBQLoxhugoimdNjrs29kkzvF6TFosggw6NSC1s5XEBa/eb4Xg51DzjadjCdRdcwkHwHwWi/Dr/GEGHcitwqpJzFGKzB70Q6V9+8LqkxuVO8wNQug/OT3B9TYQj8MdI53GfMIhPachSP4Cy0hMTTAPuem7vkAcoUEfetgk6ZHdsAiwIhQ2cSelqzyNEa+CuwsV705aSpUALwnsPCobkveKoY9IdcBGeA1k8Gwu12u4A5bSD1JvSuJrxZfJvfPszH4BKkNs8QF2fbVnsWnAMUiJQ0NmfFINQbJ3IxO25Z3W/rf99VP1fLX22oMgYzbHxdtefwE93ikPYshufk4KIOiIy6wwMJvEqhMESp6zUz/KfOmgbFkIp23INuMC3YGjkCrIyFwTcsU8Iyc3xFh6V++uFPzWfyViF71hbIzy3LSvyCpyP18IcBL/yHIv/TVf9AbodtbJbg4FcLm9TaTOGyKzvwPrnUuNfdbZrNb+aPc1jNP26Vnsg=
+sidebar_class_name: "delete api-method"
+info_path: docs/emissary-api/emissary-openapi-3-1
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete a deployment by ID"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/projects/{project_id}/deployments/{deployment_id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete a deployment by its unique identifier.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"required":true},{"name":"deployment_id","in":"path","required":true,"description":"The ID of the deployment to delete","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Deployment deleted successfully"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

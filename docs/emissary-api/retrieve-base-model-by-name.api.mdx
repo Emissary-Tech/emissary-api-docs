@@ -1,0 +1,71 @@
+---
+id: retrieve-base-model-by-name
+title: "Retrieve a base model"
+description: "Retrieve a base model by its name."
+sidebar_label: "Retrieve a base model"
+hide_title: true
+hide_table_of_contents: true
+api: eJylVW1r2zAQ/itCnzZI7CTtp3xaO9IR1rWl6WBQQlDsc6zOtlRJThqC//vuZMdxk1AKg0Dk091zb8+ddtyJleXjZ34tLLBfKoaMz3s8BhsZqZ1UBR/zR3BGwhqYYEtSy0mNLbdMOssKkUPAe1xpMIIMpjGamMaEYD3q9fYOFVFPC4MHB4bc7jiZoz7hLjzuoqj1JHnWwqV4NvBaSgMI7EwJx+E9peCjYCphDs+dGJ1i+0gQxkYp5IKPd9xtNXm1eFWseFXNyYfVqrBg6X40GNDfez+zMorA2qTMWJssokaqcFA40hdaZzLyF+GLJaPdqVO1fIHIUSUMwThZu6wLcRxaj8ObyHVGottM5KJ/EYz6w+v+tECNEnGqXmNyxrQoc+ptpAhhH24mrJVJEyZp5UuIY7SwdJsKRwQ4eO0YV53uLRygXDg4l5lAPLIQ2cO7HFUB94lv+1EDeq0EQ16C6UoklndFonmFAdhSa2XcwoJZg8mwH50AlkplIIpu1RKRWSBDJ53Pp2XkrMxzYbbYfbq+HFyedvxOOXajyiJmYIwy/9PsA4WfMWvhSqr2ATUGqvp7RjRq45NK9HiiTI6N8qKLUTdfzKPaA3/IJsotodyorT6AD9XrRBaFcovGqlPTKy0n5BExb5pLX1RkSqpoHazAE56meczD9TD042nD3dHcVzSlvrP1dihNhgapc9qOw1BoGWwkjngurcXWBchNfrwNJs0lu3qYshqL03xbiEoj3dbjItLiL9B53r2bUfvq4rcabVFQ8hMFvf3K+tNHD/1a5JdVCiImZxV9J8qbNgVqg+qzew0FhXYRDE9if0qlZfgTrDV4wBmjbtfpaIja0aWli4OY2/tkhmnKCJpSYaXsRqyQKYFUoVcJG+qKyFMXOSozP9te9O2kqJgCchtwHR5WE3ZZYH3YKBgg2qEz6G6z2QTC3wbKrMLG1Ia30++Tu9mkjyZB6vKMcKm3dbaDYIhQtFSUdbkoOq7OvjjH5dodpvFzT1TTSAdvLsTdJf1G84nsGm4+8zV1pWYnHsbH7xKSJcVoSXPnyfvbZFVF4tcSjCcUpiiMFEtqPFItlpbOcbOKPsjhy2OzI76yTz9pZ1PaE7Ygaq5FVtIXHj2fT55a3Ku9PXcp4FrrCt867Tr2J+uOBqcd8B+TJyT+P6Rd2lM=
+sidebar_class_name: "get api-method"
+info_path: docs/emissary-api/emissary-openapi-3-1
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Retrieve a base model"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/v1/models/{base_model_name}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Retrieve a base model by its name.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"base_model_name","in":"path","required":true,"description":"The name of the base model to retrieve","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful operation","content":{"application/json":{"schema":{"type":"object","properties":{"name":{"type":"string","example":"Llama-3.2-1B-Instruct"},"type":{"type":"string","enum":["completion","classification","embeddings","chat"],"example":"completion"},"parameter_template":{"type":"object","additionalProperties":{"oneOf":[{"type":"string"},{"type":"number"},{"type":"integer"}]}},"support_serverless":{"type":"boolean","example":false}},"title":"BaseModelSummary"}}}},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

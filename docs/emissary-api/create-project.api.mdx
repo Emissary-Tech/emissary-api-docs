@@ -1,0 +1,71 @@
+---
+id: create-project
+title: "Create a new project"
+description: "Create a new project which will be used as an your Fine-Tuning workspace."
+sidebar_label: "Create a new project"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1VVGP2jgQ/iuWnyGB3d4LT92uOAm1ul0dW+mkFapMMiFuE9tnO6Qo4r/fjO0Au6zah/YQQmE8ns/fN58nA/di5/jimT9a/RUKzzcTXoIrrDReasUX/N6C8MAEU9AzE7NYX8uiZr1sGrYF1jkomXBMKHbQnWV/SgXTp05JtWO9tt+cEQVkfMK1ASuo7qrEykWoPAJPuIV/O3D+gy4PfDG8Ogam7WUJEWA8hhItMFlRkPVCeeY1cwYKWR2Y9IRYaOVBeaonjGlkEeDzr46KDtwVNbSCnvzBAMLobToMQuBhvQRHqwR0keW8RW6YBd9FaxoKtYcv5sTk5dGfaogn1RXz+DzmHekTaUsLqEglGgch4oxWLkLfzObXariuKMC5qmvYSdNfYXuldZB33bWtsAf28LYosvyJJG46v7l998ebgqA7sNsMW6q8rCRYVmn7Up7J/yX7hHvpw/bENBHlsSHvZrNrxVdqLxpZspUynWdgrba/Ivi56c9IS/jOEa1QdfNa57R+riIRdAeEj5q1wsfQ7c2lMkjiOFb8oYIfRMnSzXshzZ2RS9qdiAfeo2Vb8LWmK2y0C74QvsZ/+X6eJ5WJjgO7B0vTZeCdbTCh9t64RZ4LI7NeYlNa6RwKnxW6verfMi2yu8cVi7X4cUNli85Kfwh1sdKXb0DPm8u1NQkf1TtlnETAyEcMjPbi/0wRYRpDkpBrECWBIVPq5N/nubQcZRtHwqUBj7S90gEpiXjiMGUPBhQxuc3mb1hVOoZfwU4bHhvhqbuRfZhpyV001jzY1j1Ua1RFFpCURWFdL3bojEzqPKTkyaOiCB5FM0rqQwq9v+oBUkATA86eC4p3OL7x/txkM6x2biTC9X2fibCaabvL01aXf1rdL/9aL6e4Jat921BdskJkO8vmWApD5J5WqAuot142r9Uazrfut76ckjs8fPe5aQQ64ZjoDsngz3w/j1MwWhwNV9MFwIVh2AoHn21zPFIYDWODKZG3sFJsyQ1o0cnoLfJucCW/j2SmTwRP6U0XTfpqnBwn4447nP3G/zB3c3FHHx/WT5i8Ta/VVpe0x4qexhD+Lnh4M9PucGFCbOCNULtO7Cg31qTPf8jc0v8=
+sidebar_class_name: "post api-method"
+info_path: docs/emissary-api/emissary-openapi-3-1
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Create a new project"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Create a new project which will be used as an your Fine-Tuning workspace.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"description":"Provide your project name if you want to specify it.","content":{"application/json":{"schema":{"type":"object","properties":{"name":{"type":"string","example":"my_project","description":"The name of the project"}}}}},"required":false}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"201":{"description":"successful operation","content":{"application/json":{"schema":{"type":"object","description":"Project Summary Object","properties":{"id":{"type":"string","example":"ms-12345","description":"The unique identifier for the project"},"name":{"type":"string","example":"my_project","description":"The name of the project"}},"title":"ProjectSummary"}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      
