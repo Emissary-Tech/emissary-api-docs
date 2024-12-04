@@ -7,9 +7,9 @@ import type * as Plugin from "@docusaurus/types/src/plugin";
 import type * as OpenApiPlugin from "docusaurus-plugin-openapi-docs";
 
 const config: Config = {
-  title: "Emissary Tutorial",
+  title: "Emissary Docs",
   tagline: "Start your first Fine-Tuning project with Emissary",
-  url: "https://your-docusaurus-test-site.com",
+  url: "https://docs.withemissary.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -17,19 +17,18 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: "facebook", // Usually your GitHub org/user name.
-  projectName: "docusaurus", // Usually your repo name.
-
+  organizationName: "Emissary", // Usually your GitHub org/user name.
+  projectName: "Emissary-Docs", // Usually your repo name.
   presets: [
     [
       "classic",
       {
         docs: {
-          sidebarPath: require.resolve("./sidebars.ts"),
+          sidebarPath: 'sidebars.ts',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          // editUrl:
+          //   "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
           docItemComponent: "@theme/ApiItem", // Derived from docusaurus-theme-openapi
         },
         blog: {
@@ -53,6 +52,7 @@ const config: Config = {
       docs: {
         sidebar: {
           hideable: true,
+          autoCollapseCategories: true,
         },
       },
       navbar: {
@@ -64,11 +64,11 @@ const config: Config = {
         items: [
           {
             type: "doc",
-            docId: "intro",
+            docId: "quickstart",
             position: "left",
-            label: "Tutorial",
+            label: "Docs",
           },
-          { to: "/blog", label: "Blog", position: "left" },
+          // { to: "/blog", label: "Blog", position: "left" },
           {
             label: "API",
             position: "left",
@@ -117,10 +117,10 @@ const config: Config = {
           {
             title: "More",
             items: [
-              {
-                label: "Blog",
-                to: "/blog",
-              },
+              // {
+              //   label: "Blog",
+              //   to: "/blog",
+              // },
               {
                 label: "GitHub",
                 href: "https://github.com/Emissary-Tech/emissary-api-docs",
@@ -130,67 +130,54 @@ const config: Config = {
         ],
         copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
       },
-      prism: {
-        prism: {
-          additionalLanguages: [
-            "ruby",
-            "csharp",
-            "php",
-            "java",
-            "powershell",
-            "json",
-            "bash",
-          ],
+      languageTabs: [
+        {
+          highlight: "python",
+          language: "python",
+          logoClass: "python",
         },
-        languageTabs: [
-          {
-            highlight: "python",
-            language: "python",
-            logoClass: "python",
-          },
-          {
-            highlight: "bash",
-            language: "curl",
-            logoClass: "bash",
-          },
-          {
-            highlight: "csharp",
-            language: "csharp",
-            logoClass: "csharp",
-          },
-          {
-            highlight: "go",
-            language: "go",
-            logoClass: "go",
-          },
-          {
-            highlight: "javascript",
-            language: "nodejs",
-            logoClass: "nodejs",
-          },
-          {
-            highlight: "ruby",
-            language: "ruby",
-            logoClass: "ruby",
-          },
-          {
-            highlight: "php",
-            language: "php",
-            logoClass: "php",
-          },
-          {
-            highlight: "java",
-            language: "java",
-            logoClass: "java",
-            variant: "unirest",
-          },
-          {
-            highlight: "powershell",
-            language: "powershell",
-            logoClass: "powershell",
-          },
-        ],
-      },
+        {
+          highlight: "bash",
+          language: "curl",
+          logoClass: "curl",
+        },
+        // {
+        //   highlight: "csharp",
+        //   language: "csharp",
+        //   logoClass: "csharp",
+        // },
+        {
+          highlight: "go",
+          language: "go",
+          logoClass: "go",
+        },
+        {
+          highlight: "javascript",
+          language: "nodejs",
+          logoClass: "nodejs",
+        },
+        {
+          highlight: "ruby",
+          language: "ruby",
+          logoClass: "ruby",
+        },
+        // {
+        //   highlight: "php",
+        //   language: "php",
+        //   logoClass: "php",
+        // },
+        {
+          highlight: "java",
+          language: "java",
+          logoClass: "java",
+          variant: "unirest",
+        },
+        {
+          highlight: "powershell",
+          language: "powershell",
+          logoClass: "powershell",
+        },
+      ],
     } satisfies Preset.ThemeConfig,
 
   plugins: [
@@ -209,6 +196,7 @@ const config: Config = {
               groupPathsBy: "tag",
               categoryLinkSource: "tag",
             },
+            showSchemas: true,
           } satisfies OpenApiPlugin.Options,
         } satisfies Plugin.PluginOptions,
       },
