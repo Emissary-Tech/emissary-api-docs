@@ -1,0 +1,86 @@
+---
+title: Embeddings
+---
+
+## 1. Objective
+Text similarity tasks involve calculating semantic similarity between pairs of sentences. For this task, the **All-Mpnet-Base-V2-Embedding** model is recommended, which is optimized for generating embeddings that can be used for computing similarity between texts.
+
+## 2. Finetuning Preparation
+
+Please refer to the in-depth guide on Finetuning on Emissary here - [Quickstart Guide](../finetuning/quickstart)
+
+### Create Model Service
+Navigate to **Dashboard** arriving at **Model Services**, the default page on the Emissary platform.
+
+1. Click **+ NEW SERVICE** in the dashboard.
+![project_create_1](/img/guides/project_create1.png)
+2. In the pop-up, enter a new model service name, and click **CREATE**.
+![project_create_2](/img/guides/project_create2.png")
+
+### Uploading Datasets
+
+A tile is created for your task. Click **Manage** to enter the task workspace.  
+![project_manage_1](/img/guides/project_manage1.png")
+
+1. Click **MANAGE** in the **Datasets Available** tile.
+![project_manage_2](/img/guides/project_manage2.png")
+2. Click on **+ UPLOAD DATASET** and select training and test datasets.
+![dataset1](/img/guides/dataset1.png")
+
+3. Name datasets clearly to distinguish between training and test data (e.g., <span style={{ color: 'green' }}>embedding_data_train, embedding_data_test</span>).
+
+**Important Note:** For LLM models, it is recommended to use JSON Lines (<span style={{ color: 'green' }}>.jsonl</span>) format.  
+![dataset2](/img/guides/dataset2.png")
+
+## 3. Model Finetuning
+Now, go back one panel by clicking **OVERVIEW** and then click **MANAGE** in the Training Jobs tile.  
+![project_manage_3](/img/guides/project_manage3.png")
+
+Here, we’ll kick off finetunes. The shortest path to finetuning a model is by clicking **+NEW TRAINING JOB**, naming the output model, picking a backbone (**base model**), selecting the training dataset (you must have uploaded it in the step before), and finally hitting **START NEW TRAINING JOB**.  
+![finetune1](/img/guides/finetune1.png")
+![finetune2](/img/guides/finetune2.png")
+
+### Selecting Base Model
+1. For **Embeddings and Text Similarity** related tasks, we recommend using the **All-Mpnet-Base-V2-Embedding** model.
+![base_model_embedding](/img/guides/base_model_embedding.png")
+
+2. A custom function that generates a sample text matching metric score has been provided. Uncomment **<span style={{ color: 'red' }}>metric_name1</span>** to use. You could also add your own custom metric functions similarly.
+![testing](/img/guides/testing.png")
+
+
+### Training Parameter Configuration
+Please refer to the in-depth guide on configuring training parameters here - [Finetuning Parameter Guide](../finetuning/parameters).
+
+## 4. Model Monitoring & Evaluation
+
+### Using Test Datasets
+Including a test dataset allows you to evaluate the model's performance during training.
+
+- **Per Epoch Evaluation:** The platform evaluates the model at each epoch using the test dataset.
+- **Metrics and Outputs:** View evaluation metrics and generated outputs for test samples.
+- **Post-completion of training:** Check results in **Training Job --> Artifacts**
+![evaluate_embedding](/img/guides/evaluate_embedding.png")
+
+### Evaluation Metric Interpretation
+- **Accuracy:** Indicates the percentage of correct predictions.
+- **F1 Score:** Balances precision and recall; useful for imbalanced datasets.
+- **Custom Metrics:** Define custom metrics in the testing script to suit your evaluation needs.
+
+## 5. Deployment
+Refer to the in-depth walkthrough on deploying a model on Emissary here - [Deployment Guide](../finetuning/deployments).  
+Deploying your models allows you to serve them and integrate them into your applications.
+
+### Finetuned Model Deployment
+1. Navigate to the **Training Jobs Page**. From the list of the finetuning jobs, select the one you want to deploy.
+![deployment_fine_tuned](/img/guides/deployment_fine_tuned.png")
+2. Go to the **ARTIFACTS** tab.
+![artifacts1](/img/guides/artifacts1.png")
+3. Select a **Checkpoint** to Deploy.
+![checkpoint_evaluate](/img/guides/checkpoint_evaluate.png")
+
+
+## 6. Best Practices
+- **Start Small:** Begin with a smaller dataset to validate your setup.
+- **Monitor Training:** Keep an eye on training logs and metrics.
+- **Iterative Testing:** Use the test dataset to iteratively improve your model.
+- **Data Format:** Use the recommended data formats for your chosen model to ensure compatibility and optimal performance.

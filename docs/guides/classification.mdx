@@ -1,0 +1,113 @@
+---
+title: Text Classification
+---
+
+## Objective
+
+The following is a guide on finetuning a model for **Text Classification** tasks on Emissary, specifically focusing on **Llama3-8B-Chat** and **BERT** models that we recommend for such tasks.
+
+## Finetuning Preparation
+
+Please refer to the in-depth guide on Finetuning on Emissary here - [Quickstart Guide](../finetuning/quickstart).
+
+### Create Model Service
+
+Navigate to **Dashboard**, arriving at **Model Services**, the default page on the Emissary platform.
+
+1. Click **+ NEW SERVICE** in the dashboard.
+![project_create_4](/img/guides/project_create1.png")
+2. In the pop-up, enter a new model service name, and click **CREATE**.
+![project_create_2](/img/guides/project_create2.png")
+
+### Uploading Datasets
+
+A tile is created for your task. Click **Manage** to enter the task workspace.
+![project_manage_1](/img/guides/project_manage1.png")
+
+1. Click **MANAGE** in the **Datasets Available** tile.
+![project_manage_2](/img/guides/project_manage2.png")
+2. Click on **+ UPLOAD DATASET** and select training and test datasets.
+![dataset1](/img/guides/dataset1.png")
+3. Name datasets clearly to distinguish between training and test data (e.g., <span style={{ color: 'green' }}>train_big_news_csv, test_big_news_csv, train_big_news_completion, test_big_news_completion</span>).
+
+**Important Note**: For **BERT models** or other traditional models, please use **CSV** (<span style={{ color: 'green' }}>.csv</span>) format.
+![dataset2](/img/guides/dataset2.png")
+
+## Model Finetuning
+
+Now, go back one panel by clicking **OVERVIEW** and then click **MANAGE** in the **Training Jobs** tile.
+![project_manage_3](/img/guides/project_manage3.png")
+
+Here, we’ll kick off finetuning. The shortest path to finetuning a model is by clicking **+NEW TRAINING JOB**, naming the output model, picking a backbone (**base model**), selecting the training dataset (you must have uploaded it in the step before), and finally hitting **START NEW TRAINING JOB**.  
+![finetune1](/img/guides/finetune1.png")
+
+### Selecting Base Model
+
+1. **BERT Model** (for CSV datasets):  
+BERT is highly efficient for text classification with structured CSV data, especially for tasks where the primary focus is accuracy over natural language generation.
+![bert1](/img/guides/bert1.png")
+
+2. **Llama 3 8B Model** (for JSONL datasets):  
+The Llama model is well-suited for classification tasks that require deeper natural language understanding. JSONL is recommended for LLM models due to its flexibility with longer text inputs.
+![llama3-8b](/img/guides/llama3-8b.png")
+
+3. A custom function that compares two **strings** and gives a matching score has been provided. Uncomment <span style={{ color: 'red' }}>"classification_score"</span> to use.
+![testing_classification](/img/guides/testing_classification.png")
+
+### Training Parameter Configuration
+
+Please refer to the in-depth guide on configuring training parameters here - [Finetuning Parameter Guide](../finetuning/parameters).
+
+## Model Monitoring & Evaluation
+
+### Using Test Datasets
+
+Including a test dataset allows you to evaluate the model's performance during training.
+
+- **Per Epoch Evaluation**: The platform evaluates the model at each epoch using the test dataset.
+- **Metrics and Outputs**: View evaluation metrics and generated outputs for test samples.
+- Post completion of training, check scores in **Training Job --> Artifacts**.
+  <br></br>For the **LLM model**, expect the following:  
+
+![evaluate_classification](/img/guides/evaluate_classification.png")
+
+For **BERT**, expect accuracy scores as follows:
+![evaluate_bert](/img/guides/evaluate_bert.png")
+
+
+### Evaluation Metric Interpretation
+
+- **Accuracy**: Indicates the percentage of correct predictions.
+- **F1 Score**: Balances precision and recall; useful for imbalanced datasets.
+- **Custom Metrics**: Define custom metrics in the testing script to suit your evaluation needs.
+
+## Deployment
+
+Refer to the in-depth walkthrough on deploying a model on Emissary here - [Deployment Guide](../finetuning/deployments).
+
+Deploying your models allows you to serve them and integrate them into your applications.
+
+### Finetuned Model Deployment
+
+1. Navigate to the **Training Jobs Page**. From the list of the finetuning jobs, select the one you want to deploy.
+![deployment_fine_tuned](/img/guides/deployment_fine_tuned.png")
+2. Go to the **ARTIFACTS** tab.
+![artifacts1](/img/guides/artifacts1.png")
+3. Select a **Checkpoint** to Deploy.
+![checkpoint_evaluate](/img/guides/checkpoint_evaluate.png")
+
+### Parameter Recalibration
+
+Adjust parameters like <span style={{ color: 'green' }}>do_sample, temperature, max_new_tokens </span>, etc. to finetune the model's response behavior.
+
+- **<span style={{ color: 'green' }}>do_sample</span>**: Enable sampling for more varied outputs.
+- **<span style={{ color: 'green' }}>temperature</span>**: Increase for more creativity, decrease for more deterministic responses.
+- **<span style={{ color: 'green' }}>max_new_tokens</span>**: Limit the length of generated responses.
+- **<span style={{ color: 'green' }}>top_p</span>** and **top_k**: Control the diversity of the output.
+
+## Best Practices
+
+- **Start Small**: Begin with a smaller dataset to validate your setup.
+- **Monitor Training**: Keep an eye on training logs and metrics.
+- **Iterative Testing**: Use the test dataset to iteratively improve your model.
+- **Data Format**: Use the recommended data formats for your chosen model to ensure compatibility and optimal performance.
