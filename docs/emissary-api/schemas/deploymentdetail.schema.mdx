@@ -1,0 +1,33 @@
+---
+id: deploymentdetail
+title: "DeploymentDetail"
+description: "Deployment Object"
+sidebar_label: "DeploymentDetail"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"id":"dp-12345","name":"deployment-1","description":"Deployment for my training job","base_model":"Llama-3.2-1B-Instruct","status":"Deployed","training_id":"tr-12345","checkpoint":4,"created_at":1633036800,"updated_at":1633036800}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"DeploymentDetail"}
+>
+</Heading>
+
+
+
+Deployment Object
+
+<Schema
+  schema={{"type":"object","description":"Deployment Object","properties":{"id":{"type":"string","example":"dp-12345","description":"The unique identifier for the deployment"},"name":{"type":"string","example":"deployment-1","description":"The name of the deployment"},"description":{"type":"string","example":"Deployment for my training job","description":"A description of the deployment"},"base_model":{"type":"string","example":"Llama-3.2-1B-Instruct","description":"The base model used for deployment"},"status":{"type":"string","enum":["Pending","Deploying","Deployed","Failed","Cancelled","TimedOut"],"example":"Deployed","description":"The current status of the deployment"},"training_id":{"type":"string","example":"tr-12345","description":"The training job ID used for deployment"},"checkpoint":{"type":"integer","example":4,"description":"The checkpoint number used for deployment"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the deployment was created"},"updated_at":{"type":"integer","example":1633036800,"description":"The timestamp when the deployment was last updated"}},"title":"DeploymentDetail"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

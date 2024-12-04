@@ -1,0 +1,33 @@
+---
+id: apierrorunauthorized
+title: "ApiErrorUnauthorized"
+description: ""
+sidebar_label: "ApiErrorUnauthorized"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"status":401,"error":"Unauthorized"}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"ApiErrorUnauthorized"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":401},"error":{"type":"string","example":"Unauthorized"}},"title":"ApiErrorUnauthorized"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

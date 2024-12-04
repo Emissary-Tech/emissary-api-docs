@@ -1,0 +1,33 @@
+---
+id: datasetdetail
+title: "DatasetDetail"
+description: "Dataset Object"
+sidebar_label: "DatasetDetail"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"id":"ds-12345","name":"my_dataset","is_uploaded":true,"dataset_download_url":"s3:/my_dataset","upload_by":"user-12345","created_at":1633036800,"updated_at":1633036800}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"DatasetDetail"}
+>
+</Heading>
+
+
+
+Dataset Object
+
+<Schema
+  schema={{"type":"object","description":"Dataset Object","properties":{"id":{"type":"string","example":"ds-12345","description":"The unique identifier for the dataset"},"name":{"type":"string","example":"my_dataset","description":"The name of the dataset"},"is_uploaded":{"type":"boolean","example":true,"description":"Whether the dataset has been uploaded"},"dataset_download_url":{"type":"string","example":"s3:/my_dataset","description":"The URL to download the dataset"},"upload_by":{"type":"string","example":"user-12345","description":"The user ID who uploaded the dataset"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the dataset was created"},"updated_at":{"type":"integer","example":1633036800,"description":"The timestamp when the dataset was last updated"}},"title":"DatasetDetail"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

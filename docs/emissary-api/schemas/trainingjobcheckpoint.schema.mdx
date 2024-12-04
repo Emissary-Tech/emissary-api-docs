@@ -1,0 +1,33 @@
+---
+id: trainingjobcheckpoint
+title: "TrainingJobCheckpoint"
+description: "Training Job Checkpoint Object"
+sidebar_label: "TrainingJobCheckpoint"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"checkpoint":3,"model_download_url":"s3:/my_model","test_results":{"general_test_result":"s3://","aggregated_test_result":{}},"created_at":1633036800,"updated_at":1633036800}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"TrainingJobCheckpoint"}
+>
+</Heading>
+
+
+
+Training Job Checkpoint Object
+
+<Schema
+  schema={{"type":"object","description":"Training Job Checkpoint Object","properties":{"checkpoint":{"type":"integer","example":3,"description":"The checkpoint number"},"model_download_url":{"type":"string","example":"s3:/my_model","description":"The URL to download the model checkpoint"},"test_results":{"type":"object","properties":{"general_test_result":{"type":"string","example":"s3://"},"aggregated_test_result":{"type":"object","additionalProperties":{"type":"string"}}}},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the checkpoint was created"},"updated_at":{"type":"integer","example":1633036800,"description":"The timestamp when the checkpoint was created"}},"title":"TrainingJobCheckpoint"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

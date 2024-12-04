@@ -1,0 +1,33 @@
+---
+id: datasetsummary
+title: "DatasetSummary"
+description: "Dataset Summary Object"
+sidebar_label: "DatasetSummary"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"id":"ds-12345","name":"my_dataset","created_at":1633036800,"is_uploaded":true}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"DatasetSummary"}
+>
+</Heading>
+
+
+
+Dataset Summary Object
+
+<Schema
+  schema={{"type":"object","description":"Dataset Summary Object","properties":{"id":{"type":"string","example":"ds-12345","description":"The unique identifier for the dataset"},"name":{"type":"string","example":"my_dataset","description":"The name of the dataset"},"created_at":{"type":"integer","example":1633036800,"description":"The UNIX timestamp when the dataset was created"},"is_uploaded":{"type":"boolean","example":true}},"title":"DatasetSummary"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

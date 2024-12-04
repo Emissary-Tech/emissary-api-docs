@@ -1,0 +1,33 @@
+---
+id: projectsummary
+title: "ProjectSummary"
+description: "Project Summary Object"
+sidebar_label: "ProjectSummary"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"id":"ms-12345","name":"my_project"}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"ProjectSummary"}
+>
+</Heading>
+
+
+
+Project Summary Object
+
+<Schema
+  schema={{"type":"object","description":"Project Summary Object","properties":{"id":{"type":"string","example":"ms-12345","description":"The unique identifier for the project"},"name":{"type":"string","example":"my_project","description":"The name of the project"}},"title":"ProjectSummary"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

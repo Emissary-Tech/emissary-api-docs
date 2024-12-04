@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
-  title: Emissary - OpenAPI 3.1
+  title: Emissary API
   description: |-
-    This is a Emissary Platform API specification.
-  termsOfService: http://swagger.io/terms/
+    Closed-Alpha version
+  termsOfService: https://www.withemissary.com/terms-of-service
   contact:
     email: contact@withemissary.com
   license:
@@ -13,26 +13,26 @@ info:
 security:
   - api_key: []
 servers:
-  - url: https://api.withemissary.com
+  - url: https://d1d3-4-4-33-74.ngrok-free.app
     description: Emissary API server
 tags:
-  - name: Base Model
+  - name: Base Models
     description: Deals with base models
-  - name: Project
+  - name: Projects
     description: Deals with projects (workspace)
   - name: Dataset
     description: Datasets are used to upload documents that can be used for fine-tuning
-  - name: Training Job
+  - name: Training Jobs
     description: Deals with training jobs
-  - name: Deployment
+  - name: Deployments
     description: Deals with deployments
 paths:
   '/v1/models':
     get:
       tags:
-        - Base Model
-      summary: List of Base Models
-      description: Fetching a list of base models
+        - Base Models
+      summary: List base models
+      description: List and describe the various models available in the API
       operationId: listBaseModels
       responses:
         '200':
@@ -50,20 +50,20 @@ paths:
   '/v1/models/{base_model_name}':
     get:
       tags:
-        - Base Model
-      summary: Retrieve a base model
-      description: Retrieve a base model by its name.
+        - Base Models
+      summary: Retrieve base model
+      description: Retrieves a model instance, providing basic information about the model such as the hyper parameters that can be adjusted
       operationId: retrieveBaseModelByName
       parameters:
         - name: base_model_name
           in: path
           required: true
-          description: The name of the base model to retrieve
+          description: The name of the base model to use for this request
           schema:
             type: string
       responses:
         '200':
-          description: Successful operation
+          description: The base model object matching the specified name.
           content:
             application/json:
               schema:
@@ -73,12 +73,12 @@ paths:
   '/v1/projects': # path parameter in curly braces
     post:
       tags:
-        - Project
-      summary: Create a new project
-      description: Create a new project which will be used as an your Fine-Tuning workspace.
+        - Projects
+      summary: Create project
+      description: Create a new project. Projects can be created and used to organize datasets, training jobs, and deployments.
       operationId: createProject
       requestBody:
-        description: Provide your project name if you want to specify it.
+        #        description: Provide your project name if you want to specify it.
         content:
           application/json:
             schema:
@@ -91,7 +91,7 @@ paths:
         required: false
       responses:
         '201':
-          description: successful operation
+          description: The created Project's summary object
           content:
             application/json:
               schema:
@@ -100,18 +100,18 @@ paths:
           $ref: '#/components/responses/InvalidInput'
     get:
       tags:
-        - Project
+        - Projects
       # documentation for GET operation for this path
-      summary: List of Projects
+      summary: List projects
       # you can use GFM in operation description too: https://guides.github.com/features/mastering-markdown
       description: |
-        Fetching a list of projects,
+        Returns a list of projects.
       # operationId should be unique across the whole specification
       operationId: listProjects
       # security schemas applied to this operation
       responses:
         '200':
-          description: List of projects with their ID and name
+          description: List of Project's summary object.
           content:
             application/json:
               schema:
@@ -123,19 +123,20 @@ paths:
   '/v1/projects/{project_id}':
     get:
       tags:
-        - Project
-      summary: Retrieve a project by ID
-      description: Retrieve a project by its unique identifier.
+        - Projects
+      summary: Retrieve project
+      description: Retrieve a project.
       operationId: retrieveProjectById
       parameters:
         - name: project_id
           in: path
           schema:
             type: string
+          description: The ID of the project.
           required: true
       responses:
         '200':
-          description: Successful operation
+          description: The ProjectDetail object matching the specified ID.
           content:
             application/json:
               schema:
@@ -144,15 +145,16 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       tags:
-        - Project
-      summary: Delete a project by ID
-      description: Delete a project by its unique identifier.
+        - Projects
+      summary: Delete project
+      description: Delete a project.
       operationId: deleteProjectById
       parameters:
         - name: project_id
           in: path
           schema:
             type: string
+          description: The ID of the project.
           required: true
       responses:
         '204':
@@ -162,15 +164,14 @@ paths:
   '/v1/projects/{project_id}/datasets':
     post:
       tags:
-        - Dataset
-      summary: Create a new Dataset
-      description: Create a new dataset which will be used in the project.
+        - Datasets
+      summary: Upload dataset
+      description: Upload dataset to the project.
       operationId: createDataset
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       requestBody:
         required: true
-        description: Provide your project name if you want to specify it.
         content:
           multipart/form-data:
             schema:
@@ -179,7 +180,7 @@ paths:
                 file:
                   type: string
                   format: binary
-                  description: The dataset file to upload
+                  description: The dataset file (binary format) to upload
                 name:
                   type: string
                   example: my_dataset
@@ -188,7 +189,7 @@ paths:
                 - file
       responses:
         '201':
-          description: Dataset created successfully
+          description: The Dataset's summary object.
           content:
             application/json:
               schema:
@@ -197,15 +198,15 @@ paths:
           $ref: '#/components/responses/InvalidInput'
     get:
       tags:
-        - Dataset
-      summary: List of Datasets
-      description: Fetching a list of datasets
+        - Datasets
+      summary: List datasets
+      description: Returns a list of datasets
       operationId: listDatasets
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
-          description: List of datasets with their ID and name
+          description: List of Dataset's summary object.
           content:
             application/json:
               schema:
@@ -217,21 +218,21 @@ paths:
   '/v1/projects/{project_id}/datasets/{dataset_id}':
     get:
       tags:
-        - Dataset
-      summary: Retrieve a dataset by ID
-      description: Retrieve a dataset by its unique identifier.
+        - Datasets
+      summary: Retrieve dataset
+      description: Retrieve a dataset.
       operationId: retrieveDatasetById
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - name: dataset_id
           in: path
           required: true
-          description: The ID of the dataset to retrieve
+          description: The ID of the dataset.
           schema:
             type: string
       responses:
         '200':
-          description: Successful operation
+          description: The DatasetDetail object matching the specified ID.
           content:
             application/json:
               schema:
@@ -240,21 +241,16 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       tags:
-        - Dataset
-      summary: Delete a dataset by ID
-      description: Delete a dataset by its unique identifier.
+        - Datasets
+      summary: Delete dataset
+      description: Delete a dataset.
       operationId: deleteDatasetById
       parameters:
-        - name: project_id
-          in: path
-          required: true
-          description: The ID of the project to retrieve datasets for
-          schema:
-            type: string
+        - $ref: '#/components/parameters/ProjectId'
         - name: dataset_id
           in: path
           required: true
-          description: The ID of the dataset to delete
+          description: The ID of the dataset
           schema:
             type: string
       responses:
@@ -265,15 +261,14 @@ paths:
   '/v1/projects/{project_id}/training-jobs':
     post:
       tags:
-        - Training Job
-      summary: Create a new Training Job
-      description: Create a new training job for the project.
+        - Training Jobs
+      summary: Create training job
+      description: Initiate fine-tuning (training job).
       operationId: createTrainingJob
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       requestBody:
         required: true
-        description: Provide your training job details
         content:
           application/json:
             schema:
@@ -286,23 +281,23 @@ paths:
                 train_dataset_id:
                   type: string
                   example: "ds-12345"
-                  description: The dataset ID to use for training
+                  description: The training dataset ID to use for fine-tuning
                 test_dataset_id:
                   type: string
                   example: "ds-67890"
-                  description: The test dataset ID to use for validation
+                  description: The testing dataset ID to use for fine-tuning (optional)
                 train_test_split_ratio:
                   type: number
                   example: 0.2
-                  description: The ratio of training to testing data
+                  description: The ratio to split the training dataset for testing (optional)
                 name:
                   type: string
                   example: "training-1"
-                  description: The name of the training job
+                  description: The name of the training job (optional)
                 description:
                   type: string
                   example: "Fine-tuning the model on my dataset"
-                  description: A description of the training job
+                  description: A description of the training job (optional)
                 task_type:
                   type: string
                   enum:
@@ -310,7 +305,7 @@ paths:
                     - classification
                     - embedding
                   example: "text-generation"
-                  description: The task type for the training job
+                  description: The task type for the training job (default = "text-generation")
                 parameters:
                   type: object
                   additionalProperties:
@@ -318,7 +313,7 @@ paths:
                       - type: string
                       - type: number
                       - type: integer
-                  description: Additional parameters for the training job
+                  description: The hyper parameters to use for fine-tuning (optional)
                 hf_model_link:
                   type: string
                   example: "https://huggingface.co/my_model"
@@ -328,7 +323,7 @@ paths:
                 - train_dataset_id
       responses:
         '201':
-          description: Training job created successfully
+          description: Returns the TrainingJob's summary object.
           content:
             application/json:
               schema:
@@ -337,15 +332,15 @@ paths:
           $ref: '#/components/responses/InvalidInput'
     get:
       tags:
-        - Training Job
-      summary: List of Training Jobs
-      description: Fetching a list of training jobs
+        - Training Jobs
+      summary: List training jobs
+      description: Returns a list of training jobs
       operationId: listTrainingJobs
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
-          description: List of training jobs with their ID and name
+          description: List of TrainingJob's summary object.
           content:
             application/json:
               schema:
@@ -357,21 +352,21 @@ paths:
   '/v1/projects/{project_id}/training-jobs/{training_job_id}':
     get:
       tags:
-        - Training Job
-      summary: Retrieve a training job by ID
-      description: Retrieve a training job by its unique identifier.
+        - Training Jobs
+      summary: Retrieve training job
+      description: Retrieve a training job.
       operationId: retrieveTrainingJobById
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - name: training_job_id
           in: path
           required: true
-          description: The ID of the training job to retrieve
+          description: The ID of the training job.
           schema:
             type: string
       responses:
         '200':
-          description: Successful operation
+          description: The TrainingJobDetail object matching the specified ID.
           content:
             application/json:
               schema:
@@ -380,16 +375,16 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       tags:
-        - Training Job
-      summary: Delete a training job by ID
-      description: Delete a training job by its unique identifier.
+        - Training Jobs
+      summary: Delete training job
+      description: Delete a training job.
       operationId: deleteTrainingJobById
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - name: training_job_id
           in: path
           required: true
-          description: The ID of the training job to delete
+          description: The ID of the training job
           schema:
             type: string
       responses:
@@ -400,16 +395,16 @@ paths:
   '/v1/projects/{project_id}/training-jobs/{training_job_id}/cancel':
     post:
       tags:
-        - Training Job
-      summary: Cancel a training job by ID
-      description: Cancel a training job by its unique identifier.
+        - Training Jobs
+      summary: Cancel training job
+      description: Cancel a training job.
       operationId: cancelTrainingJobById
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - name: training_job_id
           in: path
           required: true
-          description: The ID of the training job to cancel
+          description: The ID of the training job
           schema:
             type: string
       responses:
@@ -420,21 +415,21 @@ paths:
   '/v1/projects/{project_id}/training-jobs/{training_job_id}/checkpoints':
     get:
       tags:
-        - Training Job
-      summary: List of Checkpoints
-      description: Fetching a list of checkpoints for a training job
+        - Training Jobs
+      summary: List checkpoints
+      description: Returns a list of checkpoints for a training job.
       operationId: listCheckpoints
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - name: training_job_id
           in: path
           required: true
-          description: The ID of the training job to retrieve checkpoints for
+          description: The ID of the training job
           schema:
             type: string
       responses:
         '200':
-          description: List of checkpoints for the training job
+          description: List of TrainingJobCheckpoint object.
           content:
             application/json:
               schema:
@@ -446,15 +441,14 @@ paths:
   '/v1/projects/{project_id}/deployments':
     post:
       tags:
-        - Deployment
-      summary: Create a new Deployment
-      description: Create a new deployment for the project.
+        - Deployments
+      summary: Create deployment
+      description: Create a new deployment.
       operationId: createDeployment
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       requestBody:
         required: true
-        description: Provide you deployment details
         content:
           application/json:
             schema:
@@ -474,6 +468,7 @@ paths:
                     - serverless
                     - on-demand
                   example: "on-demand"
+                  description: The server type to use for deployment (default = "on-demand")
                 name:
                   type: string
                   example: "deployment-1"
@@ -487,7 +482,7 @@ paths:
                 - checkpoint
       responses:
         '201':
-          description: Deployment created successfully
+          description: The created Deployment's summary object
           content:
             application/json:
               schema:
@@ -496,15 +491,15 @@ paths:
           $ref: '#/components/responses/InvalidInput'
     get:
       tags:
-        - Deployment
-      summary: List of Deployments
-      description: Fetching a list of deployments
+        - Deployments
+      summary: List deployments
+      description: Returns a list of deployments
       operationId: listDeployments
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
-          description: List of deployments with their ID and name
+          description: List of Deployment's summary object.
           content:
             application/json:
               schema:
@@ -516,21 +511,21 @@ paths:
   '/v1/projects/{project_id}/deployments/{deployment_id}':
     get:
       tags:
-        - Deployment
-      summary: Retrieve a deployment by ID
-      description: Retrieve a deployment by its unique identifier.
+        - Deployments
+      summary: Retrieve deployment
+      description: Retrieve a deployment.
       operationId: retrieveDeploymentById
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - name: deployment_id
           in: path
           required: true
-          description: The ID of the deployment to retrieve
+          description: The ID of the deployment.
           schema:
             type: string
       responses:
         '200':
-          description: Successful operation
+          description: The DeploymentDetail object matching the specified ID.
           content:
             application/json:
               schema:
@@ -539,16 +534,16 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       tags:
-        - Deployment
-      summary: Delete a deployment by ID
-      description: Delete a deployment by its unique identifier.
+        - Deployments
+      summary: Delete deployment
+      description: Delete a deployment.
       operationId: deleteDeploymentById
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - name: deployment_id
           in: path
           required: true
-          description: The ID of the deployment to delete
+          description: The ID of the deployment
           schema:
             type: string
       responses:
@@ -559,16 +554,16 @@ paths:
   '/v1/projects/{project_id}/deployments/{deployment_id}/cancel':
     post:
       tags:
-        - Deployment
-      summary: Cancel a deployment by ID
-      description: Cancel a deployment by its unique identifier.
+        - Deployments
+      summary: Cancel deployment
+      description: Cancel a deployment.
       operationId: cancelDeploymentById
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - name: deployment_id
           in: path
           required: true
-          description: The ID of the deployment to cancel
+          description: The ID of the deployment
           schema:
             type: string
       responses:
@@ -579,8 +574,8 @@ paths:
   '/v1/projects/{project_id}/deployments/{deployment_id}/completions':
     post:
       tags:
-        - Deployment
-      summary: Get Completions from a Deployment
+        - Deployments
+      summary: Completions
       description: Get completions from a deployment using the provided input.
       operationId: getCompletionsFromDeployment
       parameters:
@@ -653,8 +648,8 @@ paths:
   '/v1/projects/{project_id}/deployments/{deployment_id}/chat/completions':
     post:
       tags:
-        - Deployment
-      summary: Get Chat Completions from a Deployment
+        - Deployments
+      summary: Chat Completion
       description: Get chat completions from a deployment using the provided input.
       operationId: getChatCompletionsFromDeployment
       parameters:
@@ -746,8 +741,8 @@ paths:
   '/v1/projects/{project_id}/deployments/{deployment_id}/embeddings':
     post:
       tags:
-        - Deployment
-      summary: Get Embeddings from a Deployment
+        - Deployments
+      summary: Embeddings
       description: Get embeddings from a deployment using the provided input.
       operationId: getEmbeddingsFromDeployment
       parameters:
@@ -829,8 +824,8 @@ paths:
   '/v1/projects/{project_id}/deployments/{deployment_id}/classification':
     post:
       tags:
-        - Deployment
-      summary: Get Classification from a Deployment
+        - Deployments
+      summary: Classification
       description: Get classification from a deployment using the provided input.
       operationId: getClassificationFromDeployment
       parameters:
@@ -885,6 +880,7 @@ components:
       in: path
       schema:
         type: string
+      description: The ID of the project
       required: true
   schemas:
     BaseModelSummary:

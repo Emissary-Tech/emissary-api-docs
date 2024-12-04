@@ -1,0 +1,33 @@
+---
+id: apierrornotfound
+title: "ApiErrorNotFound"
+description: ""
+sidebar_label: "ApiErrorNotFound"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"status":404,"error":"Not found","code":"object_not_found"}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"ApiErrorNotFound"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

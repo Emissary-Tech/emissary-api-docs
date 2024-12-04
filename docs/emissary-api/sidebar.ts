@@ -4,7 +4,7 @@ const sidebar: SidebarsConfig = {
   apisidebar: [
     {
       type: "doc",
-      id: "emissary-api/emissary-openapi-3-1",
+      id: "emissary-api/emissary-api",
     },
     {
       type: "category",
@@ -58,40 +58,6 @@ const sidebar: SidebarsConfig = {
           type: "doc",
           id: "emissary-api/delete-project-by-id",
           label: "Delete project",
-          className: "api-method delete",
-        },
-      ],
-    },
-    {
-      type: "category",
-      label: "Dataset",
-      link: {
-        type: "doc",
-        id: "emissary-api/dataset",
-      },
-      items: [
-        {
-          type: "doc",
-          id: "emissary-api/create-dataset",
-          label: "Upload dataset",
-          className: "api-method post",
-        },
-        {
-          type: "doc",
-          id: "emissary-api/list-datasets",
-          label: "List datasets",
-          className: "api-method get",
-        },
-        {
-          type: "doc",
-          id: "emissary-api/retrieve-dataset-by-id",
-          label: "Retrieve dataset",
-          className: "api-method get",
-        },
-        {
-          type: "doc",
-          id: "emissary-api/delete-dataset-by-id",
-          label: "Delete dataset",
           className: "api-method delete",
         },
       ],
@@ -203,6 +169,126 @@ const sidebar: SidebarsConfig = {
           id: "emissary-api/get-classification-from-deployment",
           label: "Classification",
           className: "api-method post",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Datasets",
+      items: [
+        {
+          type: "doc",
+          id: "emissary-api/create-dataset",
+          label: "Upload dataset",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/list-datasets",
+          label: "List datasets",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/retrieve-dataset-by-id",
+          label: "Retrieve dataset",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/delete-dataset-by-id",
+          label: "Delete dataset",
+          className: "api-method delete",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Schemas",
+      items: [
+        {
+          type: "doc",
+          id: "emissary-api/schemas/basemodelsummary",
+          label: "BaseModelSummary",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/projectsummary",
+          label: "ProjectSummary",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/projectdetail",
+          label: "ProjectDetail",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/datasetsummary",
+          label: "DatasetSummary",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/datasetdetail",
+          label: "DatasetDetail",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/trainingjobsummary",
+          label: "TrainingJobSummary",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/trainingjobdetail",
+          label: "TrainingJobDetail",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/trainingjobcheckpoint",
+          label: "TrainingJobCheckpoint",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/deploymentsummary",
+          label: "DeploymentSummary",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/deploymentdetail",
+          label: "DeploymentDetail",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/apiresponse",
+          label: "ApiResponse",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/apierrorinvalidinput",
+          label: "ApiErrorInvalidInput",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/apierrornotfound",
+          label: "ApiErrorNotFound",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/schemas/apierrorunauthorized",
+          label: "ApiErrorUnauthorized",
+          className: "schema",
         },
       ],
     },

@@ -1,0 +1,33 @@
+---
+id: deploymentsummary
+title: "DeploymentSummary"
+description: "Deployment Summary Object"
+sidebar_label: "DeploymentSummary"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"id":"dp-12345","name":"deployment-1","status":"Deployed","created_at":1633036800}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"DeploymentSummary"}
+>
+</Heading>
+
+
+
+Deployment Summary Object
+
+<Schema
+  schema={{"type":"object","description":"Deployment Summary Object","properties":{"id":{"type":"string","example":"dp-12345","description":"The unique identifier for the deployment"},"name":{"type":"string","example":"deployment-1","description":"The name of the deployment"},"status":{"type":"string","enum":["Pending","Deploying","Deployed","Failed","Cancelled","TimedOut"],"example":"Deployed","description":"The current status of the deployment"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the deployment was created"}},"title":"DeploymentSummary"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

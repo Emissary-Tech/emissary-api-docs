@@ -1,0 +1,33 @@
+---
+id: basemodelsummary
+title: "BaseModelSummary"
+description: ""
+sidebar_label: "BaseModelSummary"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"name":"Llama-3.2-1B-Instruct","type":"completion","parameter_template":{},"support_serverless":false}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"BaseModelSummary"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"name":{"type":"string","example":"Llama-3.2-1B-Instruct"},"type":{"type":"string","enum":["completion","classification","embeddings","chat"],"example":"completion"},"parameter_template":{"type":"object","additionalProperties":{"oneOf":[{"type":"string"},{"type":"number"},{"type":"integer"}]}},"support_serverless":{"type":"boolean","example":false}},"title":"BaseModelSummary"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

@@ -1,0 +1,33 @@
+---
+id: apierrorinvalidinput
+title: "ApiErrorInvalidInput"
+description: ""
+sidebar_label: "ApiErrorInvalidInput"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"status":400,"error":"Bad request"}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"ApiErrorInvalidInput"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            
