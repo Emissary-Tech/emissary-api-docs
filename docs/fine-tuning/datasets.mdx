@@ -1,0 +1,112 @@
+---
+title: Datasets
+---
+
+# Dataset Preparation Best Practices
+
+Guidelines for preparing datasets for fine-tuning models
+
+## Supported File Formats
+
+Our platform supports datasets in two formats:
+
+- CSV (.csv)
+- JSON Lines (.jsonl)
+
+## Format Specifications
+
+### CSV Format
+
+Your CSV dataset should contain exactly two columns:
+
+1. **input**: This column should include the text input data.
+2. **expected_output**: This column should contain the corresponding expected output or response.
+
+Example:
+
+```csv
+input,expected_output
+"What is AI?","Artificial intelligence (AI) is the simulation of human intelligence in machines."
+"Define machine learning.","Machine learning is a subset of AI that involves the use of algorithms and statistical models to perform tasks without explicit instructions."
+```
+
+### JSON Lines Format
+
+We support two types of JSON Lines (.jsonl) formats, depending on your use case:
+
+#### a. Completion Format
+
+Ideal for text completion tasks where the model generates text based on a prompt.
+
+Keys:
+
+- `prompt`: The text prompt you want the model to respond to.
+- `completion`: The desired output or completion you expect from the model.
+
+Example:
+
+```json
+{"prompt": "What is the capital of France?", "completion": "Paris."}
+{"prompt": "Explain photosynthesis.", "completion": "Photosynthesis is a process used by plants to convert light energy into chemical energy."}
+```
+
+#### b. Chat Template
+
+Use this format for chat-based datasets with multiple conversational exchanges between roles.
+
+Key:
+
+- `messages`: Contains a list of message objects, each with a role and content.
+
+Roles:
+
+- `system`: Defines initial instructions or context for the conversation.
+- `user`: Represents the user's input.
+- `assistant`: Represents the model's response.
+
+Example:
+
+```json
+{"messages": [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Tell me a joke."},
+    {"role": "assistant", "content": "Why did the scarecrow win an award? Because he was outstanding in his field!"},
+    {"role": "user", "content": "That's funny! Do you know any puns?"},
+    {"role": "assistant", "content": "I was wondering why the baseball was getting bigger. Then it hit me."}
+]}
+```
+
+## Data Formatting Guidelines
+
+- **Consistent Structure**: Ensure that all entries in your dataset follow the specified format without deviation.
+- **UTF-8 Encoding**: Use UTF-8 encoding to support a wide range of characters and symbols.
+- **No Missing Fields**: Every entry should include all the required fields (input and expected_output for CSV, or the necessary keys for JSONL formats).
+
+## Data Cleaning and Preprocessing
+
+- **Remove Noise**: Eliminate irrelevant content, typos, special characters, and duplicate entries.
+- **Normalize Text**: Standardize text formatting (e.g., consistent capitalization, punctuation).
+- **Spell Check**: Correct spelling errors to improve data quality.
+
+## Ensuring Data Quality and Diversity
+
+- **Relevance**: Include data that is directly related to your AI use case to enhance model effectiveness.
+- **Diversity**: Incorporate a variety of examples to help the model generalize better across different inputs.
+- **Balanced Representation**: For tasks like classification, ensure all classes are adequately represented.
+
+## Handling Special Cases
+
+- **Multi-Turn Conversations**: Use the Chat Template in JSONL format for datasets involving dialogues or multiple interactions.
+- **Long Texts**: If dealing with long inputs or outputs, ensure they are properly formatted and do not exceed any platform-specific length limitations.
+
+## Data Privacy and Compliance
+
+- **Anonymization**: Remove or mask any personally identifiable information (PII) in your dataset to protect individual privacy.
+- **Compliance**: Ensure your data collection and usage comply with relevant laws and regulations such as GDPR, CCPA, etc.
+
+
+## Tips for Successful Dataset Preparation
+
+- **Start Small**: Begin with a smaller subset of your data to validate formatting and upload processes.
+- **Validate Format**: Use tools or scripts to check the JSON or CSV format before uploading.
+- **Sample Review**: Manually review a sample of your dataset entries to catch any errors early.

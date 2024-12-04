@@ -1,11 +1,11 @@
 ---
 id: delete-project-by-id
-title: "Delete a project by ID"
-description: "Delete a project by its unique identifier."
-sidebar_label: "Delete a project by ID"
+title: "Delete project"
+description: "Delete a project."
+sidebar_label: "Delete project"
 hide_title: true
 hide_table_of_contents: true
-api: eJyVVG1r2zAQ/itCnzZI7L59yqdlqwthpS1rB4MQgmKfY3W2pUpy0mD833cnK4nXdIVBIPLpuZfn7jm13Im15ZM5fzDqGVLHFyOegU2N1E6qmk/4NZTggAmmewRb7Zh0ljW1fGmAyQxqJ3MJJuIjrjQYQY6zDF0z7xoif92hbcS1MKJCq6GsLa/xA5Eh9lISRFJaLVyBZ5sWUAk+abnbaUJaZ2S95t2IG3hppAFM5EwD3YIsVqvagiX8xdkV/f1NJtTC+soyZps0BWvzpix3FPPqPac75diNauqMgTHKYFWpqh3SJqjQupSp5xw/W8K3p0Wrle/tsOY5MhGusWg8Rs2A+o/NwDY62fMIsGMwibnXQA65MpVwvenygiK9ikqXCEIe3T7wSe8GOM8tJ27E3hfwIbwnsqyVWwYvdHPS+cuplgllxJg34bKjexx3oY568CLA4U54vDmPw+Rt3B410NHgwWz2ImlMiejCOW0ncSy0jLbSYYultcLsolRV/K1qk3DJpg8z1sfiJBELaWOk2/m4GGn5G+i8GN490vj65h8Qh6ag5TsaRnvl/hpjhnFv8sItQGSUrKPvXHnX0KBDUWN2r6Gm0i6j85PanwppGf4EOzg8lMLRtHs6GlLcuF50tHW4TZW9zx+RpkwhtAo7ZbdijUqJpIo9JA7SFamXLmpUUmOD6ctJU5ECahtwowgeCE+1wP6wi+gMox0ng+m2220k/G2kzDoOrja+nX1L7h6TMbpEhatKikuz7dmeRecYCk1aWVeJepDqvadndv22X+1xHf/vsQoTdfDqYl0KnF4XGLVBoXO+ofHsNYrHyeClQskUWDPB2nYlLPw0ZdeRGXMZLyskKowUKxo/Ci6Tls64C7koLXxA5NOP8FJ8Zv+qdC/ImqS3EWVDX3j0eh2+qN0C0UGWVEUPmOLLp93A9eQlo5047O51cps8JSjrPwefHTo=
+api: eJx9VG1r2zAQ/itCnzaI7aYJDPJp2epCWGnL2sGghKDa51itbamSnDQY//fd2UriNl1poPLpuefeHl3DnVhbPnvgt0Y9QeIsX454CjYxUjupKj7jF1CAAyaY7iEhH3GlwQi6X6SISDuEZ/ixQ9uIa2FEiVZD7A2v8AORnmIlCSKJXQuX49kmOZSCzxrudpqQ1hlZrXn7Ppv7HNjigqmMOTwNUjLwUksDmI8zNbRLslitKguWaM/PpvTvLZlPmfUFpMzWSQLWZnVR7Cj09COna+XYpaqrlIExymDoRFUOKkdQoXUhk6410ZMlfHNam3qkqG9yfsCChastGo+sKdA0sEbstpN9HR52JJMYew3kkClTCtebJufE9CpKXSAI62j3xCctHuC62jKqjarvEvgU3heyqpRbeS90c9J1l3MtY4qInJf+sqV7VEWujrLptIIamPFoM478QG3UHKXSkj7AbPZaqk2B6Nw5bWdRlI7TSTDFv8kk+DYNq7VRz0FmAEKcBX8vn7iU1gqzY/PbBetJOWnFQlIb6XZdAKHl6hnovBze3dEc+ykcEIfuoOUXGkZ7pf8NMELQmzqh5yBSCtbSd6Y6V9+pQ1IBu9FQUWqTcHyS+30uLcOfYAeH20I4GntfjoZEZl599CTw9ZX2JrvDMmUCvmfYMrsVa5RMKFXUQSKvYZF0GkaxSuqwN33fSnxqPmKYqJK0gSIHfFoE9wXPtcD+sPPwDNmOI8Jw2+0WZ0G3oTLryLva6GrxM76+iwN0CXNXFsRLQ+6rPQvHSIUmrawrRTUI5TeSV8j7PjXH9/jh7vIDc/DqIl0IHE7rE268Eh/4hrq/1yIeZ4PFhYrIMSWCNc2jsPDHFG1L5pcaTKcarEMYKR5puqinVFo6o+YzUVj4JN8vv/1G+Mr+u+g+zH+vwor0thFFTV947EQ6XLvtEtFei5RbD5jj3tNu4Hqyx+ghHF7uRXwV38eo5X/C6h3G
 sidebar_class_name: "delete api-method"
 info_path: docs/emissary-api/emissary-openapi-3-1
 custom_edit_url: null
@@ -22,7 +22,7 @@ import Heading from "@theme/Heading";
 <Heading
   as={"h1"}
   className={"openapi__heading"}
-  children={"Delete a project by ID"}
+  children={"Delete project"}
 >
 </Heading>
 
@@ -36,7 +36,7 @@ import Heading from "@theme/Heading";
 
 
 
-Delete a project by its unique identifier.
+Delete a project.
 
 <Heading
   id={"request"}
@@ -47,7 +47,7 @@ Delete a project by its unique identifier.
 </Heading>
 
 <ParamsDetails
-  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"required":true}]}
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project.","required":true}]}
 >
   
 </ParamsDetails>

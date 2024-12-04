@@ -1,0 +1,163 @@
+---
+title: Fine-Tuning Parameters
+description: 'Detailed guide on fine-tuning parameters, selecting base models, and optimizing for large models'
+---
+
+## Fine-Tuning Parameters
+
+Fine-tuning adjusts a pre-trained model to better fit your specific task. Understanding and configuring the right parameters is crucial for optimal performance.
+
+### Selecting the Base Model
+
+Choosing the appropriate base model is a critical decision that can significantly impact your fine-tuning results.
+
+#### Available Base Models
+
+Our platform provides the following base models for fine-tuning:
+
+- **Mistral Models**:
+- **`mistral-7b-instruct-v0.2`**: `mistralai/Mistral-7B-Instruct-v0.2`
+- **`mistral-7b-instruct-v0.1`**: `mistralai/Mistral-7B-Instruct-v0.1`
+- **`mistral-7b-completion`**: `mistralai/Mistral-7B-v0.1`
+- **`codestral`**: `mistralai/Codestral-22B-v0.1`
+
+- **Llama Models**:
+- **`llama2-7b-chat`**: `meta-llama/Llama-2-7b-chat-hf`
+- **`llama2-7b-completion`**: `meta-llama/Llama-2-7b-hf`
+- **`llama3-8b-chat`**: `meta-llama/Meta-Llama-3-8B-Instruct`
+- **`llama3-8b-completion`**: `meta-llama/Meta-Llama-3-8B`
+- **`llama3.1-8b-instruct`**: `meta-llama/Llama-3.1-8B-Instruct`
+- **`llama3.1-8b-completion`**: `meta-llama/Llama-3.1-8B`
+
+- **Falcon Models**:
+- **`falcon-7b-chat`**: `tiiuae/falcon-7b-instruct`
+- **`falcon-7b-completion`**: `tiiuae/falcon-7b`
+
+- **Other Models**:
+- **`opencodeinterpreter-7B-chat`**: `m-a-p/OpenCodeInterpreter-DS-6.7B`
+- **`phi-3-mini-4k-instruct`**: `microsoft/Phi-3-mini-4k-instruct`
+
+#### Using Custom Hugging Face Models
+
+In addition to the provided base models, our platform allows you to use any Hugging Face model by providing the model's Hugging Face repository link.
+
+**Guidelines for Using Custom Models:**
+
+- **Model Size Limitation**: Currently, we recommend using models with less than **8B parameters**. Support for larger models will be added soon.
+- **Compatibility**: Ensure the model is compatible with the Transformers library and supports the tasks you intend to perform.
+- **Access Permissions**: If the model is private, make sure you have the necessary permissions or access tokens to use it.
+
+**How to Use a Custom Model:**
+
+1. **Select Custom Model Option**:
+- In the base model selection dropdown, choose the option to **enter a custom Hugging Face model link**.
+
+2. **Provide the Model Link**:
+- Enter the full Hugging Face repository link of the model you wish to use.
+
+
+![hf-model-1](/img/finetuning/HF-model1.png)
+![hf-model-2](/img/finetuning/HF-model-link.png)
+
+
+
+**Important Considerations:**
+
+- **Resource Requirements**: Larger models require more computational resources.
+- **Support for Larger Models**: While we currently recommend models under 8B parameters, support for larger models will be available soon.
+
+
+#### Model Selection Criteria
+
+- **Domain Relevance**: Choose a base model that aligns with your specific domain or industry.
+- **Model Size**:
+- **Larger Models**: Provide better performance but require more computational resources.
+- **Smaller Models**: Faster and less resource-intensive but may have lower accuracy.
+- **Instruction vs. Completion Models**:
+- **Instruction (Chat) Models**: Designed for conversational tasks and follow instruction prompts effectively.
+- **Completion Models**: Ideal for tasks requiring the model to continue from a given input.
+
+#### How to Select a Base Model
+
+1. **Navigate to the Fine-Tuning Section**: In your model service workspace, go to the training jobs panel.
+2. **Create a New Training Job**: Click on `+ NEW TRAINING JOB`.
+3. **Select a Base Model**: In the base model dropdown, choose from the list of available models.
+
+### Understanding Hyperparameters
+
+Fine-tuning involves several hyperparameters that control the training process.
+
+#### Default Hyperparameters for Mistral 7B Model
+
+For running the `mistral-7b` model on 24GB GPU A10 machines, we recommend the following default parameters:
+
+```json
+{
+  "num_train_epochs": 5,
+  "per_device_train_batch_size": 1,
+  "gradient_accumulation_steps": 4,
+  "optim": "adamw_8bit",
+  "weight_decay": 0.01,
+  "logging_steps": 10,
+  "learning_rate": 0.0002,
+  "warmup_steps": 5,
+  "lr_scheduler_type": "linear",
+  "downsample_size": 100,
+  "eval_accumulation_steps": 50,
+  "per_device_eval_batch_size": 1
+}
+```
+**Explanation of Key Parameters:**
+
+- **`num_train_epochs`**: Number of times the model will see the entire dataset during training. Set to `5` for sufficient learning.
+- **`per_device_train_batch_size`**: Number of samples processed before the model parameters are updated. Set to `1` due to GPU memory constraints.
+- **`gradient_accumulation_steps`**: Number of steps to accumulate gradients before updating model parameters. Set to `4` to simulate a larger batch size.
+- **`optim`**: Optimizer used for training. Using `"adamw_8bit"` reduces memory usage with 8-bit precision.
+- **`learning_rate`**: Controls the step size during optimization. Set to `0.0002` for stable convergence.
+- **`downsample_size`**: Percentage of the dataset used for training. Set to `100` to use the full dataset.
+
+**Note:** These parameters are optimized for the `mistral-7b` model. When fine-tuning other models, you may need to adjust these settings based on their specific requirements and your hardware capabilities.
+
+### Techniques for Efficient Fine-Tuning
+
+To optimize fine-tuning large models on limited hardware resources, consider the following techniques:
+
+#### 1. Quantization
+
+- **Purpose**: Reduce the memory footprint of the model by representing weights with lower precision.
+- **Methods**:
+- **4-bit Quantization**: Uses 4 bits to represent weights.
+- **8-bit Quantization**: Uses 8 bits for a balance between performance and resource usage.
+- **Benefit**: Allows training of larger models on GPUs with less memory.
+
+#### 2. Gradient Accumulation
+
+- **Purpose**: Simulate a larger batch size without increasing memory usage.
+- **How It Works**: Accumulates gradients over several steps before performing an update.
+- **Configuration**:
+- Set `gradient_accumulation_steps` to the desired number of steps to accumulate.
+- Effective batch size = `per_device_train_batch_size` × `gradient_accumulation_steps`.
+
+#### 3. Low-Rank Adaptation (LoRA)
+
+- **Purpose**: Efficiently fine-tune large models by updating only a small subset of parameters.
+- **How It Works**: Adds trainable rank decomposition matrices to existing weights, significantly reducing the number of trainable parameters.
+- **Benefit**: Saves memory and speeds up training while maintaining performance.
+
+### Implementing the Techniques
+
+These techniques are integrated into our training pipeline:
+
+- **Quantization**:
+- We currnetly support 4-bit quantization by default on our platform. You can update that in the setup model function given in the script.
+- **Gradient Accumulation**:
+- Set `gradient_accumulation_steps` in the training configuration.
+- **LoRA**:
+- We have enabled LoRA in the training settings to reduce trainable parameters.
+
+### Best Practices for Fine-Tuning
+
+- **Monitor Resource Usage**: Keep an eye on GPU memory and utilization to prevent out-of-memory errors.
+- **Experiment with Hyperparameters**: Adjust parameters like learning rate and batch size to find the optimal settings for your model and dataset.
+- **Use Appropriate Base Models**: Choose a base model that aligns closely with your task to reduce the amount of fine-tuning required.
+- **Leverage Advanced Techniques**: Utilize quantization, gradient accumulation, and LoRA to efficiently fine-tune large models.

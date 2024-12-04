@@ -1,11 +1,11 @@
 ---
 id: list-projects
-title: "List of Projects"
-description: "Fetching a list of projects,"
-sidebar_label: "List of Projects"
+title: "List projects"
+description: "Returns a list of projects."
+sidebar_label: "List projects"
 hide_title: true
 hide_table_of_contents: true
-api: eJydVF1r2zAU/StCz4mdpN1Lnxa2bISVtZAWBm0ot/ZNrM62VElOmhn/991rK9+lg0Egyf04V+fcI9XSw9LJqwd5a/ULJl7OezJFl1hlvNKlvJLf0CeZKpcCRK6cF3ohTFfreo+l7Elt0AIXT1Mq55qA5Shp0RldOqQZtRwNBvx1jH99AirWymfCZ6ismH4VUKaihAIJK9Glx9IzBBiTq6SdGr84xqmlSzIsgH/5jUFCBmthQ33KY+EO4vq5ZXpKNJxazKqiALsRN9syOhlR9KojodIDKOctSUM1+AaFyTlUuP5wdHH56Qz/LkNRleq1QqFS4qEWCq1YaMtkt/Rl05Mt3Y9nbJ629e9NYQCW9AiXgL3ybXtgGohSquHs5WB4vp37Eiqfaav+YCrQWm3/YxE7wS2+VspiyoZzHnzFFulQ56c6h/weRdHQJfJ80qwA34UuRofKEIdmi/ihgoe8jrQZGzXh9pOCVqECKcImX2LrC/AZ/YlXw9jsHe/QrtDynaplZXMqyLw37iqOwaiIzY2Fco6EjxJdnO1vEpJifDsVHZZs5gybVFb5TYtLSE+/kX/PD3MzFr5Tb1exvw1G/UC+Dp295K8+Teh3IcWTM4SUhzX8f6Hb1iDK7lB9cWOw5KNdRMN3vKecoA+IXcNtDp7X1dExmJDrO7tE1O7RFu5mMSOaKsEgFSnl1rCkVUdKx21JHEwHSWs6cpdiYUPo85moRIFcifTucHkgPDZA+ohRNCC0/WZo3Hq9jqDNRtou49Dq4uvpl8nP2aRPLVHmi5xxebcd20E0JCgKGe18AeXBqO2bdvAQHilV76/Qv9/XsD+Pbz42OdCumnD+OljwQa6G3TvVTSNLZHQmTtT1Mzi8t3nTcJgeH9vahoiAVfDM6yUT9bbbZ3e1vpHjJEHDNl9BXnUGOrnqbL3dlfg+uSPr/AWQ+ymW
+api: eJydVO9r2zAQ/VeEvuxLbMdJxqCfFkYYZWUtSweDLhTVvthqbUuV5KSZ8f++O1txfrSsMPIhyenuPd27d2q4E5nlF3f8xqhHSJzlqxFPwSZGaidVxS/4D3C1qSwTrJDWMbVm2ueGvys+4kqDEZR7mWI25QxYI27AalVZQI6GT8Zj+jqFv/KgvuiDZbYuS2F2TD1QIESURFUOKkfFQutCJh1f9GgJoeE2yaEU9MvtNCCmMEbssE46KO1RvEfk5x16arb0xNf7NGwUm3Oyv75Mj6CsM7LKMAdeRKkLCpU2iCfT2cdX+Lc5sLqSzzUwmWIfci3BsLUyzOGJV5O3I16JEt7h2N3v899iIQAS8wQXgZ10Xbnv1DeKRy2dzsbx67n8rETtcmXkH0gZGKPMfwxiENzAcy0NpGQ164SryRw96upcZ39+QJFImgHxo2alcH1oOjlWBnto94j/VPC4rxNt5louqPwsoVOoBIyQvTPofCFcjn+iTRzpg9ctmA0Y2qaG16bAhNw5bS+iKI3TaTDDz3QafJqFVWbUU7A2ACGq+GqQi1JaSz6c31yyHpS3K8JPaiPdriMQWt4/Af1eHZ8taQK9jEPGYS20/Aa0F73P+K8AGYI+JIk5B5ESWUv/16or9eoMlwrYtYaKrjYN4zdMKC2T9FgMBTeFcDS3vh0NCdq/9w2ttgNT2uv1EtuUCXjNUDK7FRnOPJQq6lIi7z6RdO5Dm0lS2Ic+byVa3jOGiSppm9CegE8PpfuG51qgPmwSjhHtMCKk2263OAs6DZXJIl9qo6vLL4vvy0WAJWHuyoJwach9t+MwRigMaWVdKaojqu5ZOzLHiUzNYZHefV797By8uEgXAufU+rs33od3fBP3j9Xwgud4Hzpomgdh4acp2pbC+AKZzjLYhDBSPNBo0UCj/eTJWZ1n+DxJQJPXN6Koe/Oc7TvZbtiLr4tbtM1fZnQnlw==
 sidebar_class_name: "get api-method"
 info_path: docs/emissary-api/emissary-openapi-3-1
 custom_edit_url: null
@@ -22,7 +22,7 @@ import Heading from "@theme/Heading";
 <Heading
   as={"h1"}
   className={"openapi__heading"}
-  children={"List of Projects"}
+  children={"List projects"}
 >
 </Heading>
 
@@ -36,7 +36,7 @@ import Heading from "@theme/Heading";
 
 
 
-Fetching a list of projects,
+Returns a list of projects.
 
 
 <ParamsDetails
@@ -55,7 +55,7 @@ Fetching a list of projects,
 <StatusCodes
   id={undefined}
   label={undefined}
-  responses={{"200":{"description":"List of projects with their ID and name","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","description":"Project Summary Object","properties":{"id":{"type":"string","example":"ms-12345","description":"The unique identifier for the project"},"name":{"type":"string","example":"my_project","description":"The name of the project"}},"title":"ProjectSummary"}}}}},"401":{"description":"Unauthorized error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":401},"error":{"type":"string","example":"Unauthorized"}},"title":"ApiErrorUnauthorized"}}}}}}
+  responses={{"200":{"description":"List of Project's summary object.","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","description":"Project Summary Object","properties":{"id":{"type":"string","example":"ms-12345","description":"The unique identifier for the project"},"name":{"type":"string","example":"my_project","description":"The name of the project"}},"title":"ProjectSummary"}}}}},"401":{"description":"Unauthorized error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":401},"error":{"type":"string","example":"Unauthorized"}},"title":"ApiErrorUnauthorized"}}}}}}
 >
   
 </StatusCodes>
