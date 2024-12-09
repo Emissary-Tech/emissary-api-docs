@@ -14,12 +14,11 @@ import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
 
 const sidebars: SidebarsConfig = {
   docs: [
-      // 'introduction',
+      'home-doc',
       {
         type: 'category',
         label: 'Fine-Tuning',
         items: [
-            'quickstart',
             'fine-tuning/datasets',
             'fine-tuning/parameters',
             'fine-tuning/testing',
@@ -44,12 +43,12 @@ const sidebars: SidebarsConfig = {
   openApiSidebar: [
     {
       type: "category",
-      label: "API",
+      label: "Emissary API",
       link: {
         type: "generated-index",
-        title: "API",
+        title: "Emissary API Specification",
         description:
-          "This is a sample server Petstore server. You can find out more about Swagger at http://swagger.io or on irc.freenode.net, #swagger. For this sample, you can use the api key special-key to test the authorization filters.",
+            "The Emissary API is a RESTful API that provides endpoints for interacting with the Emissary platform.",
         slug: "/category/emissary-api"
       },
       items: require("./docs/emissary-api/sidebar.ts")
