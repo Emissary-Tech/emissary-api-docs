@@ -9,7 +9,7 @@ import type * as OpenApiPlugin from "docusaurus-plugin-openapi-docs";
 const config: Config = {
   title: "Emissary Docs",
   tagline: "Start your first Fine-Tuning project with Emissary",
-  url: "https://docs.withemissary.com",
+  url: "https://www.withemissary.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -64,7 +64,7 @@ const config: Config = {
           {
             label: "API",
             position: "left",
-            to: "/docs/category/emissary-api",
+            to: "/docs/api",
           },
           {
             href: "https://github.com/Emissary-Tech/emissary-api-docs",
@@ -85,7 +85,7 @@ const config: Config = {
               },
               {
                 label: "API",
-                to: "/docs/category/emissary-api",
+                to: "/docs/api/",
               },
             ],
           },

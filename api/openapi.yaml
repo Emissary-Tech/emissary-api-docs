@@ -26,6 +26,8 @@ tags:
     description: Deals with training jobs
   - name: Deployments
     description: Deals with deployments
+  - name: Inference
+    description: Deals with inference request to the deployed model
 paths:
   '/v1/models':
     get:
@@ -574,7 +576,7 @@ paths:
   '/v1/projects/{project_id}/deployments/{deployment_id}/completions':
     post:
       tags:
-        - Deployments
+        - Inference
       summary: Completions
       description: Get completions from a deployment using the provided input.
       operationId: getCompletionsFromDeployment
@@ -648,7 +650,7 @@ paths:
   '/v1/projects/{project_id}/deployments/{deployment_id}/chat/completions':
     post:
       tags:
-        - Deployments
+        - Inference
       summary: Chat Completion
       description: Get chat completions from a deployment using the provided input.
       operationId: getChatCompletionsFromDeployment
@@ -741,7 +743,7 @@ paths:
   '/v1/projects/{project_id}/deployments/{deployment_id}/embeddings':
     post:
       tags:
-        - Deployments
+        - Inference
       summary: Embeddings
       description: Get embeddings from a deployment using the provided input.
       operationId: getEmbeddingsFromDeployment
@@ -824,7 +826,7 @@ paths:
   '/v1/projects/{project_id}/deployments/{deployment_id}/classification':
     post:
       tags:
-        - Deployments
+        - Inference
       summary: Classification
       description: Get classification from a deployment using the provided input.
       operationId: getClassificationFromDeployment

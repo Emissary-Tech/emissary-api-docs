@@ -8,28 +8,6 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Base Models",
-      link: {
-        type: "doc",
-        id: "emissary-api/base-models",
-      },
-      items: [
-        {
-          type: "doc",
-          id: "emissary-api/list-base-models",
-          label: "List base models",
-          className: "api-method get",
-        },
-        {
-          type: "doc",
-          id: "emissary-api/retrieve-base-model-by-name",
-          label: "Retrieve base model",
-          className: "api-method get",
-        },
-      ],
-    },
-    {
-      type: "category",
       label: "Projects",
       link: {
         type: "doc",
@@ -58,6 +36,36 @@ const sidebar: SidebarsConfig = {
           type: "doc",
           id: "emissary-api/delete-project-by-id",
           label: "Delete project",
+          className: "api-method delete",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Datasets",
+      items: [
+        {
+          type: "doc",
+          id: "emissary-api/create-dataset",
+          label: "Upload dataset",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/list-datasets",
+          label: "List datasets",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/retrieve-dataset-by-id",
+          label: "Retrieve dataset",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/delete-dataset-by-id",
+          label: "Delete dataset",
           className: "api-method delete",
         },
       ],
@@ -146,6 +154,16 @@ const sidebar: SidebarsConfig = {
           label: "Cancel deployment",
           className: "api-method post",
         },
+      ],
+    },
+    {
+      type: "category",
+      label: "Inference",
+      link: {
+        type: "doc",
+        id: "emissary-api/inference",
+      },
+      items: [
         {
           type: "doc",
           id: "emissary-api/get-completions-from-deployment",
@@ -174,31 +192,23 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Datasets",
+      label: "Base Models",
+      link: {
+        type: "doc",
+        id: "emissary-api/base-models",
+      },
       items: [
         {
           type: "doc",
-          id: "emissary-api/create-dataset",
-          label: "Upload dataset",
-          className: "api-method post",
-        },
-        {
-          type: "doc",
-          id: "emissary-api/list-datasets",
-          label: "List datasets",
+          id: "emissary-api/list-base-models",
+          label: "List base models",
           className: "api-method get",
         },
         {
           type: "doc",
-          id: "emissary-api/retrieve-dataset-by-id",
-          label: "Retrieve dataset",
+          id: "emissary-api/retrieve-base-model-by-name",
+          label: "Retrieve base model",
           className: "api-method get",
-        },
-        {
-          type: "doc",
-          id: "emissary-api/delete-dataset-by-id",
-          label: "Delete dataset",
-          className: "api-method delete",
         },
       ],
     },
