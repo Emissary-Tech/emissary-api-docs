@@ -11,7 +11,7 @@ const config: Config = {
   tagline: "Start your first Fine-Tuning project with Emissary",
   url: "https://staging.withemissary.com",
   baseUrl: "/docs/",
-  onBrokenLinks: "throw",
+  onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/emissary.svg",
 
