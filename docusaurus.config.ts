@@ -78,46 +78,59 @@ const config: Config = {
         style: "dark",
         links: [
           {
-            title: "Docs",
+            title: "Follow Us",
             items: [
               {
-                label: "Quick Start",
-                to: "/docs/",
+                label: "Twitter",
+                href: "https://x.com/withemissary",
               },
               {
-                label: "API",
-                to: "/docs/api/",
-              },
-            ],
+                label: "LinkedIn",
+                href: "https://www.linkedin.com/company/withemissary/",
+              }
+            ]
           },
-          // {
-          //   title: "Community",
-          //   items: [
-          //     {
-          //       label: "Stack Overflow",
-          //       href: "https://stackoverflow.com/questions/tagged/docusaurus",
-          //     },
-          //     {
-          //       label: "Discord",
-          //       href: "https://discordapp.com/invite/docusaurus",
-          //     },
-          //     {
-          //       label: "Twitter",
-          //       href: "https://twitter.com/docusaurus",
-          //     },
-          //   ],
-          // },
           {
-            title: "More",
+            title: "Company",
             items: [
-              // {
-              //   label: "Blog",
-              //   to: "/blog",
-              // },
               {
-                label: "GitHub",
-                href: "https://github.com/Emissary-Tech/emissary-api-docs",
+                label: "About",
+                href: "https://www.withemissary.com/about-us",
               },
+              {
+                label: "Careers",
+                href: "https://www.withemissary.com/careers",
+              }
+            ]
+          },
+          {
+            title: "Resources",
+            items: [
+              {
+                label: "Product",
+                href: "https://www.withemissary.com/#infrastructure",
+              },
+              {
+                label: "Resources",
+                href: "https://www.withemissary.com/resources",
+              },
+              {
+                label: "Documentation",
+                to: "/"
+              }
+            ]
+          },
+          {
+            title: "Legal",
+            items: [
+              {
+                label: "Privacy Policy",
+                href: "https://www.withemissary.com/privacy-policy",
+              },
+              {
+                label: "Terms of Service",
+                href: "https://www.withemissary.com/terms-of-service",
+              }
             ],
           },
         ],
@@ -191,13 +204,6 @@ const config: Config = {
             },
             showSchemas: true,
           } satisfies OpenApiPlugin.Options,
-          // petstore: {
-          //   specPath: "examples/petstore.yaml",
-          //   outputDir: "docs/petstore",
-          //   sidebarOptions: {
-          //     groupPathsBy: "tag",
-          //   },
-          // } satisfies OpenApiPlugin.Options,
         } satisfies Plugin.PluginOptions,
       },
     ],
