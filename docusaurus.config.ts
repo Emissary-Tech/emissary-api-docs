@@ -10,7 +10,7 @@ const config: Config = {
   title: "Emissary Docs",
   tagline: "Start your first Fine-Tuning project with Emissary",
   url: "https://staging.withemissary.com",
-  baseUrl: "/",
+  baseUrl: "/docs/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/emissary.svg",
@@ -18,13 +18,14 @@ const config: Config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: "Emissary", // Usually your GitHub org/user name.
-  projectName: "Emissary-Docs", // Usually your repo name.
+  projectName: "emissary-api-docs", // Usually your repo name.
   presets: [
     [
       "classic",
       {
         docs: {
-          sidebarPath: 'sidebars.ts',
+          sidebarPath: require.resolve("./sidebars.js"),
+          routeBasePath: "/",
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
@@ -64,7 +65,7 @@ const config: Config = {
           {
             label: "API",
             position: "left",
-            to: "/docs/api",
+            to: "/api",
           },
           {
             href: "https://github.com/Emissary-Tech/emissary-api-docs",
@@ -187,10 +188,16 @@ const config: Config = {
               "https://raw.githubusercontent.com/Emissary-Tech/emissary-api-docs/refs/heads/main/api/openapi.yaml",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
             },
             showSchemas: true,
           } satisfies OpenApiPlugin.Options,
+          // petstore: {
+          //   specPath: "examples/petstore.yaml",
+          //   outputDir: "docs/petstore",
+          //   sidebarOptions: {
+          //     groupPathsBy: "tag",
+          //   },
+          // } satisfies OpenApiPlugin.Options,
         } satisfies Plugin.PluginOptions,
       },
     ],
