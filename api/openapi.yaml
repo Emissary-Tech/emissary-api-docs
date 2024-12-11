@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Emissary API
   description: |-
-    Closed-Alpha version
+    v0.1.0
   termsOfService: https://www.withemissary.com/terms-of-service
   contact:
     email: contact@withemissary.com
@@ -13,7 +13,7 @@ info:
 security:
   - api_key: []
 servers:
-  - url: https://d1d3-4-4-33-74.ngrok-free.app
+  - url: https://api.withemissary.com
     description: Emissary API server
 tags:
   - name: Base Models
@@ -306,6 +306,7 @@ paths:
                     - text-generation
                     - classification
                     - embedding
+                    - regression
                   example: "text-generation"
                   description: The task type for the training job (default = "text-generation")
                 parameters:
@@ -316,6 +317,30 @@ paths:
                       - type: number
                       - type: integer
                   description: The hyper parameters to use for fine-tuning (optional)
+                lora_configs:
+                  type: object
+                  description: Lora configurations
+                  properties:
+                    rank:
+                      type: integer
+                      example: 32
+                      description: rank [0-256] (default = 32)
+                    lora_alpha:
+                      type: integer
+                      example: 64
+                      description: alpha [0-256] (default = 64)
+                    lora_dropout:
+                      type: number
+                      example: 0.05
+                      description: dropout [0-1] (default = 0.05)
+                quantization:
+                  type: string
+                  enum:
+                    - int4
+                    - int8
+                    - fp16
+                  example: "int4"
+                  description: "Quantization type for the model (default = int4)"
                 hf_model_link:
                   type: string
                   example: "https://huggingface.co/my_model"
