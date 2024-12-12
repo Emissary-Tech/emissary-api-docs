@@ -10,7 +10,7 @@ const config: Config = {
   title: "Emissary Docs",
   tagline: "Start your first Fine-Tuning project with Emissary",
   url: "https://docs2.withemissary.com",
-  baseUrl: "/docs/",
+  baseUrl: "/",
   onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/emissary.svg",
@@ -26,10 +26,6 @@ const config: Config = {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           routeBasePath: "/",
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          // editUrl:
-          //   "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
           docItemComponent: "@theme/ApiItem", // Derived from docusaurus-theme-openapi
         },
         blog: false,
@@ -195,7 +191,7 @@ const config: Config = {
         config: {
           emissary: {
             specPath: "api/openapi.yaml",
-            outputDir: "docs/emissary-api",
+            outputDir: "docs/api",
             hideSendButton: true,
             downloadUrl:
               "https://raw.githubusercontent.com/Emissary-Tech/emissary-api-docs/refs/heads/main/api/openapi.yaml",

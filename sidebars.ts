@@ -47,7 +47,7 @@ const sidebars: SidebarsConfig = {
             "The Emissary API is a RESTful API that provides endpoints for interacting with the Emissary platform.",
         slug: "/api"
       },
-      items: require("./docs/emissary-api/sidebar.ts")
+      items: require("./docs/api/sidebar.ts")
     }
   ]
 };
