@@ -68,24 +68,6 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Base Models",
-      items: [
-        {
-          type: "doc",
-          id: "api/list-base-models",
-          label: "List base models",
-          className: "api-method get",
-        },
-        {
-          type: "doc",
-          id: "api/retrieve-base-model-by-name",
-          label: "Retrieve base model",
-          className: "api-method get",
-        },
-      ],
-    },
-    {
-      type: "category",
       label: "Training Jobs",
       items: [
         {
@@ -183,6 +165,24 @@ const sidebar: SidebarsConfig = {
           id: "api/get-classification-from-deployment",
           label: "Classification",
           className: "api-method post",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Base Models",
+      items: [
+        {
+          type: "doc",
+          id: "api/list-base-models",
+          label: "List base models",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "api/retrieve-base-model-by-name",
+          label: "Retrieve base model",
+          className: "api-method get",
         },
       ],
     },
