@@ -279,7 +279,7 @@ paths:
                 base_model:
                   type: string
                   example: "Llama-3.2-1B-Instruct"
-                  description: The base model to fine-tune. To see full list of supported base model please visit [Base Models](https://staging.withemissary.com/docs/fine-tuning/parameters#available-base-models)
+                  description: The base model to fine-tune. To see full list of supported base model please visit [Base Models](/docs/fine-tuning/parameters#available-base-models)
                 train_dataset_id:
                   type: string
                   example: "ds-12345"
