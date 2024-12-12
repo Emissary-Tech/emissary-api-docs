@@ -8,24 +8,6 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Base Models",
-      items: [
-        {
-          type: "doc",
-          id: "emissary-api/list-base-models",
-          label: "List base models",
-          className: "api-method get",
-        },
-        {
-          type: "doc",
-          id: "emissary-api/retrieve-base-model-by-name",
-          label: "Retrieve base model",
-          className: "api-method get",
-        },
-      ],
-    },
-    {
-      type: "category",
       label: "Projects",
       items: [
         {
@@ -51,6 +33,54 @@ const sidebar: SidebarsConfig = {
           id: "emissary-api/delete-project-by-id",
           label: "Delete project",
           className: "api-method delete",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Datasets",
+      items: [
+        {
+          type: "doc",
+          id: "emissary-api/create-dataset",
+          label: "Upload dataset",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/list-datasets",
+          label: "List datasets",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/retrieve-dataset-by-id",
+          label: "Retrieve dataset",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/delete-dataset-by-id",
+          label: "Delete dataset",
+          className: "api-method delete",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Base Models",
+      items: [
+        {
+          type: "doc",
+          id: "emissary-api/list-base-models",
+          label: "List base models",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "emissary-api/retrieve-base-model-by-name",
+          label: "Retrieve base model",
+          className: "api-method get",
         },
       ],
     },
@@ -144,12 +174,6 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
-          id: "emissary-api/get-chat-completions-from-deployment",
-          label: "Chat Completion",
-          className: "api-method post",
-        },
-        {
-          type: "doc",
           id: "emissary-api/get-embeddings-from-deployment",
           label: "Embeddings",
           className: "api-method post",
@@ -159,36 +183,6 @@ const sidebar: SidebarsConfig = {
           id: "emissary-api/get-classification-from-deployment",
           label: "Classification",
           className: "api-method post",
-        },
-      ],
-    },
-    {
-      type: "category",
-      label: "Datasets",
-      items: [
-        {
-          type: "doc",
-          id: "emissary-api/create-dataset",
-          label: "Upload dataset",
-          className: "api-method post",
-        },
-        {
-          type: "doc",
-          id: "emissary-api/list-datasets",
-          label: "List datasets",
-          className: "api-method get",
-        },
-        {
-          type: "doc",
-          id: "emissary-api/retrieve-dataset-by-id",
-          label: "Retrieve dataset",
-          className: "api-method get",
-        },
-        {
-          type: "doc",
-          id: "emissary-api/delete-dataset-by-id",
-          label: "Delete dataset",
-          className: "api-method delete",
         },
       ],
     },
