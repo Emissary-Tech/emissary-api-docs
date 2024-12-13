@@ -64,6 +64,11 @@ const config: Config = {
             to: "/api",
           },
           {
+            href: "https://www.withemissary.com/app",
+            label: "Dashboard",
+            position: "right",
+          },
+          {
             href: "https://github.com/Emissary-Tech/emissary-api-docs",
             label: "GitHub",
             position: "right",
@@ -204,7 +209,6 @@ const config: Config = {
       },
     ],
   ],
-
   themes: ["docusaurus-theme-openapi-docs"],
 };
 
