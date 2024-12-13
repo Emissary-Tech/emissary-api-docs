@@ -49,6 +49,7 @@ const config: Config = {
         logo: {
           alt: "emissary-logo",
           src: "img/emissary.svg",
+          srcDark: "img/emissary-white.svg"
         },
         items: [
           {
