@@ -317,30 +317,30 @@ paths:
                       - type: number
                       - type: integer
                   description: The hyper parameters to use for fine-tuning (optional)
-                lora_configs:
-                  type: object
-                  description: Lora configurations
-                  properties:
-                    rank:
-                      type: integer
-                      example: 32
-                      description: rank [0-256] (default = 32)
-                    lora_alpha:
-                      type: integer
-                      example: 64
-                      description: alpha [0-256] (default = 64)
-                    lora_dropout:
-                      type: number
-                      example: 0.05
-                      description: dropout [0-1] (default = 0.05)
-                quantization:
-                  type: string
-                  enum:
-                    - int4
-                    - int8
-                    - fp16
-                  example: "int4"
-                  description: "Quantization type for the model (default = int4)"
+#                lora_configs:
+#                  type: object
+#                  description: Lora configurations
+#                  properties:
+#                    rank:
+#                      type: integer
+#                      example: 32
+#                      description: rank [0-256] (default = 32)
+#                    lora_alpha:
+#                      type: integer
+#                      example: 64
+#                      description: alpha [0-256] (default = 64)
+#                    lora_dropout:
+#                      type: number
+#                      example: 0.05
+#                      description: dropout [0-1] (default = 0.05)
+#                quantization:
+#                  type: string
+#                  enum:
+#                    - int4
+#                    - int8
+#                    - fp16
+#                  example: "int4"
+#                  description: "Quantization type for the model (default = int4)"
                 hf_model_link:
                   type: string
                   example: "https://huggingface.co/my_model"
