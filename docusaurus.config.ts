@@ -9,26 +9,23 @@ import type * as OpenApiPlugin from "docusaurus-plugin-openapi-docs";
 const config: Config = {
   title: "Emissary Docs",
   tagline: "Start your first Fine-Tuning project with Emissary",
-  url: "https://www.withemissary.com",
+  url: "https://docs2.withemissary.com",
   baseUrl: "/",
-  onBrokenLinks: "throw",
+  onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/emissary.svg",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: "Emissary", // Usually your GitHub org/user name.
-  projectName: "Emissary-Docs", // Usually your repo name.
+  projectName: "emissary-api-docs", // Usually your repo name.
   presets: [
     [
       "classic",
       {
         docs: {
-          sidebarPath: 'sidebars.ts',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          // editUrl:
-          //   "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          sidebarPath: require.resolve("./sidebars.js"),
+          routeBasePath: "/",
           docItemComponent: "@theme/ApiItem", // Derived from docusaurus-theme-openapi
         },
         blog: false,
@@ -52,6 +49,7 @@ const config: Config = {
         logo: {
           alt: "emissary-logo",
           src: "img/emissary.svg",
+          srcDark: "img/emissary-white.svg"
         },
         items: [
           {
@@ -64,7 +62,12 @@ const config: Config = {
           {
             label: "API",
             position: "left",
-            to: "/docs/api",
+            to: "/api",
+          },
+          {
+            href: "https://www.withemissary.com/app",
+            label: "Dashboard",
+            position: "right",
           },
           {
             href: "https://github.com/Emissary-Tech/emissary-api-docs",
@@ -77,46 +80,59 @@ const config: Config = {
         style: "dark",
         links: [
           {
-            title: "Docs",
+            title: "Follow Us",
             items: [
               {
-                label: "Quick Start",
-                to: "/docs/",
+                label: "Twitter",
+                href: "https://x.com/withemissary",
               },
               {
-                label: "API",
-                to: "/docs/api/",
-              },
-            ],
+                label: "LinkedIn",
+                href: "https://www.linkedin.com/company/withemissary/",
+              }
+            ]
           },
-          // {
-          //   title: "Community",
-          //   items: [
-          //     {
-          //       label: "Stack Overflow",
-          //       href: "https://stackoverflow.com/questions/tagged/docusaurus",
-          //     },
-          //     {
-          //       label: "Discord",
-          //       href: "https://discordapp.com/invite/docusaurus",
-          //     },
-          //     {
-          //       label: "Twitter",
-          //       href: "https://twitter.com/docusaurus",
-          //     },
-          //   ],
-          // },
           {
-            title: "More",
+            title: "Company",
             items: [
-              // {
-              //   label: "Blog",
-              //   to: "/blog",
-              // },
               {
-                label: "GitHub",
-                href: "https://github.com/Emissary-Tech/emissary-api-docs",
+                label: "About",
+                href: "https://www.withemissary.com/about-us",
               },
+              {
+                label: "Careers",
+                href: "https://www.withemissary.com/careers",
+              }
+            ]
+          },
+          {
+            title: "Resources",
+            items: [
+              {
+                label: "Product",
+                href: "https://www.withemissary.com/#infrastructure",
+              },
+              {
+                label: "Resources",
+                href: "https://www.withemissary.com/resources",
+              },
+              {
+                label: "Documentation",
+                to: "/"
+              }
+            ]
+          },
+          {
+            title: "Legal",
+            items: [
+              {
+                label: "Privacy Policy",
+                href: "https://www.withemissary.com/privacy-policy",
+              },
+              {
+                label: "Terms of Service",
+                href: "https://www.withemissary.com/terms-of-service",
+              }
             ],
           },
         ],
@@ -181,13 +197,12 @@ const config: Config = {
         config: {
           emissary: {
             specPath: "api/openapi.yaml",
-            outputDir: "docs/emissary-api",
+            outputDir: "docs/api",
             hideSendButton: true,
             downloadUrl:
               "https://raw.githubusercontent.com/Emissary-Tech/emissary-api-docs/refs/heads/main/api/openapi.yaml",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
             },
             showSchemas: true,
           } satisfies OpenApiPlugin.Options,
@@ -195,7 +210,6 @@ const config: Config = {
       },
     ],
   ],
-
   themes: ["docusaurus-theme-openapi-docs"],
 };
 

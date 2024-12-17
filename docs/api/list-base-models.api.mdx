@@ -1,0 +1,64 @@
+---
+id: list-base-models
+title: "List base models"
+description: "List and describe the various models available in the API"
+sidebar_label: "List base models"
+hide_title: true
+hide_table_of_contents: true
+api: eJzVVd9v2jAQ/lciPxMCdE88rZ3QhNatlVilSVVVHclB3NmxZztQhvjfd+cESAFN0/Y0XkjO9+O7z99dtiLA0ovxo7gBj8lnU6Dy4qknCvS5kzZIU4mxuJU+JFAVSWOeYxJKTFbgpKl9omNUAiuQCuYKE1nF8+v7qegJY9EB55kWlElRJi7VVuoJh96ayiOB2IrRYMB/F4qbRTJnhHofl5sqYBXYHaxVMo81shfPMVvh8xI18FPYWKQs4BxsKE4G1L5jN/MXzAMdWMdIg2yQVKCx4+WDk9WSvPAVtFVsulWgIb3qj9LhTTqtyKOmPLteG3IhtKo1M50bzhCbozYUeC8XLXz20nMsCoqITZYQ+DaOVTvBVMqCI5wB3TN1ZRUEvNQZUD6OAHX/pkdT4d2CEJ1C3fUOFoI8R9e1SKJ9yaanHQHwtbXGhWePboVOoe9SOzdGIVRd1hagPHJgkCH2c9DCrNYa3Ebs+NcT7y4pYVqtQMkimVa2Dgk6Z9xfKOHAi8MftXRY8KX4AKFmypusT6d6aM/HZzz0xMI4TdcUTVejbrfUxG6f8bdauoEiYTToSUEddq6tnHB023jsW+wJGp4T9FBBHUrj5E8s/gt+hn/GT7eviwSdOESGaDBKwztniXG+IZT0kq2G2WGJNLL1cQZqp+i4DMH6cZaBlf21pC2mpfekyz4Nnjhdi5P2kDdd0uSiueC0ee1k2MS8lOn5O/LzU/dsxrQ33B08jsvKyk/I26pZQ+JbShXSxiS5colQcLEdvy9MDG0p6YI6Q7wa9If9AZlpZ2h/t5gRaJljp/H1en3WeBa9U7NIfevfqAryqCqSj1RxN0XT+zPeCCXJDmnLH1crXR0QBckowjmS30KAeNo3bpm1oT67nX6YfJlNUgrpl0ErzsvX17TWdMZL0figoeqUil+Qt5+PN7RsjzPyT5+69vYCvoaMtrGMOzq2tm3l9yhWQ3LUh+9sSWDZvN0yvgendjs20ypwUTLUIZXmUlFAvf3Ns7KiZsR1nqNlgdOKqBvxnAw5y+4wDB8nX0k2vwDfyb2z
+sidebar_class_name: "get api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"List base models"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/v1/models"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+List and describe the various models available in the API
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"List of base models","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string","example":"Llama-3.2-1B-Instruct"},"type":{"type":"string","enum":["completion","classification","embeddings","chat"],"example":"completion"},"parameter_template":{"type":"object","additionalProperties":{"oneOf":[{"type":"string"},{"type":"number"},{"type":"integer"}]}},"support_serverless":{"type":"boolean","example":false}},"title":"BaseModelSummary"}}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}},"401":{"description":"Unauthorized error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":401},"error":{"type":"string","example":"Unauthorized"}},"title":"ApiErrorUnauthorized"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

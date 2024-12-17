@@ -1,0 +1,72 @@
+---
+id: create-training-job
+title: "Create training job"
+description: "Initiate fine-tuning (training job)."
+sidebar_label: "Create training job"
+hide_title: true
+hide_table_of_contents: true
+api: eJy9WG1v2zYQ/iuE9mEpEFl20rcFGLAkTTBv6RIkKTAgNQxaoi2mEqmRlF3D8H/fHUnHlOWo2YauH1KaL3fPvT08ahUZOtPRyUN0rygXXMzIb3Kio9FhlDGdKl4ZLkV0Eg0FN5waRqZcsNjUduuB2Rx6lJNXvegwkhVTFI8MMziUKgZHNpJBMOyoqKIlM0yh1lUk4AfsrJR8ZKkZ8wy2cFRYUZPDWKc5K2l0sorMssKd2iiQFa13Ad7njAw/EDklBkZeHghQ7K+aKwZwjKrZeuRmmDZnMlui3OaGwyiVwjBhcIlWVcFTa0/yqFHNqg1ITrwm0AnWG840rk6oZuNSZqxogz+M2FdaVgVOXRW0pPFx7ygenMVDATtqK61tHUokViIx8ikOrEfuJdEMIlMXBSm4NugEXVeVVIZl4THQiD/mXHNDHs5w/BEX9OggCeKabGP0A51TXtBJwWKUE1s5+hW638Z+nFED8zZwnWZmOh4cHb9+s9eypzTy0jCQYGIN+KZShSlnFUPw/onet+/e/9TfrxckvUgtOZD2HC0C0y0ODRlixjbnAyCiLidMhUD6vaN9COxBVGrl2NRtOQOxbJA2cbji6TJ/Iywe7HUACtiUTFjLO3oaB7vUXQYuQ5ku7aQg5XJjTgvHKQl+vwAMSPkydhD2QAHPI5sZ9tXEMyY8G8FKWlCt+dSXM26FEGWZO6bYTDFYhoVRw30tMXuSCPAQxOEC1QKfsSmtC0N+Jp935X2OrEUhJbZphQJIZ/5Ng2CkYNdTy6G7zLibhsEMB26b4dRoL4HmsEuRLZ6XlUM+dUQ3Lrj40p0guTGVPkmSvJ7NYG1KU9ZLZVIuPVXugroCiQgC3fqrO0Mu4ZDPrIR8AnRSFEuyyJkgS1lbvHb75fjj9YeLK0I1oZYFo/U6vA8eQo7ew2ej9dod0JUU2jn9qD/A/5ogb5mpldBWa3DZ/aiBhcuSqiVxwcQL8l/fLjvBCm5rcue1XO+/ib5FkUZ1UDPEG25LwjMADdUD2bEvy78rGaHw73qbQsZkziyvFTVqQ02tuzjmhglPH7e1EG50V6cpEAmMLuHeZNjN3POSZdc1ojinImUFTjdYZnu8DTOtlQLXEwfnOfdAwC2BBXA3lR4oevemS8NGxnM6XDOXjSfL7hCANzsTCpbxol3kkniRneqo6TZq8Pb4uH/89n2/v5ecwfngurJy/LBToWQB3OAVoc66yv4fnXAXGeK1WVYy3FjnBRt9VUeOhV73+23iGYo5LXhGhqKqDWFKSfVfKCakRp/+YLSVOtollVZ5bN0ElVSiB3Hq+Cj0Gxix3kjszKEzmhHfpjfcc1rxCzztDbd2WwfBHrixcomvjkpqS4L4gDiJkvkg8a8Bnay274x18kRHj/jigYpnar55ltSqCG4rWvHegkMgS641xASurLKV3Bd+kZzeDImTFeFzQzOoMG6WVi5IGn9hOB6Fa3cYE+fYpx1P/oGZ32Fiw7DRnzFoiN2UfSrljGaoDJyAQb7dvm8uNh5tvkeepcl2Tx827q3GO+yun+uJbePrkXdcAC/rHIPeb09v1uij2n3JN5uPNfpz6vp4n3BhUFuY5/3eoGdtZ6rU19M7CDpPwzZnsVi0Eiexu2M5jbXf70qWprZkoTY5hshP/dLKO0AJNc2gI8Ht3rOnFYUUIkcWzjZ5PQRqV3tSzRJ/VCdXw/OLP+4uYjjSy01prcf0d6Y5y/BmgWIqqQhUnVu+bPJ164nwxEEv/XAQBDWpCli0fKzsde8q+SGaD1xvY2sZhieNrwbNcobiypEH4Nhqhbn/SRXrNU5DcShbgGAvVRzftrY0M65xDGk9pYVmHSYd3HqifEWe++qw15xNPQusXCCwGn/B0JZ7+AnEdue+qhGa23DuAMT3KGYroMXx2O67E6fQjFSmc+8oIM6b67t72DzxH0awKGBW0QXeDfDXgnWdv6UqO7eKCipmNZ3hXicT//0NKqhW1A==
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Create training job"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/training-jobs"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Initiate fine-tuning (training job).
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","properties":{"base_model":{"type":"string","example":"Llama-3.2-1B-Instruct","description":"The base model to fine-tune. To see full list of supported base model please visit [Base Models](/fine-tuning/parameters#available-base-models)"},"train_dataset_id":{"type":"string","example":"ds-12345","description":"The training dataset ID to use for fine-tuning"},"test_dataset_id":{"type":"string","example":"ds-67890","description":"The testing dataset ID to use for fine-tuning (optional)"},"train_test_split_ratio":{"type":"number","example":0.2,"description":"The ratio to split the training dataset for testing (optional)"},"name":{"type":"string","example":"training-1","description":"The name of the training job (optional)"},"description":{"type":"string","example":"Fine-tuning the model on my dataset","description":"A description of the training job (optional)"},"task_type":{"type":"string","enum":["text-generation","classification","embedding","regression"],"example":"text-generation","description":"The task type for the training job (default = \"text-generation\")"},"parameters":{"type":"object","additionalProperties":{"oneOf":[{"type":"string"},{"type":"number"},{"type":"integer"}]},"description":"The hyper parameters to use for fine-tuning (optional)"},"hf_model_link":{"type":"string","example":"https://huggingface.co/my_model","description":"Link to the Hugging Face model / Use only when you use the HF_MODEL as a base"}},"required":["base_model","train_dataset_id"]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"201":{"description":"Returns the TrainingJob's summary object.","content":{"application/json":{"schema":{"type":"object","description":"Training Job Summary Object","properties":{"id":{"type":"string","example":"tr-12345","description":"The unique identifier for the training job"},"name":{"type":"string","example":"training-1","description":"The name of the training job"},"base_model":{"type":"string","example":"Llama-3.2-1B-Instruct","description":"The base model used for training"},"status":{"type":"string","enum":["Pending","Running","Success","Failed","TimedOut","Cancelled"],"example":"Running","description":"The current status of the training job"},"progress":{"type":"integer","example":75,"description":"The current progress of the training job"},"created_by":{"type":"string","example":"user-12345","description":"The user ID who created the training job"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the TrainingJob was created"},"updated_at":{"type":"integer","example":1633036800,"description":"The timestamp when the TrainingJob was last updated"}},"title":"TrainingJobSummary"}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

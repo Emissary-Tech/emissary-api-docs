@@ -1,0 +1,72 @@
+---
+id: cancel-training-job-by-id
+title: "Cancel training job"
+description: "Cancel a training job."
+sidebar_label: "Cancel training job"
+hide_title: true
+hide_table_of_contents: true
+api: eJytVVtv2jAU/iuWnzYJkrbrE09jHZXYprYanTQJIWQSh7hLYtd2oCjKf985jgMhafsw7QnnXL5z+86hopZtDZ0s6aNmohDFlnyTG0NXIxpzE2mhrJAFndAbVkQ8I4zY1u5JbgI6olJxzdBoHoNZ5MxaLID6cgD5iCqmWc4t1xirogV8gLXS8olHdi3QRGAYxWwKbxOlPGd0UlF7UGhprAY8WvfTekw5mX8lMiEWXh4PADR/LoXmkJLVJa9Hx5Bt+mtIfxj33O39YN1GvJdyvUJco2RhuEH91cU1/vSwO2ik6SKPiSmjiBuTlFl2wOKvX3O9k5bcyrKICddaasglkoXlhUVTplQmIjeg8MmgfTVMVW4GbVtC/syWBoQn1JgjMaDLMHMrmmq82QlMQOwtR4dE6pzZRvTpCpFeWK4yMII66hZ40LGOnastwdqwepfAu+ZNIetC2rX3AjcrrFNOlZhhRMC89coa9cDLVCJ5lTTWcRW4MKHh7jL0hDJhdaJqHbaTH8OsQNWjVB0240NOcL1rKV/qDEBTa5WZhCFTItgLoFEujGH6EEQyp32+zbySTB/mpMGiyCbDo1ILe3C4gLT+w/G96uoWOONmQkeLY+dA8h0Eo3Ypfo8hwrgRuXVIOYsxWI3fiXSuvovdpAYZ7y6Cy+ACxLDpublPFpC0iHin8P1+Pyg8dNZjmYyNt28ozCJHYeCqwN550edB3yBL4DiH/UJzX9NUMWgBuXLpnJrvU2BOG0i9Db2rCX/Mb2Z3i9kYXILU5hni4via0prKQIQsyVnRCeVvY+8gnHWmOu3k26fUT8fyFxuqDHQYzqVeeVIu6e6Sjtq7ics5ObuhZ8xE7fDceXICVVKkO0BW1YYZ/ktndY3i55JrRyeonmnBNjh2IFosDL5hURKWmf5x7Bb44ac/Ix/JW/f51VJbdhbIwx3LSvyCpyNv988C7/l/SKc3sH/Iqd/eegUufnmwZ43VFI64sh3/wVHGzT2eoYf7xSOs3l+85pmc
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Cancel training job"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/training-jobs/{training_job_id}/cancel"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Cancel a training job.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true},{"name":"training_job_id","in":"path","required":true,"description":"The ID of the training job","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Training job canceled successfully"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

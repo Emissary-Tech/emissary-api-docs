@@ -1,0 +1,72 @@
+---
+id: create-project
+title: "Create project"
+description: "Create a new project. Projects can be created and used to organize datasets, training jobs, and deployments."
+sidebar_label: "Create project"
+hide_title: true
+hide_table_of_contents: true
+api: eJy9VV1v2jAU/SuWX/YSEmi7F55GKx7QprUanTSpQpVJLsRdEnu2A2MR/333Og6E0nXSpo0HMNf36xwfXzfcibXl4wd+Z9QTpM7yRcQzsKmR2klV8TG/MSAcMMEq2DLdusWs82epqNgSWOq9MiaqjNUWF04xZdaikj+AZcIJC85GzBkhK1mt2ZNa4l/yzkAXaldC5WzMI640GEGlZxkWb9OGYrhr4FsN1l2rbMfHDU9V5TCQlkLrQqY+Mnmy1HnDbZpDKWjldhownVqGPIgD6zgJlnYrUULPyzqDLaIXfBelLshU7h71oYlTfu5zYJSAqRVzuO789vRpO5YGEMxKFBa8xWpV2bb0xXBEP+cpO0ID9jeW2boshdmxA4g/Rn9aLVRg85D/9mWSZPYbiuxgdHF59fZFgupK4sExmWG/ciXBsJUyp3RF/+oYIu6k8+EBaQDK2wO6Gg7PT2BWbUQhMzardO0YGKPM3xB+FMEDwhKutgTLZ1085znsH7NILLoGqo+clcK1psuLPjMIYt9lfJXBa5GxcIlOqJloOaXoANzj7iRcgssV3UatrNeFcDn+SzajRHdjI+IWzAYMDZOG16ZAh9w5bcdJIrSMtxIPpZTWIvFxqsqz85uGTTa5m7E2F98vKG1aG+l2Pi9mevwKtF709+ZEfMveweNAAlreo6GTF/8ywAqD1iSpcg4io2KIlE7y03HETDvauhHRF+CewlfKVwok9jGcAdwM41E8RLMDU9rb1RwxyhR6PG232zOeEu89UKuBDf6tDEXqZYh6k0R1ML07oxm7RJ0CjpseiokWyBi78O0czyq0IPxujNM7CaE2+TC7mX6cTwcYEueuLCgvnXYLrUWGJhJIKapeqfB6/OLW9ib4/35ngjocfHeJLtCb+vdcNEHgD3wzaqfg4WXM6QLgRtMssdBnU+z3ZEbBGC9KJEUYKZakBpRo1GmLtOtVyW9avIN7Kk/uRd2K9Nk42UddxCRNQbtXfRe9O3p3O79H52V4IUuVUYwRWxpD+D3m/pGlaH9hvK3hhajWtViTb5uTPj8Brz7Otw==
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Create project"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Create a new project. Projects can be created and used to organize datasets, training jobs, and deployments.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"content":{"application/json":{"schema":{"type":"object","properties":{"name":{"type":"string","example":"my_project","description":"The name of the project"}}}}},"required":false}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"201":{"description":"The created Project's summary object","content":{"application/json":{"schema":{"type":"object","description":"Project Summary Object","properties":{"id":{"type":"string","example":"ms-12345","description":"The unique identifier for the project"},"name":{"type":"string","example":"my_project","description":"The name of the project"}},"title":"ProjectSummary"}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

@@ -1,0 +1,72 @@
+---
+id: delete-dataset-by-id
+title: "Delete dataset"
+description: "Delete a dataset."
+sidebar_label: "Delete dataset"
+hide_title: true
+hide_table_of_contents: true
+api: eJytVN9vmzAQ/leQnzYpgbbrU56WLVSKVnXT2kmVqihywQR3gF37SBoh/vfdGSfQ0PVh2hPmfnz+7u7zNQz4xrLZA1tw4FaAZasJS4VNjNQgVcVmbCEKASLgQdqFhGzClBaGk3+ZYkTqIjzClz3aJkxzw0u0GkJvWIU/GKmNehIJrCWFSELXHHI82yQXJWezhsFeU6QFI6sNa0/Z3OUiWC4ClQWAJ4+HAEY819IIpAOmFu3keKVnPb7ydcb793iQ94i2K4K0WlVWWPJfnF3S56SZHVDQtSwNbJ0kwtqsLoo9FXv5VtKNguBK1VUaCGOUQRaJqkBUQKFc60ImbhjRk6X4ZkxSPY7a9IDMOdQWjT1qKmj+2FWcL8iuDh/Wg0m8eyMoIVOm5NCZPl0Q0gsvdYFBWEd7AB71ahDnasuoNqreEXg3vCtkXSlY+yxMAwnOOdcyphsR88o7W/KjDnPVC9WpEyUwY9H2PPISslHTi7ON/MDR2uunpfELsz1oujYFYuQA2s6iiGsZ7iSKpZTWcrMPE1WyU1XF3hnMfyyDDouRcKxIaiNh73ARaf1b0Hk19N3SULuRHCOOrULLNzRMDqq/n+IN087kRJ8LntJlLf1nyqX6tg1JjRhvz8Lz8AzN+JRL+z27RdIyEYPCd7vdqPDIRU9VNrU+vtMsT5xmUZySeudNn0d9Q5YoaoFPicJ9TXPNsQXBhaPTN99T4M4bKrOJfKqNrpdf45vbeIopYQ5lQbg0vq60rjI0aWWh5NXgKr/z+mf/qilN//7e3I5+JiBeINIFx/63nnDjlffAtudscliH9AZnr1bjQX7kGCwwVEOOXCm/aR7R+ssUbUvm51oYpxgskBvJH2myqKVUWjqj+DNe2NMtNyzkw0+/Gj4Gf9uxb9Z1EGBFUtvyoqY/PDp9Dhc+7eT/QKefyT/QGfSyXWG0fxXUqS5gjutYwyB1tF7pSR4XyiK+ju9ifFV/AMamewM=
+sidebar_class_name: "delete api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete dataset"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/projects/{project_id}/datasets/{dataset_id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete a dataset.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true},{"name":"dataset_id","in":"path","required":true,"description":"The ID of the dataset","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Dataset deleted successfully"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

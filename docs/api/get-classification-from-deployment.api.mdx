@@ -1,0 +1,72 @@
+---
+id: get-classification-from-deployment
+title: "Classification"
+description: "Get classification from a deployment using the provided input."
+sidebar_label: "Classification"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1Vt9v2zYQ/lcIPm2AbSVp9uKXNU2dwtjQBnWKFgiMgJEoi50kciRl1xD0v++OpC3J0rxiTfOQKMfjd3ff/WJNLdsYOn+kyzLlmpcxp+sJTbiJtVBWyJLO6TtuSZwzY0QqYoZCkmpZEEYSrnK5L3hpSWVEuSE240RpuRUJT4goVWVndEKl4trdWyYAt+H2tod2B2Bvj0igr5hmBbdco2c1LeEfuAe4X3lsn0QCKgIdU8xm8G3ijBeMzmtq9wo1jdXgDG1OA3kA75ZviUwPfiIeAGj+dyU0B+esrngzOZps4xta7V86b6rDk5VkM87nuUiatTfIjX0jkz1qnLd/75NA9rLSPhEklfrELFiMZWmRdABkSuXhIPpqEKUeOiSfA2fAHmTVCm7w1FkY+j2h/BsrVI6izxmzRBjHR8yUsCxHeu40g6L7nY4R2Pq9y0ScjXMH5HST8Rh8WTeNPzBKlsZ7eXVxgX/6hlZVHHNj0grcOdTpCxKTnGelH8v08urV9W+jXFSlgPQTyGlpQZ9rx4sj84SONujzpu+ZFmbUlgImRWyhhcfavl/QtGk809dj5C7LLctFQpYuk1xrqX+E226ajWW2Qv896vqU+XDeoggwuuFoH5grmPWiV1ddUiCI5oB4lrw3LCGhIV0BWmGd/EaJBd4Ogbu46YGg6yFB76Uld7Iqk59KDqIm/MU4uv4+jjC2FGPDmnQOnFX3gTyV0j6FWyO8AuZdOHSkwprIJG4VJY1fHTCc5zTaXkZhvpuobjdHE7WVCwe9+d5Eg+louN4etlClcwDOrFVmHkUwwGY7Aa1QCGOY3s9iN8D7yV2EQ3JzvyQei+IkNzyutLB7hwtIT39x/F53z1aYZ5+lo8aRPZD8AYLJYU99mYKFqRe5HZVxlqAxYAgL52O7OhYHvo9D+78mc4OYqXTmQza6gQ2i3l7MLmcXIIYFXpgP6QoCFzHvkLfb7QbkRU57KtOpCfq+FVjsWgFqXiD/QfR6wD14Cb3Cw9QLvNwoBjSSK+dOm8DgAnOnM6k3Ubhqoj+Xt4v3q8UUrswyW+SIiyXgQ/ORgQirrWBlx9Ttae30SKnbtv7x51QoAsu/2UjlTLiZ76KrQ/0/0u2lX0WuA+Bz3ns9dZoAz06fOSd9AFWZYXcBbF0/M8M/6bxpUAxVpV3lAkmwTdgzVgfUdCIMfkNfpiw3p4+TLhm/fAxT61fyb6+z0XAPjVBiycOorfA/+HR90n0q4mvuBdz53hfc/3C2z36zhguhfZFKr3PrPZw+IFKLMVgQGK2/cQOvGmXP6q474/P+w+oBlJ/D47Jw05pqtsPFAr+dv9Ix5maSk9U0Z+WmYhvU9Zj48w89DkmV
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Classification"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/deployments/{deployment_id}/classification"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Get classification from a deployment using the provided input.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true},{"name":"deployment_id","in":"path","required":true,"description":"The ID of the deployment to get classification from","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"description":"Provide your input for classification","content":{"application/json":{"schema":{"type":"object","properties":{"input":{"type":"string","example":"What is the capital of France?","description":"The input for which to get classification"}},"required":["input"]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful operation","content":{"application/json":{"schema":{"type":"object","properties":{"id":{"type":"string","example":"classification-12345","description":"The unique identifier for the classification"},"response":{"type":"string","example":"Paris","description":"The predicted classification from the deployment"}}}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

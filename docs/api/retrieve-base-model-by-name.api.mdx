@@ -1,0 +1,72 @@
+---
+id: retrieve-base-model-by-name
+title: "Retrieve base model"
+description: "Retrieves a model instance, providing basic information about the model such as the hyper parameters that can be adjusted"
+sidebar_label: "Retrieve base model"
+hide_title: true
+hide_table_of_contents: true
+api: eJzFVU1v2zgQ/SsET7uAbTlpTzptsnAXQdu0aLrAAkFgjKWRxVQiVQ7lNDD03ztDybZqBTnsHvZkeTgfbx7fDPc6wJZ0eq+vgVB9dDlWpB9mOkfKvGmCcVan+gsGb3CHpEDV4qOMpQA2w5lqvNuZ3Nit2gCZjE8K52uQSAUb1wYVShyiqM1KBRQt5XODXjXgocaAXowQVAZWbVBB/thSwFzPtGO3mO0mZyR+QCJwI9rr51tOwH6nTNzOXluxppox4ToWX9vez0hDDYSSvz1+b43nMmnwLZ53/ZVRSpByRUQsuYZGglMt/+FO+cSQkkRIgVNSVmINOt3rwA1yFmLAdqu77kHqUeMsIcn55XIpP9Oaozpu84hZUExnVgrFAoMazExhMI/gFlwzczagDZINmqYyWeQreSRJuZ9C6rMKZ17YDaYH1FN2Dnym8QfUTSWmDxXUMH+zuJxfXM9vWAK+5TzdbAh5IdS2tagrc5Ih9shwKyDiDnqY4lVvMBcJkZyyDESBp6qj4G50z+uAbIeAL3UGnE8ioPr8S4/O4qciCuTsemZHC0PeoB9bDNO7FdNDxwCobRrnw5rQ79BXSDQCsHGuQrBj1gqoCCUwmBD7OWr3rq1r8M+sDTl+u3w71cOtC+qda22u0Hvn/8tln8R+z11DaIXtU9YchfVfFTG4pRMmZrof8t705nLcL/fRHRK/qibprZDe5FojgFfd+0bW1oX1EDXi9KoxK6nIOd8Nh5FUVkrpZHFsMQpe5j7Vye4iiQNGyf5sQ3Qyw/Fm+z3S+ooDyhAaSpMEGrN4MjyFtSHiq1uwNvX53lgNh+rq843qc2mZfsKs9SY8x7ycaf0N5fthfHYn19eTf/Q4ksKW92yYHZbbP3OuMO9Nca2VCLkU6+R/4WLoQNAY1ATxbrm4WCzZzGNV06fijkGbDEeNPz09TRpPovfcFXMa/Ht1QhbVyTI0VRzfaPpjwhujZPki78PT9uGLBKZAXUY4J/IHCBBPF85vkyGUkg83f65u71ZzDlmUoa4kr1xf31rfmewNR6EGOyp1eNVGC/ecmf1p3P7XR3AQQMAfIeGdZ+ImjOzsB03f690FO/aq5o/0/OVjkZVMgXjuo+j/9lXXiZmfLh+FyLyBN7ARwbBEc0PynQ8r7BVqfvsy7Jbf1b96NF9s7yB6K/LeQdXKP/6MMzF52Hk3zw76F/C911WWYRNG8ZOVKcN3XBJ/rb7y8PwEqtwltQ==
+sidebar_class_name: "get api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Retrieve base model"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/v1/models/{base_model_name}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Retrieves a model instance, providing basic information about the model such as the hyper parameters that can be adjusted
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"base_model_name","in":"path","required":true,"description":"The name of the base model to use for this request","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"The base model object matching the specified name.","content":{"application/json":{"schema":{"type":"object","properties":{"name":{"type":"string","example":"Llama-3.2-1B-Instruct"},"type":{"type":"string","enum":["completion","classification","embeddings","chat"],"example":"completion"},"parameter_template":{"type":"object","additionalProperties":{"oneOf":[{"type":"string"},{"type":"number"},{"type":"integer"}]}},"support_serverless":{"type":"boolean","example":false}},"title":"BaseModelSummary"}}}},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

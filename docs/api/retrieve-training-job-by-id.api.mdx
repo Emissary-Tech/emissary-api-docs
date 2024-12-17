@@ -1,0 +1,72 @@
+---
+id: retrieve-training-job-by-id
+title: "Retrieve training job"
+description: "Retrieve a training job."
+sidebar_label: "Retrieve training job"
+hide_title: true
+hide_table_of_contents: true
+api: eJztV21v2zYQ/isEP22AX+O0HfxpaZMM3ookiFOgQBAYtERbzCRSJSm7hqH/vjtSsmnL1oqu2Idhn0yLx3vu5eHxbkstWxo6fqZPmgkp5JL8ruaGvnRozE2kRW6FknRMH7nVgq84YcTWkq9q3qMdqnKuGYpNYhDUlWCtD9S938BOh+ZMs4xbrhFvSyX8Aflcq1ce2ZlAEYFQObMJrE2U8IzR8ZbaTY6SBhTLJS2PTXtKOJlcE7UgFlaVPlCg+ZdCaA5GWV3wsrODrB2YgQNN3MNj7WDHoThrc/mCik2upOEG9y8GA/xpKg/ids0tEylRc3SIZMxGCWIhsMl5JBaCx2AMAkdKWi4tqmR5norIJaT/alDvtmmX10kb3gUkIPe1DIQUUmyFtxwC1vCvQ/lXluWpj253eDG6fNNUDnYXUnwpOBExGIv2a7JQuhFKzLHPVTuQP9EdnoRCBafy1CBQG8atkLxrC1nHPVMxh4xIkm1IzCwzvBnEKxL8P2fBHI7OnLZ2Az6mLGPdUe+iO3zfnUiQKE7lDRBQY2VfYYAYLrAVKiIay2xhTqLJIsMS8MBl7L88FlL61RM31q+mRRRxY2B1C6zkeG2eRMbj+wLt+cBkxFP8/BKav1fUNDgqtAYaEG/YuUAB+ZYacfeGC+D6kuswTu/etCHUOs5huP+zOp9/e0uuvSCZFlnG9OZ7L0psvuui1GZ+0x3JNrNzND2+I4HeSHNmeTxjtj3qw7ej0WD09pfB4JTyT3eTz8QCRSDBWU7WCZchEFkzQyokBBVmVuSpYjEP4zZXKuVMhqiummPWhHU+VumosuHyCZD/p/O/k876vU7VQR1gWrMNvt6WZ+ZUng8TuLM9EIXKNz8XBEA+AmxKD3qY87JEBxIQ0rOwy2laxOJYYExZ+nBgm5L8fuHaouNm5xg8+FKnsHwpgyzPN+0cgseh9YWGbexw1omq03myZv4YUp3gU9AAHXOqyON/BzNlxpIKjYbkbHRn1Of+cnDZbOfulCW3qpAx4Vor/U/atH1T+lw/5ODvTmvM8dk9pHvjvd8HCmpPhjHET6OLMHLgR1krbmUR+rZA3xwX0IBWce/ITCo7q04FQb3KxQ0igs7batMFFa5RonCmWLp65/rzMe2vhv2qyTf97X58KPu7hhAoCltHbX6J/TnXq3r+KDS0XjSxNjfjfp/lorcWwIVMGAN1pxeprHE/bqpNcvUwIV4Xxc7ecOg0hN04vaBp9ifH9Uu4N8Xc+szsJPaVLBd/cCxl1YTyuQsIXf/JzSYJh0KqXdSEXChfznz0QqMaFq+gQPUGFJ9EnZn7xRSMFhEPHF+v1w3H+066qxZdU8l76rLIURc4KjB21adfG3HDygmnYNZB8cqnq5xBCMiFM2cf/MoE5nZ7Si/71VHT/zj5cHM3venCkV5isxT1Yvq8a94z7BCVsRmTAdRuWD0oWo22f3cb26bbKkOWf7X9PIU9V4i0a9s9I5/paugfG8dJWI4PhtoDWuLu8fwJLEnAB9S03WIb/0mnZYmfoWfQjkngONOCzTHjwLFYGFzD3Viw1BwPqaFnPz1WleNncm5OPulhTUyJFFyxtMB/sHS8DYd2fI9+gDnfFPZ2o47DCs9ip744GDQvdQVTTG6D841CjLd2V3p+u3mCW/cX5KbiWg==
+sidebar_class_name: "get api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Retrieve training job"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/v1/projects/{project_id}/training-jobs/{training_job_id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Retrieve a training job.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true},{"name":"training_job_id","in":"path","required":true,"description":"The ID of the training job.","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"The TrainingJobDetail object matching the specified ID.","content":{"application/json":{"schema":{"type":"object","description":"Training Job Object","properties":{"id":{"type":"string","example":"tr-12345","description":"The unique identifier for the training job"},"name":{"type":"string","example":"training-1","description":"The name of the training job"},"description":{"type":"string","example":"Fine-tuning the model on my dataset","description":"A description of the training job"},"base_model":{"type":"string","example":"Llama-3.2-1B-Instruct","description":"The base model used for training"},"status":{"type":"string","enum":["Pending","Running","Testing","Success","Failed","TimedOut","Cancelled"],"example":"Running","description":"The current status of the training job"},"progress":{"type":"integer","example":75,"description":"The current progress of the training job"},"train_dataset":{"type":"object","description":"Dataset Summary Object","properties":{"id":{"type":"string","example":"ds-12345","description":"The unique identifier for the dataset"},"name":{"type":"string","example":"my_dataset","description":"The name of the dataset"},"created_at":{"type":"integer","example":1633036800,"description":"The UNIX timestamp when the dataset was created"},"is_uploaded":{"type":"boolean","example":true}},"title":"DatasetSummary"},"test_dataset":{"type":"object","description":"Dataset Summary Object","properties":{"id":{"type":"string","example":"ds-12345","description":"The unique identifier for the dataset"},"name":{"type":"string","example":"my_dataset","description":"The name of the dataset"},"created_at":{"type":"integer","example":1633036800,"description":"The UNIX timestamp when the dataset was created"},"is_uploaded":{"type":"boolean","example":true}},"title":"DatasetSummary"},"training_loss":{"type":"array","items":{"type":"object","properties":{"timestamp":{"type":"number","example":1633036800},"loss":{"type":"number","example":0.1234}}}},"hyper_parameters":{"type":"object","additionalProperties":{"oneOf":[{"type":"string"},{"type":"number"},{"type":"integer"}]}},"created_by":{"type":"string","example":"user-12345","description":"The user ID who created the training job"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the TrainingJob was created"},"updated_at":{"type":"integer","example":1633036800,"description":"The timestamp when the TrainingJob was last updated"}},"title":"TrainingJobDetail"}}}},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

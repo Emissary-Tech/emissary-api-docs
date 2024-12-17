@@ -1,0 +1,72 @@
+---
+id: delete-project-by-id
+title: "Delete project"
+description: "Delete a project."
+sidebar_label: "Delete project"
+hide_title: true
+hide_table_of_contents: true
+api: eJx9VMFu2zAM/RVDpw1I7LbrKadlqwsEK7pi7YABRRCoNh2rsy1VopMGhv99pKw0btP1ZJl6JB/JJ3YC5dqJ2b24sfoRMnRiORE5uMwqg0o3YiYuoAKESEZmgMRiIrQBK/l+kRMi94gQ4duObBNhpJU1WS1H70RDP4QMIVaKIYqjG4klnV1WQi3FrBO4M4x0aFWzFv1bNnclRIuLSBcR0mlEycJTqywQH7Qt9Eu2OKMbB47Dnp2c8+d1sEA5GgrII9dmGThXtFW149Tn7zlda4wuddvkEVirLaXOdIPQIEOlMZXKfGuSR8f47rg2/cBZX3G+p4Ilto6Mh6g58DSoRuo2qqGOADsEU5R7DexQaFtLHExfzjjSs6xNRSCqo98HPmrxCOdrK7g2rt4T+BA+FLJqNK6CF7mhQn85NyrljBTzMlz2fE+qKPVBNl4rpIGZSDanSRioS7qDVHrWB9jNXkutrQhdIho3SxJpVLxVJIZaOSftLs50Ld6qJg2X0fxmEQ2xBEvEQdZahTsflyKt/gKfl+O7Wx7f0PwXxEtTyPKDDJO9wP9MKcN0MHl9lyBzTtbzf6G9a2jQmNQR481JfBqfkJmeUO1+FrdEWmUwKny73R4Vnnj0VBdTF/CDOmXm1UkyVNy7YPp61DdiSfIFejQMDzXNjaQWRGeezqH5gYL0t7G26yS4uuRq8T29vk2n5BKXWFccl8c3lDZURiajHdayGaUKuybM/m1TusNLe3crhZkgPGNiKkn97wPhLmjsXmxOxWS/hvi1zUYriYZeEiWGdd2DdPDbVn3P5qcWrBcG1SGtkg88QJJMrhyfSc2FrBx8wPfTr/DWP0f/XWHv8t8LrWFJbWTV8h8dvQ7HC7VfEjrIjbkNgDltNIMj16MNxVp/eZMX6VV6l5Jc/wF6TRP3
+sidebar_class_name: "delete api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete project"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/projects/{project_id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete a project.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project.","required":true}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Project deleted successfully"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

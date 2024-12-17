@@ -1,0 +1,72 @@
+---
+id: create-dataset
+title: "Upload dataset"
+description: "Upload dataset to the project."
+sidebar_label: "Upload dataset"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1Vt9vGjkQ/lcsvzSRgIXQVieeLm3zgK5qqpJIlSKEzO4Q3Ntd+2wvFKH932/GNmCyXPpQ3RNmPD+/+Wa8e+7Es+WTJ/5JOGHBWT7v8QJsbqR2UtV8wh91qUTBiqDAnGJuDUwb9QNyN+A9rjQYQcrTAtVzA8JBdIe3WhhRgQNDYfa8xj+oFc0XskAVSWG0cGs823wNleCTPXc7TZrWGVk/8/ZlWg+YxPQTU6s0HXRg4J9GGsBUnGmgnQcJWPdBFTvye67Q47mqHdSOrqqmdBITdtlKmapPJZO4k5NaxmAYFot3EizdrmQJ3cx7nJwJDMCXshZmxy+VcoCXfLCroMiC4TVh3vguEAwBwW4U+CkqTQnwarcojvh3Q5GDA26HsFfKa4jymrdtCuJTqGretkFutaptKPdmOKKfboDY/DeW2aaqqJAAGJElQVtoXcrcMyf7Ycn6NajPw8QQbBYD3F/uCNLrVaQK2x/djN++u4hTU0skDpMF5itXEgz1I0Xt/+oG+Q1jVCyES7xLxO4ZTOp+9H48Ho7f/zEcXnL++GX6nTlZIf1Rn23XUJ+1fSssi5EoqLSLwDNIcVsqVYKo06h+tNDASedrjO2I3eCBLG+Hwy4/pvVGlLJg01o3joExyvwOK1KiYo2usZSm9zp/SYZ4fwnO44SiaHyTVopFtAePr7b5A+7IuGl4Cs2tlndkHQv3dXuAUAf34lrR0tTKhl2JO3DCs80oiwvNZvvTqmyz4rClcVGC2RyWamNKNFs7p+0ky4SWg63ENlfSWmzHIFdVh3p38ZLdfp2y4IvTsrSQN0a6nfeLnhZ/A53n6d2M2hEwPWocoUHJX0A7Lm76732M0A8iv+jXgPwyHiNZr5Q3jVilSXUy3gwHo8EQxfiWVPZ+NcOkZQ5J4dvttlN45rX7atW3UT+wTeSebUgrSdhF0Z8d3DBLpCPgziP1WNOtFggBu/HpnMCPKQh/O1DmOYumNvs8/Xj3ZXbXR5PB2lUl+aX2hdJCZSgiHlSiTkKdv74vQdmfJufX73RskIOfLtOlwGa0Mft9ZN4T34zCDvXcw+Pk7KEuko+ENVEWLfb7JcoeTdm2JMYBMJ4wWJ8wUiypsUilQlo6I9lXorTwSh1X3+JMX7P/euMvVnLgX01Mw1lr6B8ePT3TD452jtqRhZRaUPgYEug/kJuTg0ufBG3vYHSb56Bdot7ZXjQ3xzH/ej97QOVl/BKpVEE25Nj77Z2ONHFt+y/wf04z
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Upload dataset"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/datasets"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Upload dataset to the project.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"multipart/form-data":{"schema":{"type":"object","properties":{"file":{"type":"string","format":"binary","description":"The dataset file (binary format) to upload"},"name":{"type":"string","example":"my_dataset","description":"The name of the dataset (optional)"}},"required":["file"]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"201":{"description":"The Dataset's summary object.","content":{"application/json":{"schema":{"type":"object","description":"Dataset Summary Object","properties":{"id":{"type":"string","example":"ds-12345","description":"The unique identifier for the dataset"},"name":{"type":"string","example":"my_dataset","description":"The name of the dataset"},"created_at":{"type":"integer","example":1633036800,"description":"The UNIX timestamp when the dataset was created"},"is_uploaded":{"type":"boolean","example":true}},"title":"DatasetSummary"}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

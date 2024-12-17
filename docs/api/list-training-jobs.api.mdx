@@ -1,0 +1,72 @@
+---
+id: list-training-jobs
+title: "List training jobs"
+description: "Returns a list of training jobs"
+sidebar_label: "List training jobs"
+hide_title: true
+hide_table_of_contents: true
+api: eJy9Vt9v2zYQ/lcIvawDIss/2m7w07LOG9IFTRGnQIHACGjpbDGTSJak7HqG/vfdUVQsW44x7GFPpsnjfXfffbzTPnJ8baPpY/RguJBCrtlHtbTR4irKwKZGaCeUjKbRPbjKSMs4K4R1TK2Yay8804WrSGkwnKxvMrQnq9blx8ZAc8NLcGAIbx9J/IOG2qhnSN2TyNBEEJTmLse1TXMoeTTdR26nydI6g86i+jS0hxzYzW8+JFwFf+jAwLdKGMBonKmgXtCO1UpasOR1PBzSz7Gv25BcJ/QfLLNVWXKzY2pJrgfoO1XSgXTkgGtdiNRnnjxb8rLvx86N4TtK0EFpO/uNx6iXUqcYbB7Q71pbTBG5dqLJA4nrcXQVwXde6oK2nIlH48nbd30QZKuS4lsFTGSYjFgJMGyljOexW17ivCnXZaDmRjw6C0UO2iKdOl9yC0+lyqC4DHFb8JLHk8E4Hv0a30i0qM6xhwjkkXmPrLKQNWkFVEK0jrvKnkWTVUkP4jPIrNm5r6RsVvMqTcGSmH/nogCS7IMoIburKIoPXKZQ0PaiG/Thej/MtDIGqWdNOK/RgwVfG8I9hCtQf2swXXZ+encJofXxGkZqgDvInpa7yyVANi8KCo/pNW5zxYLLi3DcXU5q9H4yGU7e/zwcnkNzSD5SV2rEA+mBOi+XbbltgyDMSmf/D2bBsYsEtKhGZCecJ69jGF41Htdk8XY46nejL5JXLldG/I0sgjHK/IfW89JiDv3wsZU/Ju29Lk6bSu95HGjCl1QSg7Q1GXd5wxzq1uNFDXXzOuLnWosZXT8x8Azh6MgVjZY1+CZIU2IaJZtRElq+TfaHYVInL+0ozCcU5qadPZXBRhPlzmk7TRKuxWArsJClsBZrMkhV2RP3LByy6883rPEV0UyxgC9MuJ33i56e/gJaL7pnc6pJQ+yLxWE0aPEn0GwIA/FrjAhxs+XnYQ48I7Ca/q+Uvxr46gbVi3gzHIwGQ9zGkVvau9UcgxYpdBLfbre9xBNvHatVbIN9IzmeesmhtgRxF7Z+6fGGUaImAacsmYecrjVHCtjYh3MgP4TA/elAmXUSrtrk9ubD7NN8FuOVQe7KgvxS+ZrUmsyoMyrrSi47UH6Cn36bHBGzPzyhf/FZE6rk4LtLdIFnvpMYP6gaDT5Gm1Ezlb0KcTk9+qg5FiLKIseg6dp+T1PqiynqmrZxEBsvHcyUG8GXVGIUVSYsrVH6K15YuJDNm/vwxH9kr30UnU2nVaIkzW14UdE/XHqhdr/Q6gVaBz1SaI3BNQ5F7TpXe32JHsPL+/1j9oBi/gf/6pgM
+sidebar_class_name: "get api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"List training jobs"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/v1/projects/{project_id}/training-jobs"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Returns a list of training jobs
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"List of TrainingJob's summary object.","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","description":"Training Job Summary Object","properties":{"id":{"type":"string","example":"tr-12345","description":"The unique identifier for the training job"},"name":{"type":"string","example":"training-1","description":"The name of the training job"},"base_model":{"type":"string","example":"Llama-3.2-1B-Instruct","description":"The base model used for training"},"status":{"type":"string","enum":["Pending","Running","Success","Failed","TimedOut","Cancelled"],"example":"Running","description":"The current status of the training job"},"progress":{"type":"integer","example":75,"description":"The current progress of the training job"},"created_by":{"type":"string","example":"user-12345","description":"The user ID who created the training job"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the TrainingJob was created"},"updated_at":{"type":"integer","example":1633036800,"description":"The timestamp when the TrainingJob was last updated"}},"title":"TrainingJobSummary"}}}}},"401":{"description":"Unauthorized error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":401},"error":{"type":"string","example":"Unauthorized"}},"title":"ApiErrorUnauthorized"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

@@ -1,0 +1,72 @@
+---
+id: get-completions-from-deployment
+title: "Completions"
+description: "Get completions from a deployment using the provided input."
+sidebar_label: "Completions"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1V21v2zYQ/isCP21AbDluimH+sqVpMhgb2qDO0AGBYdASZbGRSI6k7LiG/vvuSNqSbM3L1iwfEoUvz90998odsXRlyOSRTEXGNBMJI/MLkjKTaK4sl4JMyC/MRoksVcFwwUSZlmVEo5SpQm5LJmxUGS5Wkc1ZpLRc85SlEReqskNyQaRimuLFaQpYK2ZvGqg7QHp/gIHDimpaMss06rQjAv6BSwD6hSV2wVM4wlElRW0O3ybJWUnJZEfsVuFJYzVoQupjEx5Aten7SGZ7JREPADT7s+KagWZWV6y+OIhsjDuV2r10XlSLJCujVQ+T58yo514aM/adTLd44rzwe09/tJUVWlkq6x0RZVK3JYPQRAqLpAMmVargiXNS/MUg0O5UJ7kMnAEuuNRyZnDXwZ+qfkHYM0VxsPQ5p6CGcXwkVHFLC6TnTlMIt59IH4Fe6WAB6t7l0jlYLkyQcBC+lLJgVLSl97H0OWeAp9EjlWGRg8EABjlCOnDLShe2lW7Di6pcMt1GHw1/6FP/gNjCCdIQvaTPC8E2CyufmDAtARxcsnISwOaSWr/0ZtwW+XY06hMJmLysysjriPyChMhL8KEnUBEn30q1UP9g1499QpKqrAqIk7XLoSVd8oLbrXcQSooMKyBI8EIQ89RrXcuYPjGNDTlf5RD8HWmNTU+MqSBcDZ4GGS+gcoT8F3KhmWLULsQKasrC8K/svC7jXk/CNUfmAFGcVLqWPI08uM/Sdkl4DBkxr2u/YRTkm8+V8WiEf7pSZlWSMGOyCpJiXypfMT3T87nZ1ITB5fjN1dvebKwEhxoUQWERlmccXLNPyeY6aRl7XuRDXxnA+nBPNTfDXg320Zu2JPo+dFwYas/7VR/VU7GmBfhu6qoL01rqb2G67XRjIcmxrHrU+bEfwv6/S3Uwot4jnqX0HcWAdH3ChaPl1q1fK36Lt4Phzm6yJ+jqlKAP0kZ3shLp/0oOoqbs1Ti6ehlHaFuGtmGkOgXOHveGLKAfLMKtHl4B8y5sOlJhdMkljjlKGj/OwMAwIfH6Mg4zh4l3zTRTx03kwkZn5qjjbrs2TK/3Y1GlC0DNrVVmEseQSsMNhzwouTFUb4eJGyq6nr0Nm9H1/TTyWASnC8OSSkNVdbiAtHhi+D1v783Qyd5FhxMH6mDlV1i42A9OfwxAwsAvuaEpZzRFYUAPRs2nZpy5fT707zBFvGBUaLq+7+ydTu3a8XF3dQ0ztDzX10Jfwt7T3yXGNeqeSWdmcHmbwBN216Ph5XBEUBtdmo/ZDAjmCWs5abPZnDgpdqcHMhuYcN7nG01cvkFi8cKVaLf084mPQUtISBYKbuD/WlFwVzR26jSBElSgbnco9SoOV0382/Tm9sPsdgBXhrktC8TFUPOmectgCUO6pKIl6qYToB1Gdk3h+MbnQwgzy55trArKXaNxdu1Cej2S9aXvey7B4HPSeTC0cgz3jif7dppB0OeYuYC52y2pYb/roq5xGYJWu8QAbqBN0SUGBaRMyg1+Q85ntDDHk2abhu8+hYr4ffR3r5FeW/d5JjCjoIxX+B98ujRsP43w9fIK6rzoxfIfNO3yXs/hQigNyKM/c+PVGzwgUoNx0nnQVH/jGoYnZc+enbfq8v3H2QMcXobHVOnaANF0gx0Lfjt9pfLRgK8tXNuRgopVRVd41mPiz19yvEv8
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Completions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/deployments/{deployment_id}/completions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Get completions from a deployment using the provided input.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true},{"name":"deployment_id","in":"path","required":true,"description":"The ID of the deployment to get completions from","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"description":"Provide you prompt input for completions","content":{"application/json":{"schema":{"type":"object","properties":{"input":{"type":"string","example":"What is the capital of France?","description":"The input prompt for the deployment"},"do_sample":{"type":"boolean","example":true,"description":"Whether to use sampling or not"},"temperature":{"type":"number","example":0.7,"description":"The sampling temperature to use"},"max_new_tokens":{"type":"integer","format":"int32","example":500,"description":"The maximum number of new tokens to generate"},"top_p":{"type":"number","example":0.9,"description":"The cumulative probability for token selection"},"top_k":{"type":"integer","example":50,"description":"The number of highest probability tokens to keep for top-k-filtering"},"no_repeat_ngram_size":{"type":"integer","example":2,"description":"The size of n-grams to avoid repeating"}},"required":["input"]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful operation","content":{"application/json":{"schema":{"type":"object","properties":{"id":{"type":"string","example":"completion-12345","description":"The unique identifier for the completion"},"response":{"type":"string","example":"The capital of France is Paris.","description":"The generated completion from the deployment"}}}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

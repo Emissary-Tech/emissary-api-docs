@@ -1,0 +1,72 @@
+---
+id: create-deployment
+title: "Create deployment"
+description: "Create a new deployment."
+sidebar_label: "Create deployment"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1VlFv2zYQ/isEX9YCtmUnWTEYGLA0zQBjwxLUGTAgNQJapG2mksiRlF3D0H/fHUlbkqU6wIb1IaVPx7vv7r6744E6trZ0+kw/CZ2pfS4KZ+liQLmwqZHaSVXQKb0zgjlBGCnEjvCT5ogOqNLCMFSbcVBMvWJtCxQ0MywXThh0c6AF/ABFbdSrSN2L5KAi0YdmbgNnm25Ezuj0QN1eo6Z1RhZrWp1jetoIMvtE1Io4OEV7YMCIv0tpBKBxphTVIkiEdR8V36PdtsKApqpwCBU+Ma0zmfpwkleLbg5dQGoZPYFPCN5JYf1Xw2QBSF9e1RLD6kQwoOIby3WGImeGk6vrmx9pX1RHSwQsYYhOkdIKslKmkXtMCCBLv2olA/joDX6JtTBNdzd9XurLpCjzpTDf92OF2QrzEhz0hAX3kUJBLRPWIi+KIYe8FRzZVAdei/swBQsEHfSjIe+4WLEyc+Rn8qU29oW+R5yBW5fyXlsaTnoRoIkjp9pJaOle8lGz34PP962CdrzeksbvPtdVk9PPHZ61aLCoqqBvtSpsIObVeIL/9TDANysnNeAfLLFlnjOzJyeW/+v2aDtsZGUeXTz0N9JbvcP1hd4pCwnNTiQHR3IlgUxYg241/1eqWMdcaS+1yqMoeJCEvDTPAmv6K5OZP9yxIhVZOD/JXPCH0rVbqnGrp8alMZjzAKkfbuTBC3tjjEw+XF+Prz/8NB73Ti0AB15yTXYbUZy5ITtmj3zzjHbSnTVLZAUNDL4Zj7uknRVblklOZoUuHRHGKPNfCNrsqlgyiNZbXZyTslPSOj9AsBxTh6Lrq9bcHY+ro8WLXPvIOIlbqpWdWy3v8XYM3MftEwQ6sFM3CneuVjbsWdifU5psJ0lchjY51Gu2Snhjwx9netjJpcng5sY5badJwrQc7STUL5fWQkVGqco73LqPH8nt4yyObYq71gpgnHR7bxcsvXwVeF40v82xIiGtJ41TdkDyGwiOHUr/GoKHYRD5d8JGMI7OIAVY4s/1cr8/5rNnGTc3bnNt3pxtt9aCihAuToI3pn2FqFfKY4pFbaauY247Hk1GYxDDgym3D6s5gJOpaJRnt9t1ypN47aFaDW3UD23BUt8WEI/ECkfRL53qAkroGwEbA9Vj2LeaQabIlYdTUyRCYP7rSJl1Eq/a5PfZ3f0f8/shXBltXJ6hXSRZCC1EBiIkLGS44Sq+L3nz3Xi2b09dfukxGmvoxDeX6AzKgO489EPsj2e6nYSN4zsEjtPWU5S3n8Eb7C24dDgsmRV/mqyqUAyUM57WEB8zki2xsEB4Li2egW8rlllxIYh3n+PweU++95DtDebYJQX2AwyFEn/B0TdR81VdLUA79gpCCwp3AcDwCc3UBjpzsxocb9ymqdDuou6iMYweH+ZPoLyMb+1ccbxj2A7nLfz1YJVPiB8AXnagGSvWJVujbrCJ//4BBnxb4g==
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Create deployment"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/deployments"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Create a new deployment.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","properties":{"training_job_id":{"type":"string","example":"tr-12345","description":"The training job ID to use for deployment"},"checkpoint":{"type":"integer","example":4,"description":"The checkpoint number to use for deployment"},"server_type":{"type":"string","enum":["serverless","on-demand"],"example":"on-demand","description":"The server type to use for deployment (default = \"on-demand\")"},"name":{"type":"string","example":"deployment-1","description":"The name of the deployment"},"description":{"type":"string","example":"Deployment for my training job","description":"A description of the deployment"}},"required":["training_job_id","checkpoint"]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"201":{"description":"The created Deployment's summary object","content":{"application/json":{"schema":{"type":"object","description":"Deployment Summary Object","properties":{"id":{"type":"string","example":"dp-12345","description":"The unique identifier for the deployment"},"name":{"type":"string","example":"deployment-1","description":"The name of the deployment"},"status":{"type":"string","enum":["Pending","Deploying","Deployed","Failed","Cancelled","TimedOut"],"example":"Deployed","description":"The current status of the deployment"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the deployment was created"}},"title":"DeploymentSummary"}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      
