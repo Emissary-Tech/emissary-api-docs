@@ -1,5 +1,5 @@
 ---
-title: Text Classification (Approach 2)
+title: LLMs as Classifiers - Guide
 ---
 
 ## 1. Objective
@@ -36,7 +36,7 @@ input,expected_output
 "This is another sample text for binary classification",0
 ```
 
-### For Multi-Label Binary Classification
+### For Multi-Class/Multi-Label Binary Classification
 In cases where multiple labels are evaluated independently, the completion should be a dictionary where each label is mapped to a binary value (0 or 1) to indicate its relevance.
 
 **JSONL Format**
@@ -99,10 +99,10 @@ Select **Classification** from the given options.
 
 This selection ensures that a **classification head** is added on top of the base LLM, enabling the model to return **probabilities** for the specified labels.
 
-![new_traning_job](/img/guides/NewTrainingJob.png)
+![new_traning_job](/img/guides/train_classification.png)
 
 A custom function that calculates a matching score for the given expected and predicted outputs, based on how well the binary expected labels match the predicted probabilities has been provided.
-Uncomment the <span style={{ color: 'red' }}>"sample_match_binary_labels_metric"</span> to use it.
+Uncomment the suitable classification metric function to use it.
 
 ![classification_metric](/img/guides/classification_metric.png)
 ### Training Parameter Configuration
@@ -134,6 +134,14 @@ Deploying your models allows you to serve them and integrate them into your appl
 ![artifacts1](/img/guides/artifacts1.png)
 3. Select a **Checkpoint** to Deploy.
 ![checkpoint_evaluate](/img/guides/checkpoint_evaluate.png)
+4. Go to **Deployments** to check the status of you deployed model
+![checkpoint_evaluate](/img/guides/Deployment.png)
+5. Once the model is deployed (as shown in the status), go to the testing tab.
+![checkpoint_evaluate](/img/guides/deployment_status.png)
+6. Test your samples in the the input box.
+![checkpoint_evaluate](/img/guides/testing_tab.png)
+
+
 
 ## 7. Best Practices
 - **Start Small**: Begin with a smaller dataset to validate your setup.
