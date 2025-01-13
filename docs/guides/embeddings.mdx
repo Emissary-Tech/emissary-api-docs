@@ -5,6 +5,21 @@ title: Embeddings
 ## 1. Objective
 Text similarity tasks involve calculating semantic similarity between pairs of sentences. For this task, the **All-Mpnet-Base-V2-Embedding** model is recommended, which is optimized for generating embeddings that can be used for computing similarity between texts.
 
+### Dataset Preparation
+
+Prepare your dataset in the appropriate format for the embedding task.
+The dataset should be prepared in CSV format with three columns: "text1", "text2" and "score"
+- text1: The first piece of text input.
+- text2: The second piece of text input
+- score: A numerical value (e.g., similarity score, relevance score ) indicating the relationship between text1 and text2. Typically, this would be a float value such as a cosine similarity score or a label reflecting their semantic similarity and value would lie between 0 and 1
+
+```csv
+"text1", "text2", "score"
+"The Eiffel Tower is in Paris, France", "The Statue of Liberty is located in New York", 0.23
+"Apple is a technology company","Orange is a fruit", 0.05
+"Machine learning models can improve", "Machine learning models can improve", 0.85
+```
+
 ## 2. Finetuning Preparation
 
 Please refer to the in-depth guide on Finetuning on Emissary here - [Quickstart Guide](../).
@@ -37,7 +52,7 @@ Now, go back one panel by clicking **OVERVIEW** and then click **MANAGE** in the
 ![project_manage_3](/img/guides/project_manage3.png)
 
 Here, we’ll kick off finetunes. The shortest path to finetuning a model is by clicking **+NEW TRAINING JOB**, naming the output model, picking a backbone (**base model**), selecting the training dataset (you must have uploaded it in the step before), and finally hitting **START NEW TRAINING JOB**.  
-![finetune1](/img/guides/finetune1.png)
+![finetune1](/img/guides/train_embedding.png)
 ![finetune2](/img/guides/finetune2.png)
 
 ### Selecting Base Model
