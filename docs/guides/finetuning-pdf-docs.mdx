@@ -1,0 +1,241 @@
+---
+title: Training Pdf Files - Guide
+---
+
+## Objective
+
+The following is a guide on fine-tuning a model with pdf documents for text generation on Emissary, specifically focusing on Llama-3.2-3B-Completion and similar models that support text generation tasks.
+
+## Data Preparation: Converting PDFs to JSONL Format
+
+Fine-tuning on PDFs requires first extracting text from the documents and then structuring the data in JSONL format.
+
+### Step 1: Extract Text from PDFs
+
+**Method 1: Using PyMuPDF (fitz)**
+
+```python
+import fitz  # PyMuPDF
+
+def extract_text_from_pdf(pdf_path):
+    doc = fitz.open(pdf_path)
+    text = "\n".join([page.get_text("text") for page in doc])
+    return text
+
+pdf_text = extract_text_from_pdf("document.pdf")
+print(pdf_text[:1000])  # Print first 1000 characters
+```
+
+**Method 2: Using PDFPlumber (for complex PDFs)**
+
+```python
+import pdfplumber
+
+def extract_text_pdfplumber(pdf_path):
+    text = ""
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            text += page.extract_text() + "\n"
+    return text
+
+pdf_text = extract_text_pdfplumber("document.pdf")
+```
+
+**Method 3: Using OCR for Scanned PDFs (Tesseract)**
+
+```python
+import pytesseract
+from pdf2image import convert_from_path
+
+def extract_text_from_image_pdf(pdf_path):
+    images = convert_from_path(pdf_path)
+    text = "\n".join([pytesseract.image_to_string(img) for img in images])
+    return text
+
+pdf_text = extract_text_from_image_pdf("document.pdf")
+```
+
+### Step 2: Clean and Preprocess Extracted Text
+
+```python
+import re
+
+def clean_text(text):
+    text = re.sub(r'\s+', ' ', text)  # Remove excessive spaces
+    text = re.sub(r'[^\x00-\x7F]+', ' ', text)  # Remove non-ASCII chars
+    return text.strip()
+
+cleaned_text = clean_text(pdf_text)
+```
+
+### Step 3: Convert Extracted Text to JSONL Format
+
+**Sentence-Level Formatting**
+
+``` python
+import json
+import nltk
+from nltk.tokenize import sent_tokenize
+
+nltk.download("punkt")
+
+def split_into_prompt_completion(text):
+    sentences = sent_tokenize(text)
+    json_data = []
+    for i in range(len(sentences) - 1):
+        json_data.append({"prompt": sentences[i], "completion": sentences[i + 1]})
+    return json_data
+
+json_data = split_into_prompt_completion(cleaned_text)
+
+with open("train.jsonl", "w") as f:
+    for entry in json_data:
+        f.write(json.dumps(entry) + "\n")
+```
+
+**Paragraph-Level Formatting with Context-Length Splitting**
+
+``` python
+from transformers import AutoTokenizer
+import json
+import nltk
+from nltk.tokenize import sent_tokenize
+
+nltk.download("punkt")
+
+tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
+
+def split_text_into_chunks(text, max_length=2048):
+    tokens = tokenizer.encode(text)
+    chunks = []
+    for i in range(0, len(tokens), max_length):
+        chunk_tokens = tokens[i:i + max_length]
+        chunk_text = tokenizer.decode(chunk_tokens)
+        sentences = sent_tokenize(chunk_text)
+        if len(sentences) > 1:
+            chunks.append(sentences)
+    return chunks
+
+def format_chunks_with_prompt_completion(text, max_length=2048):
+    chunks = split_text_into_chunks(text, max_length)
+    json_data = []
+    for sentences in chunks:
+        prompt = sentences[0]
+        completion = " ".join(sentences[1:])
+        json_data.append({"prompt": prompt, "completion": completion})
+    return json_data
+
+json_data = format_chunks_with_prompt_completion(cleaned_text)
+
+with open("train.jsonl", "w") as f:
+    for entry in json_data:
+        f.write(json.dumps(entry) + "\n")
+```
+
+### Choosing the Right Splitting Method
+
+| **Splitting Type** | **Recommended Use Case** |
+|-------------|--------------------------|
+| Sentence-Level Splitting  | Best for short, independent text completions or tasks requiring precise language modeling.  |
+| Paragraph-Level Splitting  | Suitable for maintaining contextual meaning, useful for paragraph-based text generation.  |
+| Full Document Splitting  | Used when training on long-context models that require full document context preservation.  |
+
+
+## Finetuning Preparation: Converting PDFs to JSONL Format
+
+
+Please refer to the in-depth guide on Finetuning on Emissary here - [Quickstart Guide](../).
+
+### Create Model Service
+
+Navigate to **Dashboard** arriving at **Model Services**, the default page on the Emissary platform.
+
+1. Click **+ NEW SERVICE** in the dashboard.
+![project_create_1](/img/guides/project_create1.png)
+2. In the pop-up, enter a new model service name, and click **CREATE**.
+![project_create_2](/img/guides/project_create2.png)
+
+### Uploading Datasets
+
+A tile is created for your task. Click **Manage** to enter the task workspace.  
+![project_manage_1](/img/guides/project_manage1.png)
+
+1. Click **MANAGE** in the **Datasets Available** tile.
+![project_manage_2](/img/guides/project_manage2.png)
+2. Click on **+ UPLOAD DATASET** and select training and test datasets.
+![dataset1](/img/guides/dataset1.png)
+3. Name datasets clearly to distinguish between training and test data (e.g., <span style={{ color: 'green' }}>extraction_train_jsonl</span>, <span style={{ color: 'green' }}>extraction_test_jsonl</span>).
+
+**Important Note**: For LLM models, it is recommended to use JSON Lines (<span style={{ color: 'green' }}>.jsonl</span>) format.  
+![dataset2](/img/guides/dataset2.png)
+
+## Model Finetuning
+
+Now, go back one panel by clicking **OVERVIEW** and then click **MANAGE** in the **Training Jobs** tile.  
+![project_manage_3](/img/guides/project_manage3.png)
+
+Here, we’ll kick off finetuning. The shortest path to finetuning a model is by clicking **+NEW TRAINING JOB**, naming the output model, picking a backbone (**base model**), selecting the training dataset (you must have uploaded it in the step before), and finally hitting **START NEW TRAINING JOB**.  
+![finetune1](/img/guides/finetune1.png)
+
+### Selecting Base Model
+
+1. You can select base model from the dropdown, the **Llama 3.2-3B-Completion** model is recommended for starting experiments.
+![base_model_1](/img/guides/base_model1.png)
+
+2. A custom function that compares two strings and gives a matching fuzzy score has been provided. Uncomment **<span style={{ color: 'red' }}>Fuzzy match</span>** to use.
+![testing_extraction](/img/guides/fuzzy_match.png)
+
+
+### Training Parameter Configuration
+
+Please refer to the in-depth guide on configuring training parameters here - [Finetuning Parameter Guide](../fine-tuning/parameters).
+
+## Model Monitoring & Evaluation
+
+### Using Test Datasets
+
+Including a test dataset allows you to evaluate the model's performance during training.
+
+- **Per Epoch Evaluation**: The platform evaluates the model at each epoch using the test dataset.
+- **Metrics and Outputs**: View evaluation metrics and generated outputs for test samples.
+- Post completion of training, check results in **Training Job --> Artifacts**.
+
+![evaluate_extraction](/img/guides/evaluate_extraction.png)
+
+
+### Evaluation Metric Interpretation
+
+- **Accuracy**: Indicates the percentage of correct predictions.
+- **F1 Score**: Balances precision and recall; useful for imbalanced datasets.
+- **Custom Metrics**: Define custom metrics in the testing script to suit your evaluation needs.
+
+## Deployment
+
+Refer to the in-depth walkthrough on deploying a model on Emissary here - [Deployment Guide](../fine-tuning/deployment).
+
+Deploying your models allows you to serve them and integrate them into your applications.
+
+### Finetuned Model Deployment
+
+1. Navigate to the **Training Jobs Page**. From the list of the finetuning jobs, select the one you want to deploy.
+![deployment_fine_tuned](/img/guides/deployment_fine_tuned.png)
+2. Go to the **ARTIFACTS** tab.
+![artifacts1](/img/guides/artifacts1.png)
+3. Select a **Checkpoint** to Deploy.
+![checkpoint_evaluate](/img/guides/checkpoint_evaluate.png)
+
+### Parameter Recalibration
+
+Adjust parameters like <span style={{ color: 'green' }}>do_sample, temperature, max_new_tokens</span>, etc. to finetune the model's response behavior.
+
+- **<span style={{ color: 'green' }}>do_sample</span>**: Enable sampling for more varied outputs.
+- **<span style={{ color: 'green' }}>temperature</span>**: Increase for more creativity, decrease for more deterministic responses.
+- **<span style={{ color: 'green' }}>max_new_tokens</span>**: Limit the length of generated responses.
+- **<span style={{ color: 'green' }}>top_p</span>** and **<span style={{ color: 'green' }}>top_k</span>**: Control the diversity of the output.
+
+## Best Practices
+
+- **Start Small**: Begin with a smaller dataset to validate your setup.
+- **Monitor Training**: Keep an eye on training logs and metrics.
+- **Iterative Testing**: Use the test dataset to iteratively improve your model.
+- **Data Format**: Use the recommended data formats for your chosen model to ensure compatibility and optimal performance.
