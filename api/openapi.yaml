@@ -484,11 +484,11 @@ paths:
                 training_job_id:
                   type: string
                   example: "tr-12345"
-                  description: The training job ID to use for deployment
+                  description: The training job ID to use for deployment or the model name for base model deployment
                 checkpoint:
                   type: integer
                   example: 4
-                  description: The checkpoint number to use for deployment
+                  description: The checkpoint number to use for deployment (0 for base model deployment)
                 server_type:
                   type: string
                   enum:
@@ -504,6 +504,39 @@ paths:
                   type: string
                   example: "Deployment for my training job"
                   description: A description of the deployment
+                inactive_timeout:
+                  type: integer
+                  example: 3600
+                  description: The inactive timeout for the deployment in seconds (default = 3600)
+                schedule:
+                  type: object
+                  properties:
+                    timezone:
+                      type: string
+                      example: "America/Los_Angeles"
+                      description: The IANA timezone for the schedule
+                    start_time:
+                      type: string
+                      example: "10:00"
+                      description: The start time for the schedule in HH:MM format
+                    end_time:
+                      type: string
+                      example: "18:00"
+                      description: The end time for the schedule in HH:MM format
+                    days:
+                      type: array
+                      example: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+                      items:
+                        type: string
+                        enum:
+                          - monday
+                          - tuesday
+                          - wednesday
+                          - thursday
+                          - friday
+                          - saturday
+                          - sunday
+                      description: The days of the week for the schedule
               required:
                 - training_job_id
                 - checkpoint
