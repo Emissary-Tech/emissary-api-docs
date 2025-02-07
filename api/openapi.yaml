@@ -489,13 +489,6 @@ paths:
                   type: integer
                   example: 4
                   description: The checkpoint number to use for deployment (0 for base model deployment)
-                server_type:
-                  type: string
-                  enum:
-                    - serverless
-                    - on-demand
-                  example: "on-demand"
-                  description: The server type to use for deployment (default = "on-demand")
                 name:
                   type: string
                   example: "deployment-1"
