@@ -157,7 +157,7 @@ const sidebar: SidebarsConfig = {
         {
           type: "doc",
           id: "api/get-chat-completions-from-deployment",
-          label: "Chat Completion",
+          label: "Chat Completions",
           className: "api-method post",
         },
         {
