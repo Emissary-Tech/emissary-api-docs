@@ -156,6 +156,12 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "api/get-chat-completions-from-deployment",
+          label: "Chat Completion",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
           id: "api/get-embeddings-from-deployment",
           label: "Embeddings",
           className: "api-method post",
