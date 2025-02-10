@@ -702,7 +702,7 @@ paths:
     post:
       tags:
         - Inference
-      summary: Chat Completion
+      summary: Chat Completions
       description: Get chat completions from a deployment using the provided input.
       operationId: getChatCompletionsFromDeployment
       parameters:
