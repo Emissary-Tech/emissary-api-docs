@@ -1,0 +1,72 @@
+---
+id: get-chat-completions-from-deployment
+title: "Chat Completions"
+description: "Get chat completions from a deployment using the provided input."
+sidebar_label: "Chat Completions"
+hide_title: true
+hide_table_of_contents: true
+api: eJy1V21v2zYQ/iucvmwDYstxUwzzly1N083Y0AZNhg0IDIOWKIu1RLIkZccz9N93R9KWZKtOsWX5kCh8ee7uuVfuIkuXJpo8RlORMc1EwqLZRZQyk2iuLJcimkS/MEuSnMIvWaqC4aohmZYloSRlqpDbkglLKsPFkticEaXlmqcsJVyoyg6ji0gqpilenKYAuGT2BvBuGrh3gPb2AAUXFNW0ZJZpVG4XCfgHLgLwJ5bYOU/hCEfdFLU5fJskZyWNJrvIbhWeNFaDNlF9bMsDqDd9S2S2VxTxAECzzxXXDLSzumL1xUFkY+Cp1O6l86JaRFlJll+i9Jwt9cyLZMa+kekWT5zX4M77gWxlpb045xCSSd0WDDITKSwSD5BUqYInzlnxJ4M4u1OV5CLwBgyCay1nBndLZgxd+u9wkmpNt8ibZaV5HkHLgp2afhExUZUYpmZrAAgWKsM0/KHGcGMpqA7ksCeKRsG9sHvqEMTfuyRoSwwTKRyvOzScKHDA/pUVhbwgudwQqh25P/WKCmBH0sCNdTtyHr3JjewZbIOJLmEq3SYDKFg4sw66jIY/9Ek2uO2SscHBqANW0MqSPs0F28ytXDHR9gkHDZZdCa9Hoz4JAMHLqiReJTQRAIkH9PEtUK4TZ6Waq2fM+LGXwKqsCgjEtUvUBV3wgtuti14nCRxXQAzhhSBm9ZwxfWIaG3K+zCG5OtIam1aMqSBcDVaDjBdQnkKREXKumWLUzsUSCtfc8L/ZeV3GvY6Da47MAaI4qXQteUo8+L6iybkJKAcJCwlRREVbQl9F+DNnEIs6BEMTKGCVkDY6Ds1DPs/qELZGQcHwqToejfBPV8B9lSRwKasKcqj5L1dfoAKfTU39eXA5fnX1ujcfK8GhdhIoiMLyjAMLzpkYaN1KHLUsPS9v+m1JUokEbqAoXAAYFSusCN/0arDPivRYou+m3TaBhcKRftXH81SsaQGBMXUFnWkt9X+hue10KKe2wqbgUWfHTgj7fdENhJbU+qVX4zZVYES9RzxL6RuK0e6anAtHy61bv1b8Fm8Hw53d0Z6gq1OC3ktL3slKpP8rOYiashfj6OrrOELbMrTN96z0mSj1hswhwefhVg+vgPkubDpSYfjKJQ5rSho/kMHIM4ni9WUcpiYT75p5rI6byIWNztRUxxjucXfigAa93k93lS4AOrdWmUkcU8WHGw7JUHKoPno7TNxY1HXvbdgk13dT4rEinI8MSyoNddvhAtJ8xfB71t67R097Px1ONPOK4r8xHFjC/PfXACQM/JKb/XJG3bQAHGHofGwGstunQ1VuBqHH/Uyzn0kOYdg7SKCene7vWvxxx3ZdOfRV1zxD88MG19+Kxp224WdcsCeTzvQQC21STxhfj4aXw1GE6unSfMjugXSesJbjNpvNieNid3ogs4EJ5z0DNHGJCBnH0fdh6ecTv4OWkKksVOLgk2tFwYVk7NRpgieoQN3uUOplHK6a+Pfpze37+9sBXBnmtiwQF8PPm+YtgyWM9ZKKlih8p5CbTuR2aNm1/PkC76QQhJY92VgVlLte5CzchQx8jNaXvi+6HITPSedV1EpD3Dt+vqB+zgWNRRBxOeY4QO92C2rYH7qoa1yGyNYue4AsqjldYJRAQKfc4DdUh4wW5njIaFPy3cdQO78nX3p59Zq8T0aBaQcFv8L/4NPlavsZiC+1F1Dn619n/0Ldrg9qHPBDEUEy/Zkbr+PgAZEajJNGhfb6G9cwaCl79uysVcbvPtw/wOFFeDiWrmtEmm6wwcFvp69UPiTwIYZru6igYlnhs2USeUz8+QegvKDG
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Chat Completions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/deployments/{deployment_id}/chat/completions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Get chat completions from a deployment using the provided input.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true},{"name":"deployment_id","in":"path","required":true,"description":"The ID of the deployment to get chat completions from","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"description":"Provide your chat input for completions","content":{"application/json":{"schema":{"type":"object","properties":{"messages":{"type":"array","items":{"type":"object","properties":{"role":{"type":"string","enum":["system","user","assistant"],"example":"user","description":"The role of the message sender"},"content":{"type":"string","example":"Hello, how are you?","description":"The content of the message"}}},"required":["role","content"]},"temperature":{"type":"number","example":0.7,"description":"The sampling temperature to use"},"max_new_tokens":{"type":"integer","example":500,"description":"The maximum number of new tokens to generate"},"top_p":{"type":"number","example":0.9,"description":"The cumulative probability for token selection"},"top_k":{"type":"integer","example":50,"description":"The number of highest probability tokens to keep for top-k-filtering"},"no_repeat_ngram_size":{"type":"integer","example":2,"description":"The size of n-grams to avoid repeating"},"do_sample":{"type":"boolean","example":true,"description":"Whether to use sampling or not"}},"required":["messages"]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful operation","content":{"application/json":{"schema":{"type":"object","properties":{"id":{"type":"string","example":"rq-12345","description":"The unique identifier for the chat completion"},"response":{"type":"string","example":"I'm doing well, thank you!","description":"The generated chat completion from the deployment"}}}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      
