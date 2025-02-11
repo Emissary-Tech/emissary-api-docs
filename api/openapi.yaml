@@ -688,7 +688,7 @@ paths:
                 properties:
                   id:
                     type: string
-                    example: "completion-12345"
+                    example: "rq-12345"
                     description: The unique identifier for the completion
                   response:
                     type: string
@@ -698,99 +698,99 @@ paths:
           $ref: '#/components/responses/NotFound'
         '400':
           $ref: '#/components/responses/InvalidInput'
-#  '/v1/projects/{project_id}/deployments/{deployment_id}/chat/completions':
-#    post:
-#      tags:
-#        - Inference
-#      summary: Chat Completion
-#      description: Get chat completions from a deployment using the provided input.
-#      operationId: getChatCompletionsFromDeployment
-#      parameters:
-#        - $ref: '#/components/parameters/ProjectId'
-#        - name: deployment_id
-#          in: path
-#          required: true
-#          description: The ID of the deployment to get chat completions from
-#          schema:
-#            type: string
-#      requestBody:
-#        required: true
-#        description: Provide your chat input for completions
-#        content:
-#          application/json:
-#            schema:
-#              type: object
-#              properties:
-#                messages:
-#                  type: array
-#                  items:
-#                    type: object
-#                    properties:
-#                      role:
-#                        type: string
-#                        enum:
-#                          - system
-#                          - user
-#                          - assistant
-#                        example: "user"
-#                        description: The role of the message sender
-#                      content:
-#                        type: string
-#                        example: "Hello, how are you?"
-#                        description: The content of the message
-#                  required:
-#                    - role
-#                    - content
+  '/v1/projects/{project_id}/deployments/{deployment_id}/chat/completions':
+    post:
+      tags:
+        - Inference
+      summary: Chat Completions
+      description: Get chat completions from a deployment using the provided input.
+      operationId: getChatCompletionsFromDeployment
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: deployment_id
+          in: path
+          required: true
+          description: The ID of the deployment to get chat completions from
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: Provide your chat input for completions
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        enum:
+                          - system
+                          - user
+                          - assistant
+                        example: "user"
+                        description: The role of the message sender
+                      content:
+                        type: string
+                        example: "Hello, how are you?"
+                        description: The content of the message
+                  required:
+                    - role
+                    - content
 #                streaming:
 #                  type: boolean
 #                  example: false
 #                  description: Whether to stream the response
-#                temperature:
-#                  type: number
-#                  example: 0.7
-#                  description: The sampling temperature to use
-#                max_new_tokens:
-#                  type: integer
-#                  example: 500
-#                  description: The maximum number of new tokens to generate
-#                top_p:
-#                  type: number
-#                  example: 0.9
-#                  description: The cumulative probability for token selection
-#                top_k:
-#                  type: integer
-#                  example: 50
-#                  description: The number of highest probability tokens to keep for top-k-filtering
-#                no_repeat_ngram_size:
-#                  type: integer
-#                  example: 2
-#                  description: The size of n-grams to avoid repeating
-#                do_sample:
-#                  type: boolean
-#                  example: true
-#                  description: Whether to use sampling or not
-#              required:
-#                - messages
-#      responses:
-#        '200':
-#          description: Successful operation
-#          content:
-#            application/json:
-#              schema:
-#                type: object
-#                properties:
-#                  id:
-#                    type: string
-#                    example: "chat-completion-12345"
-#                    description: The unique identifier for the chat completion
-#                  response:
-#                    type: string
-#                    example: "I'm doing well, thank you!"
-#                    description: The generated chat completion from the deployment
-#        '404':
-#          $ref: '#/components/responses/NotFound'
-#        '400':
-#          $ref: '#/components/responses/InvalidInput'
+                temperature:
+                  type: number
+                  example: 0.7
+                  description: The sampling temperature to use
+                max_new_tokens:
+                  type: integer
+                  example: 500
+                  description: The maximum number of new tokens to generate
+                top_p:
+                  type: number
+                  example: 0.9
+                  description: The cumulative probability for token selection
+                top_k:
+                  type: integer
+                  example: 50
+                  description: The number of highest probability tokens to keep for top-k-filtering
+                no_repeat_ngram_size:
+                  type: integer
+                  example: 2
+                  description: The size of n-grams to avoid repeating
+                do_sample:
+                  type: boolean
+                  example: true
+                  description: Whether to use sampling or not
+              required:
+                - messages
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "rq-12345"
+                    description: The unique identifier for the chat completion
+                  response:
+                    type: string
+                    example: "I'm doing well, thank you!"
+                    description: The generated chat completion from the deployment
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
   '/v1/projects/{project_id}/deployments/{deployment_id}/embeddings':
     post:
       tags:
@@ -846,7 +846,7 @@ paths:
                 properties:
                   id:
                     type: string
-                    example: "embedding-12345"
+                    example: "rq-12345"
                     description: The unique identifier for the embedding
                   response:
                     type: object
@@ -913,7 +913,7 @@ paths:
                 properties:
                   id:
                     type: string
-                    example: "classification-12345"
+                    example: "rq-12345"
                     description: The unique identifier for the classification
                   response:
                     type: string
