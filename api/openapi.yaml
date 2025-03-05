@@ -649,7 +649,7 @@ paths:
               properties:
                 input:
                   type: string
-                  example: "What is the capital of France?"
+                  example: "The capital of France is"
                   description: The input prompt for the deployment
                 do_sample:
                   type: boolean
@@ -692,7 +692,7 @@ paths:
                     description: The unique identifier for the completion
                   response:
                     type: string
-                    example: "The capital of France is Paris."
+                    example: " Paris."
                     description: The generated completion from the deployment
         '404':
           $ref: '#/components/responses/NotFound'
@@ -899,7 +899,7 @@ paths:
               properties:
                 input:
                   type: string
-                  example: "What is the capital of France?"
+                  example: "category1 related text"
                   description: The input for which to get classification
               required:
                 - input
@@ -916,9 +916,25 @@ paths:
                     example: "rq-12345"
                     description: The unique identifier for the classification
                   response:
-                    type: string
-                    example: "Paris"
-                    description: The predicted classification from the deployment
+                    type: object
+                    description: The predicted classification percentages
+                    properties:
+                      category1:
+                        type: number
+                        format: float
+                        example: 0.9453125
+                      category2:
+                        type: number
+                        format: float
+                        example: 0.01875
+                      category3:
+                        type: number
+                        format: float
+                        example: 0.0859375
+                      category4:
+                        type: number
+                        format: float
+                        example: 0.015625
         '404':
           $ref: '#/components/responses/NotFound'
         '400':
