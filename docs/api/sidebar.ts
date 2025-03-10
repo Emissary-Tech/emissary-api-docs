@@ -146,7 +146,19 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Inference",
+      label: "Serverless Inference",
+      items: [
+        {
+          type: "doc",
+          id: "api/get-chat-completions",
+          label: "Chat Completions",
+          className: "api-method post",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "On-Demand Inference",
       items: [
         {
           type: "doc",
