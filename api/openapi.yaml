@@ -765,6 +765,26 @@ paths:
                 required:
                   - model
                   - messages
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "rq-12345"
+                    description: The unique identifier for the chat completion
+                  response:
+                    type: string
+                    example: "I'm doing well, thank you for asking. How about you? How's your day going so far?"
+                    description: The generated chat completion from the serverless deployment
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
 
   '/v1/projects/{project_id}/deployments/{deployment_id}/chat/completions':
     post:
