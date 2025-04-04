@@ -176,7 +176,7 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Base Models",
+      label: "Datasets",
       items: [
         {
           type: "doc",
@@ -196,6 +196,12 @@ const sidebar: SidebarsConfig = {
       type: "category",
       label: "Schemas",
       items: [
+        {
+          type: "doc",
+          id: "api/schemas/completionobject",
+          label: "CompletionObject",
+          className: "schema",
+        },
         {
           type: "doc",
           id: "api/schemas/chatcompletionobject",
