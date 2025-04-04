@@ -1,0 +1,33 @@
+---
+id: chatcompletionobject
+title: "ChatCompletionObject"
+description: ""
+sidebar_label: "ChatCompletionObject"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"id":"chatcmpl-B9MHDbslfkBeAs8l4bebGdFOJ6PeG","object":"chat.completion","created":1741570283,"model":"Llama-3.2-1B-Instruct","choices":[{"index":0,"message":{"role":"assistant","content":"How can I help you today?"},"finish_reason":"stop"}],"usage":{"prompt_tokens":36,"completion_tokens":8,"total_tokens":44,"prompt_tokens_details":{"cached_tokens":0,"audio_tokens":0},"completion_tokens_details":{"reasoning_tokens":0,"audio_tokens":0,"accepted_prediction_tokens":0,"rejected_prediction_tokens":0}},"service_tier":"default","system_fingerprint":"fp_fc9f1d7035"}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"ChatCompletionObject"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"id":{"type":"string","example":"chatcmpl-B9MHDbslfkBeAs8l4bebGdFOJ6PeG"},"object":{"type":"string","example":"chat.completion"},"created":{"type":"number","example":1741570283},"model":{"type":"string","example":"Llama-3.2-1B-Instruct"},"choices":{"type":"array","items":{"type":"object","properties":{"index":{"type":"number","example":0},"message":{"type":"object","properties":{"role":{"type":"string","example":"assistant"},"content":{"type":"string","example":"How can I help you today?"}}},"refusal":{"type":["string",null]},"finish_reason":{"type":"string","example":"stop"}}}},"usage":{"type":"object","properties":{"prompt_tokens":{"type":"number","example":36},"completion_tokens":{"type":"number","example":8},"total_tokens":{"type":"number","example":44},"prompt_tokens_details":{"type":"object","properties":{"cached_tokens":{"type":"number","example":0},"audio_tokens":{"type":"number","example":0}}},"completion_tokens_details":{"type":"object","properties":{"reasoning_tokens":{"type":"number","example":0},"audio_tokens":{"type":"number","example":0},"accepted_prediction_tokens":{"type":"number","example":0},"rejected_prediction_tokens":{"type":"number","example":0}}}}},"service_tier":{"type":"string","example":"default"},"system_fingerprint":{"type":"string","example":"fp_fc9f1d7035"}},"title":"ChatCompletionObject"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            
