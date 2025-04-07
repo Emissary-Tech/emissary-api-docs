@@ -693,7 +693,7 @@ paths:
               properties:
                 model:
                   type: string
-                  example: "Llama-3.2-1B-Instruct"
+                  example: "Llama-3.2-1B-Completion"
                 messages:
                   type: array
                   items:
@@ -718,9 +718,9 @@ paths:
                   type: number
                   example: 0.7
                   description: The sampling temperature to use
-                max_completion_tokens:
+                max_tokens:
                   type: integer
-                  example: 500
+                  example: 64
                   description: The maximum number of new tokens to generate
                 top_p:
                   type: number
