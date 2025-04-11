@@ -33,6 +33,7 @@ const sidebars: SidebarsConfig = {
             'guides/classification',
             'guides/embeddings',
             'guides/emissary-classification',
+            'guides/emissary-regression',
             'guides/finetuning-pdf-docs'
         ]
       }
