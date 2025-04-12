@@ -1,0 +1,118 @@
+---
+title: LLMs for Regression - Guide
+---
+
+## 1. Objective
+
+This guide provides step-by-step instructions on finetuning a model for **Regression** tasks on Emissary using our regression approach. In this approach, we add a regressive head on top of the base LLMs that returns score based on the given score. We recommend using **Llama3.1-8B-instruct** for this task.
+
+## 2. Dataset Preparation
+
+Prepare your dataset in the appropriate format for the regression task.
+
+## Regression Data Format
+
+**Each entry should contain:**
+
+- **Prompt**: The input text for Regression.
+- **Completion**: A float value .
+
+
+**JSONL Format**
+
+```json
+{
+  "prompt": "This is a sample text for regression",
+  "completion": 0.7
+}
+```
+
+
+## 3. Finetuning Preparation
+
+Please refer to the in-depth guide on Finetuning on Emissary here - [Quickstart Guide](../).
+
+### Create Model Service
+Navigate to **Dashboard** arriving at **Model Services**, the default page on the Emissary platform.
+
+1. Click **+ NEW SERVICE** in the dashboard.
+![project_create_1](/img/guides/project_create1.png)
+2. In the pop-up, enter a new model service name, and click **CREATE**.
+![project_create_2](/img/guides/project_create2.png)
+
+### Uploading Datasets
+
+A tile is created for your task. Click **Manage** to enter the task workspace.
+![project_manage_1](/img/guides/project_manage1.png)
+
+
+1. Click **MANAGE** in the **Datasets Available** tile.
+![project_manage_1](/img/guides/project_manage2.png)
+2. Click on **+ UPLOAD DATASET** and select training and test datasets.
+![dataset1](/img/guides/dataset1.png)
+
+3. Name datasets clearly to distinguish between training and test data (e.g., <span style={{ color: 'green' }}>train_regression_data.csv</span>, <span style={{ color: 'green' }}>test_regression_data.csv</span>).
+
+## 4. Model Finetuning
+Now, go back one panel by clicking **OVERVIEW** and then click **MANAGE** in the **Training Jobs** tile.
+![project_manage_1](/img/guides/project_manage3.png)
+
+Here, we’ll kick off finetuning. The shortest path to finetuning a model is by clicking **+ NEW TRAINING JOB**, naming the output model, picking a backbone (**base model**), selecting the training dataset (you must have uploaded it in the step before), and finally hitting **START NEW TRAINING JOB**.
+
+### Selecting Regression Option
+When creating a new training job, you need to specify that you are performing a regression task to utilize the regression approach.
+
+In the Training Job Creation page, locate the Task Type option.
+Select **Regression** from the given options.
+
+This selection ensures that a **regression head** is added on top of the base LLM, enabling the model to return **scores** for the specified text.
+
+![new_traning_job](/img/guides/train_regression.png)
+
+A custom function that calculates a matching score for the given expected and predicted outputs.
+Uncomment the suitable regression metric function to use it.
+
+![classification_metric](/img/guides/regression_metric.png)
+### Training Parameter Configuration
+Please refer to the in-depth guide on configuring training parameters here - [Finetuning Parameter Guide](../fine-tuning/parameters).
+
+
+## 5. Model Monitoring & Evaluation
+
+### Using Test Datasets
+
+Including a test dataset allows you to evaluate the model's performance during training.
+
+- **Per Epoch Evaluation**: The platform evaluates the model at each epoch using the test dataset.
+- **Metrics and Outputs**: View evaluation metrics and generated outputs for test samples.
+- Post completion of training, check scores in **Training Job --> Artifacts**.
+  <br></br>For the **LLM model**, expect the following:
+
+![evaluate_classification](/img/guides/evaluate_regression.png)
+
+## 6. Deployment
+Refer to the in-depth walkthrough on deploying a model on Emissary here - [Deployment Guide](../fine-tuning/deployment).
+
+Deploying your models allows you to serve them and integrate them into your applications.
+
+### Finetuned Model Deployment
+1. Navigate to the **Training Jobs Page**. From the list of finetuning jobs, select the one you want to deploy.
+![deployment_fine_tuned](/img/guides/deployment_fine_tuned.png)
+2. Go to the **ARTIFACTS** tab.
+![artifacts1](/img/guides/artifacts1.png)
+3. Select a **Checkpoint** to Deploy.
+![checkpoint_evaluate](/img/guides/checkpoint_evaluate.png)
+4. Go to **Deployments** to check the status of you deployed model
+![checkpoint_evaluate](/img/guides/Deployment.png)
+5. Once the model is deployed (as shown in the status), go to the testing tab.
+![checkpoint_evaluate](/img/guides/deployment_status.png)
+6. Test your samples in the the input box.
+![checkpoint_evaluate](/img/guides/testing_tab.png)
+
+
+
+## 7. Best Practices
+- **Start Small**: Begin with a smaller dataset to validate your setup.
+- **Monitor Training**: Keep an eye on training logs and metrics.
+- **Iterative Testing**: Use the test dataset to iteratively improve your model.
+- **Data Format**: Use the recommended data formats for your chosen model to ensure compatibility and optimal performance.
