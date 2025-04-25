@@ -156,7 +156,7 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
-          id: "api/get-chat-completions-from-deployment",
+          id: "api/get-chat-completions",
           label: "Chat Completions",
           className: "api-method post",
         },
@@ -176,7 +176,7 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Base Models",
+      label: "Datasets",
       items: [
         {
           type: "doc",
@@ -196,6 +196,18 @@ const sidebar: SidebarsConfig = {
       type: "category",
       label: "Schemas",
       items: [
+        {
+          type: "doc",
+          id: "api/schemas/completionobject",
+          label: "CompletionObject",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "api/schemas/chatcompletionobject",
+          label: "ChatCompletionObject",
+          className: "schema",
+        },
         {
           type: "doc",
           id: "api/schemas/basemodelsummary",
