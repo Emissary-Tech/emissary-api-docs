@@ -859,28 +859,52 @@ paths:
                 properties:
                   id:
                     type: string
-                    example: "rq-12345"
+                    example: "classify-12345"
                     description: The unique identifier for the classification
-                  response:
+                  model:
+                    type: string
+                    example: "dp-12345"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        index:
+                          type: number
+                          example: 0
+                        logits:
+                          type: object
+                          properties:
+                            category1:
+                              type: number
+                              format: float
+                              example: 0.9453125
+                            category2:
+                              type: number
+                              format: float
+                              example: 0.01875
+                            category3:
+                              type: number
+                              format: float
+                              example: 0.0859375
+                            category4:
+                              type: number
+                              format: float
+                              example: 0.015625
+                  usage:
                     type: object
-                    description: The predicted classification percentages
                     properties:
-                      category1:
+                      completion_tokens:
                         type: number
-                        format: float
-                        example: 0.9453125
-                      category2:
+                        example: 0
+                      prompt_tokens:
                         type: number
-                        format: float
-                        example: 0.01875
-                      category3:
+                        example: 1587
+                      prompt_token_details:
+                        type: string
+                      total_tokens:
                         type: number
-                        format: float
-                        example: 0.0859375
-                      category4:
-                        type: number
-                        format: float
-                        example: 0.015625
+                        example: 1587
         '404':
           $ref: '#/components/responses/NotFound'
         '400':
