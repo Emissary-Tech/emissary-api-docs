@@ -1,0 +1,33 @@
+---
+id: testingfunctionsummary
+title: "TestingFunctionSummary"
+description: "Testing Function Summary Object"
+sidebar_label: "TestingFunctionSummary"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"name":"similarity_score_shared","content":"def similarity_score_shared(input_text: str, expected_output: str, predicted_output: str): \n ...","dependencies":["external-library"]}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"TestingFunctionSummary"}
+>
+</Heading>
+
+
+
+Testing Function Summary Object
+
+<Schema
+  schema={{"type":"object","description":"Testing Function Summary Object","properties":{"name":{"type":"string","example":"similarity_score_shared","description":"Name of the test function (matched with exact python method name)"},"content":{"type":"string","example":"def similarity_score_shared(input_text: str, expected_output: str, predicted_output: str): \n ...","description":"Contents of test function"},"dependencies":{"type":"array","example":["external-library"],"items":{"type":"string","description":"List of external dependencies that needs to be downloaded with pip to run"}}},"title":"TestingFunctionSummary"}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

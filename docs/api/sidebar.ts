@@ -200,6 +200,18 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
+      label: "Testing Functions",
+      items: [
+        {
+          type: "doc",
+          id: "api/list-test-functions",
+          label: "List Testing Functions",
+          className: "api-method get",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Schemas",
       items: [
         {
@@ -242,6 +254,12 @@ const sidebar: SidebarsConfig = {
           type: "doc",
           id: "api/schemas/datasetdetail",
           label: "DatasetDetail",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "api/schemas/testingfunctionsummary",
+          label: "TestingFunctionSummary",
           className: "schema",
         },
         {

@@ -1028,7 +1028,24 @@ paths:
           $ref: '#/components/responses/NotFound'
         '400':
           $ref: '#/components/responses/InvalidInput'
-
+  '/v1/testing-functions':
+    get:
+      tags:
+        - Testing Functions
+      summary: List Testing Functions
+      description: Returns a list of test functions
+      operationId: listTestFunctions
+      responses:
+        '200':
+          description: List of Testing Function's summary object.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/TestingFunctionSummary"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
 # An object to hold reusable parts that can be used across the definition
 components:
@@ -1280,6 +1297,24 @@ components:
           type: integer
           example: 1633036800
           description: The timestamp when the dataset was last updated
+    TestingFunctionSummary:
+      type: object
+      description: Testing Function Summary Object
+      properties:
+        name:
+          type: string
+          example: "similarity_score_shared"
+          description: Name of the test function (matched with exact python method name)
+        content:
+          type: string
+          example: "def similarity_score_shared(input_text: str, expected_output: str, predicted_output: str): \n ..."
+          description: Contents of test function
+        dependencies:
+          type: array
+          example: [ "external-library" ]
+          items:
+            type: string
+            description: List of external dependencies that needs to be downloaded with pip to run
     TrainingJobSummary:
       type: object
       description: Training Job Summary Object
