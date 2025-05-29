@@ -176,7 +176,7 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Datasets",
+      label: "Base Models",
       items: [
         {
           type: "doc",
