@@ -306,8 +306,8 @@ paths:
                   description: The testing dataset ID to use for fine-tuning (optional)
                 train_test_split_ratio:
                   type: number
-                  example: 0.2
-                  description: The ratio to split the training dataset for testing (optional)
+                  example: 20
+                  description: The ratio (%) to split the training dataset for testing (optional)
                 test_functions:
                   type: array
                   example: ["test_similarity_shared"]
