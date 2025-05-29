@@ -73,7 +73,13 @@ const sidebar: SidebarsConfig = {
         {
           type: "doc",
           id: "api/create-training-job",
-          label: "Create training job",
+          label: "Create SFT training job",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "api/create-grpo-training-job",
+          label: "Create GRPO training job",
           className: "api-method post",
         },
         {

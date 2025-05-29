@@ -264,7 +264,7 @@ paths:
     post:
       tags:
         - Training Jobs
-      summary: Create training job
+      summary: Create SFT training job
       description: Initiate fine-tuning (training job).
       operationId: createTrainingJob
       parameters:
@@ -276,18 +276,13 @@ paths:
             schema:
               type: object
               properties:
-                training_technique:
-                  type: string
-                  enum:
-                    - SFT
-                    - GRPO
-                  example: "SFT"
                 base_model_option:
                   type: string
                   enum:
                     - pre-trained
                     - fine-tuned
                   example: "pre-trained"
+                  description: Base Model option to be used (default = "pre-trained"), you can either start from the pure base model (pre-trained) or from any checkpoint for your fine-tuned model (fine-tuned)
                 base_model:
                   type: string
                   example: "Llama-3.2-1B-Instruct"
@@ -313,20 +308,10 @@ paths:
                   example: ["test_similarity_shared"]
                   items:
                     type: string
-                    description: Name of test function to be used
-                reward:
-                  type: object
-                  description: (GRPO) Reward weight map
-                  properties:
-                    test_function_1:
-                      type: float
-                      example: 0.2
-                    test_function_2:
-                      type: float
-                      example: 0.8
+                    description: List of test function names to be used (optional)
                 name:
                   type: string
-                  example: "training-1"
+                  example: "training-job-1"
                   description: The name of the training job (optional)
                 description:
                   type: string
@@ -379,6 +364,7 @@ paths:
                   description: Link to the Hugging Face model / Use only when you use the HF_MODEL as a base
               required:
                 - base_model
+                - base_model_option
                 - train_dataset_id
       responses:
         '201':
@@ -408,6 +394,109 @@ paths:
                   "$ref": "#/components/schemas/TrainingJobSummary"
         '401':
           $ref: '#/components/responses/Unauthorized'
+  '/v1/projects/{project_id}/training-jobs/grpo':
+    post:
+      tags:
+        - Training Jobs
+      summary: Create GRPO training job
+      description: Initiate GRPO fine-tuning (training job).
+      operationId: createGRPOTrainingJob
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_model_option:
+                  type: string
+                  enum:
+                    - pre-trained
+                    - fine-tuned
+                  example: "pre-trained"
+                  description: Base Model option to be used (default = "pre-trained"), you can either start from the pure base model (pre-trained) or from any checkpoint for your fine-tuned model (fine-tuned)
+                base_model:
+                  type: string
+                  example: "Llama-3.2-1B-Instruct"
+                  description: The base model to fine-tune. To see full list of supported base model please visit [Base Models](/fine-tuning/parameters#available-base-models). If you are training on fine-tuned base model option, specify the training job name you want to use.
+                checkpoint:
+                  type: number
+                  example: 5
+                  description: (Required if base_model_option == "fine-tuned"), specify the checkpoint you want to use.
+                train_dataset_id:
+                  type: string
+                  example: "ds-12345"
+                  description: The training dataset ID to use for fine-tuning
+                test_functions:
+                  type: array
+                  example: [ "test_similarity_shared" ]
+                  items:
+                    type: string
+                    description: Name of test function to be used
+                reward:
+                  type: object
+                  description: (GRPO) Reward weight map
+                  properties:
+                    test_function_1:
+                      type: float
+                      example: 0.2
+                    test_function_2:
+                      type: float
+                      example: 0.8
+                test_dataset_id:
+                  type: string
+                  example: "ds-67890"
+                  description: The testing dataset ID to use for fine-tuning (optional)
+                train_test_split_ratio:
+                  type: number
+                  example: 20
+                  description: The ratio (%) to split the training dataset for testing (optional)
+                name:
+                  type: string
+                  example: "training-1"
+                  description: The name of the training job (optional)
+                description:
+                  type: string
+                  example: "Fine-tuning the model on my dataset"
+                  description: A description of the training job (optional)
+                task_type:
+                  type: string
+                  enum:
+                    - text-generation
+                    - classification
+                    - embedding
+                    - regression
+                  example: "text-generation"
+                  description: The task type for the training job (default = "text-generation")
+                parameters:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: number
+                      - type: integer
+                  description: The hyper parameters to use for fine-tuning (optional)
+                hf_model_link:
+                  type: string
+                  example: "https://huggingface.co/my_model"
+                  description: Link to the Hugging Face model / Use only when you use the HF_MODEL as a base
+              required:
+                - base_model
+                - base_model_option
+                - train_dataset_id
+                - test_functions
+                - reward
+      responses:
+        '201':
+          description: Returns the TrainingJob's summary object.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TrainingJobSummary"
+        '400':
+          $ref: '#/components/responses/InvalidInput'
   '/v1/projects/{project_id}/training-jobs/{training_job_id}':
     get:
       tags:
