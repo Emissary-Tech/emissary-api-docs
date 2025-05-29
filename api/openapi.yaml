@@ -1292,10 +1292,48 @@ components:
           type: string
           example: "training-1"
           description: The name of the training job
+        training_technique:
+          type: string
+          enum:
+            - SFT
+            - GRPO
+          example: "SFT"
+          description: "Training technique that has been used for this training job"
+        base_model_option:
+          type: string
+          enum:
+            - pre-trained
+            - fine-tuned
+          example: "pre-trained"
+          description: "Base model option used for training "
         base_model:
           type: string
           example: "Llama-3.2-1B-Instruct"
           description: The base model used for training
+        base_fine_tuned_model:
+          type: string
+          example: "training-job-1"
+          description: (base_model_option == "fine-tuned") Fine-tuned model that is used as a base model for the training job
+        base_fine_tuned_model_checkpoint:
+          type: int
+          example: 5
+          description: (base_model_option == "fine-tuned") Check point that is used as a base model for the training job
+        test_functions:
+          type: array
+          example: [ "test_similarity_shared" ]
+          items:
+            type: string
+            description: List of test function names used in the training job
+        reward:
+          type: object
+          description: (GRPO) Reward weight map
+          properties:
+            test_function_1:
+              type: float
+              example: 0.2
+            test_function_2:
+              type: float
+              example: 0.8
         status:
           type: string
           enum:
@@ -1335,14 +1373,48 @@ components:
           type: string
           example: "training-1"
           description: The name of the training job
-        description:
+        training_technique:
           type: string
-          example: "Fine-tuning the model on my dataset"
-          description: A description of the training job
+          enum:
+            - SFT
+            - GRPO
+          example: "SFT"
+          description: "Training technique that has been used for this training job"
+        base_model_option:
+          type: string
+          enum:
+            - pre-trained
+            - fine-tuned
+          example: "pre-trained"
+          description: "Base model option used for training "
         base_model:
           type: string
           example: "Llama-3.2-1B-Instruct"
           description: The base model used for training
+        base_fine_tuned_model:
+          type: string
+          example: "training-job-1"
+          description: (base_model_option == "fine-tuned") Fine-tuned model that is used as a base model for the training job
+        base_fine_tuned_model_checkpoint:
+          type: int
+          example: 5
+          description: (base_model_option == "fine-tuned") Check point that is used as a base model for the training job
+        test_functions:
+          type: array
+          example: [ "test_similarity_shared" ]
+          items:
+            type: string
+            description: List of test function names used in the training job
+        reward:
+          type: object
+          description: (GRPO) Reward weight map
+          properties:
+            test_function_1:
+              type: float
+              example: 0.2
+            test_function_2:
+              type: float
+              example: 0.8
         status:
           type: string
           enum:
