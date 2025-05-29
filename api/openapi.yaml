@@ -364,7 +364,6 @@ paths:
                   description: Link to the Hugging Face model / Use only when you use the HF_MODEL as a base
               required:
                 - base_model
-                - base_model_option
                 - train_dataset_id
       responses:
         '201':
@@ -484,7 +483,6 @@ paths:
                   description: Link to the Hugging Face model / Use only when you use the HF_MODEL as a base
               required:
                 - base_model
-                - base_model_option
                 - train_dataset_id
                 - test_functions
                 - reward
