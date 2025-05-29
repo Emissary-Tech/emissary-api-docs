@@ -276,10 +276,26 @@ paths:
             schema:
               type: object
               properties:
+                training_technique:
+                  type: string
+                  enum:
+                    - SFT
+                    - GRPO
+                  example: "SFT"
+                base_model_option:
+                  type: string
+                  enum:
+                    - pre-trained
+                    - fine-tuned
+                  example: "pre-trained"
                 base_model:
                   type: string
                   example: "Llama-3.2-1B-Instruct"
-                  description: The base model to fine-tune. To see full list of supported base model please visit [Base Models](/fine-tuning/parameters#available-base-models)
+                  description: The base model to fine-tune. To see full list of supported base model please visit [Base Models](/fine-tuning/parameters#available-base-models). If you are training on fine-tuned base model option, specify the training job name you want to use.
+                checkpoint:
+                  type: number
+                  example: 5
+                  description: If base_model_option == "fine-tuned", specify the checkpoint you want to use.
                 train_dataset_id:
                   type: string
                   example: "ds-12345"
@@ -292,6 +308,22 @@ paths:
                   type: number
                   example: 0.2
                   description: The ratio to split the training dataset for testing (optional)
+                test_functions:
+                  type: array
+                  example: ["test_similarity_shared"]
+                  items:
+                    type: string
+                    description: Name of test function to be used
+                reward:
+                  type: object
+                  description: (GRPO) Reward weight map
+                  properties:
+                    test_function_1:
+                      type: float
+                      example: 0.2
+                    test_function_2:
+                      type: float
+                      example: 0.8
                 name:
                   type: string
                   example: "training-1"
