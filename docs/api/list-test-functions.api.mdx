@@ -1,0 +1,64 @@
+---
+id: list-test-functions
+title: "List Testing Functions"
+description: "Returns a list of test functions"
+sidebar_label: "List Testing Functions"
+hide_title: true
+hide_table_of_contents: true
+api: eJydVVFv0zAQ/iuWXxjSmnSDpz4xoQ5NIIbYkJBGVbnJtTEktmdf2pWq/507J22zBBDiqc757ru77z5fdxLVKsjJg7yHgNqsxHVtMtTWBDk7lzmEzGvH33IiPwPW3gShRKkDCrsUSEFieYw4l9aBV/xxk1MAuzHudcfDQ3B0Akq6k5fjMf88T/OhBe9X9CKIUFeV8lthF98hw4TgMmsQDDKKcq7UWcyefg8MtZMhK6BSfMKtAwJX3qstxWmEKnTsDaLst9yvQdy1Fdwe/J3nnlE3DRlVQQc1oKdo8oInVbkymnSlS+U1buchsx7moVAe8kHmj4QUKS7gOc3irFJIbeVio7EQhJyhcFss6KoC+skFV/FS7p+x8+eKcliKP1R1po2rcY7whBNBoeeUzlHfkM9tjXTVWh356r755UR8MyJJkkFvb5uywkBCXHMODkwOJmsp7Q3uWPcDHRG8UeWo1AtPQ2HF9ud67Pf3GjtAiG5W4lyhMAA5Ha1YgMjtxpRW5QfSnXZ842uqeE81o8ZIZSuXg1pasbAPe70eXwzV/sWomobm9U8CB++t/w9VH9Xr4bHWLCeiJ6DCmp9cgzrra7W9P6FoSroCzr+0nkTWmF5ddlmnHvYHxL+qqtuX7HJ05fSUw3sOkaFGv+S0gvi2FBb0ka4vUmyYHXWXTQC/Bs/baydrX5JngejCJE2V0wkPCiodAk0gyWw10MC0vRRXn25EgyX3M4bNan4JEZeQ5j+Az7Pu3R1PoKHx6HGSqtPvgbXabAP5dUQZRo1Jc+YCSEo+sqLN0sbQlp1uUYOK1+PkIhmTmURbhdvlHRWtM+g0vtlsBo2n0Xtkl6PQ+jcCo73BmUlJmrlrTW8GvFGVpECgnX3acDRFRRSIy1jOify2BBVvE+tXaRsa0g83b6cf76YjCkkKrErG5fE1rTWdkcnZgJUynVTxrQ7/nnrk7E6P5l/+qNpR8WZLXal0XD2xj10ruwe5vohU94VHMiioSPbY7RYqwBdf7vdsfqzBR6lQZ7RM1SLuqRkhtxNnRUWtyKssA8caX6uybkTTe+cst+N7eDe9J7n8Alw2rxk=
+sidebar_class_name: "get api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"List Testing Functions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/v1/testing-functions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Returns a list of test functions
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"List of Testing Function's summary object.","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","description":"Testing Function Summary Object","properties":{"name":{"type":"string","example":"similarity_score_shared","description":"Name of the test function (matched with exact python method name)"},"content":{"type":"string","example":"def similarity_score_shared(input_text: str, expected_output: str, predicted_output: str): \n ...","description":"Contents of test function"},"dependencies":{"type":"array","example":["external-library"],"items":{"type":"string","description":"List of external dependencies that needs to be downloaded with pip to run"}}},"title":"TestingFunctionSummary"}}}}},"401":{"description":"Unauthorized error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":401},"error":{"type":"string","example":"Unauthorized"}},"title":"ApiErrorUnauthorized"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

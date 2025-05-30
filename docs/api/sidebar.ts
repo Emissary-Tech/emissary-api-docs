@@ -73,7 +73,13 @@ const sidebar: SidebarsConfig = {
         {
           type: "doc",
           id: "api/create-training-job",
-          label: "Create training job",
+          label: "Create SFT training job",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "api/create-grpo-training-job",
+          label: "Create GRPO training job",
           className: "api-method post",
         },
         {
@@ -176,7 +182,7 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Datasets",
+      label: "Base Models",
       items: [
         {
           type: "doc",
@@ -188,6 +194,18 @@ const sidebar: SidebarsConfig = {
           type: "doc",
           id: "api/retrieve-base-model-by-name",
           label: "Retrieve base model",
+          className: "api-method get",
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Testing Functions",
+      items: [
+        {
+          type: "doc",
+          id: "api/list-test-functions",
+          label: "List Testing Functions",
           className: "api-method get",
         },
       ],
@@ -236,6 +254,12 @@ const sidebar: SidebarsConfig = {
           type: "doc",
           id: "api/schemas/datasetdetail",
           label: "DatasetDetail",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "api/schemas/testingfunctionsummary",
+          label: "TestingFunctionSummary",
           className: "schema",
         },
         {
