@@ -328,11 +328,22 @@ paths:
                   description: The task type for the training job (default = "text-generation")
                 parameters:
                   type: object
-                  additionalProperties:
-                    oneOf:
-                      - type: string
-                      - type: number
-                      - type: integer
+                  properties:
+                    downsample_size:
+                      type: number
+                      example: 20
+                    learning_rate:
+                      type: number
+                      example: 0.0002
+                    num_train_epochs:
+                      type: number
+                      example: 3
+                    per_device_train_batch_size:
+                      type: number
+                      example: 2
+                    per_device_eval_batch_size:
+                      type: number
+                      example: 2
                   description: The hyper parameters to use for fine-tuning (optional)
 #                lora_configs:
 #                  type: object
@@ -471,12 +482,19 @@ paths:
                   description: The task type for the training job (default = "text-generation")
                 parameters:
                   type: object
-                  additionalProperties:
-                    oneOf:
-                      - type: string
-                      - type: number
-                      - type: integer
-                  description: The hyper parameters to use for fine-tuning (optional)
+                  properties:
+                    learning_rate:
+                      type: number
+                      example: 0.0002
+                    num_train_epochs:
+                      type: number
+                      example: 15
+                    num_generations:
+                      type: number
+                      example: 4
+                    per_device_train_batch_size:
+                      type: number
+                      example: 4
                 hf_model_link:
                   type: string
                   example: "https://huggingface.co/my_model"
