@@ -637,7 +637,7 @@ paths:
                 inactive_timeout:
                   type: integer
                   example: 3600
-                  description: The inactive timeout for the deployment in seconds (default = 3600)
+                  description: Inactive Timeout (seconds) (default = 3600). Specifies the period of inactivity, in seconds, after which the deployment will be automatically deactivated if no incoming requests are received. While deactivated, the deployment incurs no charges. When a request is sent to a deactivated deployment, it will be reactivated to process the request; this reactivation process typically introduces a delay of approximately 8 to 20 minutes before the deployment becomes fully operational.
                 schedule:
                   type: object
                   properties:
