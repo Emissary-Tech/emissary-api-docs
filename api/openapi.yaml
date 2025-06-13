@@ -1393,6 +1393,7 @@ components:
             - Pending
             - Running
             - Success
+            - Testing
             - Failed
             - TimedOut
             - Cancelled
@@ -1568,6 +1569,9 @@ components:
             - Deployed
             - Failed
             - Cancelled
+            - Terminated
+            - Deactivated
+            - Reactivating
             - TimedOut
           example: "Deployed"
           description: The current status of the deployment
@@ -1603,6 +1607,9 @@ components:
             - Deployed
             - Failed
             - Cancelled
+            - Terminated
+            - Deactivated
+            - Reactivating
             - TimedOut
           example: "Deployed"
           description: The current status of the deployment
