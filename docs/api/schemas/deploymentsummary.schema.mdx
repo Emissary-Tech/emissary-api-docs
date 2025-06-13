@@ -25,7 +25,7 @@ import Heading from "@theme/Heading";
 Deployment Summary Object
 
 <Schema
-  schema={{"type":"object","description":"Deployment Summary Object","properties":{"id":{"type":"string","example":"dp-12345","description":"The unique identifier for the deployment"},"name":{"type":"string","example":"deployment-1","description":"The name of the deployment"},"status":{"type":"string","enum":["Pending","Deploying","Deployed","Failed","Cancelled","TimedOut"],"example":"Deployed","description":"The current status of the deployment"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the deployment was created"}},"title":"DeploymentSummary"}}
+  schema={{"type":"object","description":"Deployment Summary Object","properties":{"id":{"type":"string","example":"dp-12345","description":"The unique identifier for the deployment"},"name":{"type":"string","example":"deployment-1","description":"The name of the deployment"},"status":{"type":"string","enum":["Pending","Deploying","Deployed","Failed","Cancelled","Terminated","Deactivated","Reactivating","TimedOut"],"example":"Deployed","description":"The current status of the deployment"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the deployment was created"}},"title":"DeploymentSummary"}}
   schemaType={"response"}
 >
   
