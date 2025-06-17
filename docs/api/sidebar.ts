@@ -138,6 +138,12 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "api/deactivate-deployment-by-id",
+          label: "Deactivate deployment",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
           id: "api/delete-deployment-by-id",
           label: "Delete deployment",
           className: "api-method delete",
