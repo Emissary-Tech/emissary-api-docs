@@ -1,0 +1,72 @@
+---
+id: deactivate-deployment-by-id
+title: "Deactivate deployment"
+description: "Deactivate a deployment."
+sidebar_label: "Deactivate deployment"
+hide_title: true
+hide_table_of_contents: true
+api: eJytVUtvm0AQ/itoT61kQ5Lm5FPdxpGsVklUp1KlyLI2sJhNgd3sDnYsxH/vDCwGTOpD1ZOXeXzz+mZcMuBby2ZP7EboVB0ykYNl6wmLhA2N1CBVzmao5CHIHQfhcS86WvpswpQWhpPZMkLD6GjY4X05oGrCNDc8EyAMhStZjh/ooI16ESFsJJlIiqU5JPi2YSIyzmYlg4MmSwtG5ltWneb2mAhveeOp2AN8OTwEMOK1kEZgVmAKUU2OIbv8x1GHTudDdTjn0q3WhGq1yq2wpL+6uKaf0wa3WF7XwsizRRgKa+MiTQ9U+fV7vncKvFtV5JEnjFEGkwlVDpQWmnKtUxnWAwpeLNmX41zV86hnT1gAh8KisEONBFEDW4wzB9mU48w6MImxt4IcYmUyDo3o0xUhvfFMp2iEdVQt8KhlPbu6tphqo+rrBM6aN4VscgUb54VuIKFWzrVcUETEvHXKivRIykQRebWyUBMVqTBjwe4ycGyyQdnxtAq6waNiwCbStdMjUgiza/lemBRBEwBtZ0HAtfT3ElmUSWu5Ofihytgp3RZO6c0fll6DxYhOVoSFkXCocRFp81vQe93XrWjGzYSOFsfOoeQbCibtRvyaYoRpI6q3IRE8omAVfceqdnVd7Cc1ynh34V/6FyjGNc/sfbzCpGUoeoXv9/tR4UFtPVXx1Dr7hsLYSYqMXJXUOyf6POobZokcF7hgZO5qmmuOLfCu6nS65rsUeK31ldkGztUG35dfF3erxRRd/ASylHBpfE1pTWUoIpZkPO+F6l3HwU0Y9KbstvLcOXUTAvEGgU45TqNy6ZeOmE9sd8km7eGkBZ0NjmiPnaQ7vXY9giJdEqI8QpblM7fip0mrisSvhTA1pbAD3Ej+TKNHskXS0huXJeapPb2P/RI//HCn5KP3twP9bqktQ3Pi4o6nBX3hsyZw/9+CDvp/SGcwsH/IaNjeao0ObnmoX43NHI+4hp736CjT5h7P0MP96hFX7w+rBp35
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Deactivate deployment"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/deployments/{deployment_id}/deactivate"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Deactivate a deployment.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true},{"name":"deployment_id","in":"path","required":true,"description":"The ID of the deployment","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Deployment deactivated successfully"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      
