@@ -1611,6 +1611,16 @@ components:
           type: string
           example: "deployment-1"
           description: The name of the deployment
+        task_type:
+          type: string
+          example: "classification"
+          description: Task type of the deployment
+        metadata:
+          type: object
+          description: Metadata of the deployment (structure depends on task_type)
+          examples:
+            classification:
+              labels: [ "class1", "class2", "class3" ]
         description:
           type: string
           example: "Deployment for my training job"
