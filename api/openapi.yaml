@@ -1035,23 +1035,18 @@ paths:
                           example: 0
                         logits:
                           type: object
-                          properties:
-                            category1:
-                              type: number
-                              format: float
-                              example: 0.9453125
-                            category2:
-                              type: number
-                              format: float
-                              example: 0.01875
-                            category3:
-                              type: number
-                              format: float
-                              example: 0.0859375
-                            category4:
-                              type: number
-                              format: float
-                              example: 0.015625
+                          description: |
+                            A mapping from category labels (as keys) to their corresponding logit values.
+                            The set of categories is dynamic and depends on the model's label.
+                          additionalProperties:
+                            type: number
+                            format: float
+                            example: 0.9453125
+                          example:
+                            cat: 0.9453125
+                            dog: 0.01875
+                            rabbit: 0.0859375
+                            turtle: 0.015625
                   usage:
                     type: object
                     properties:
