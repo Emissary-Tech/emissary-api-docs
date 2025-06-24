@@ -799,6 +799,7 @@ paths:
                 model:
                   type: string
                   example: "Llama-3.2-1B-Instruct"
+                  description: "Deployment name or shared serverless base model name"
                 prompt:
                   type: string
                   example: "The capital of France is"
@@ -851,6 +852,7 @@ paths:
                 model:
                   type: string
                   example: "Llama-3.2-1B-Completion"
+                  description: "Deployment name or shared serverless base model name"
                 messages:
                   type: array
                   items:
@@ -919,6 +921,7 @@ paths:
                 model:
                   type: string
                   example: "Llama-3.2-1B-Instruct"
+                  description: "Deployment name or shared serverless base model name"
                 input:
                   type: string
                   example: "What is the capital of France?"
@@ -999,6 +1002,7 @@ paths:
                 model:
                   type: string
                   example: "Llama-3.2-1B-Instruct"
+                  description: "Deployment name or shared serverless base model name"
                 input:
                   type: string
                   example: "category1 related text"
