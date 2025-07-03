@@ -1007,6 +1007,15 @@ paths:
                   type: string
                   example: "category1 related text"
                   description: The input for which to get classification
+                data_format:
+                  type: string
+                  enum:
+                    - logits
+                    - probs
+                  description: |
+                    (Optional) Specifies the format of the classification output data. 
+                    - If set to `logits` (default), the raw, unnormalized scores from the model are returned.
+                    - If set to `probs`, the output will be normalized probabilities.
               required:
                 - model
                 - input
@@ -1028,25 +1037,53 @@ paths:
                   data:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        index:
-                          type: number
-                          example: 0
-                        logits:
+                      oneOf:
+                        - title: logits
                           type: object
-                          description: |
-                            A mapping from category labels (as keys) to their corresponding logit values.
-                            The set of categories is dynamic and depends on the model's label.
-                          additionalProperties:
-                            type: number
-                            format: float
-                            example: 0.9453125
-                          example:
-                            cat: 0.9453125
-                            dog: 0.01875
-                            rabbit: 0.0859375
-                            turtle: 0.015625
+                          properties:
+                            index:
+                              type: number
+                              example: 0
+                            logits:
+                              type: object
+                              description: |
+                                A mapping from category labels (as keys) to their corresponding logit values.
+                                Present when `data_format` is set to `logits` (default).
+                              additionalProperties:
+                                type: number
+                                format: float
+                                example: 0.9453125
+                              example:
+                                cat: 0.9453125
+                                dog: 0.01875
+                                rabbit: 0.0859375
+                                turtle: 0.015625
+                          required:
+                            - index
+                            - logits
+                        - title: probs
+                          type: object
+                          properties:
+                            index:
+                              type: number
+                              example: 0
+                            probs:
+                              type: object
+                              description: |
+                                A mapping from category labels (as keys) to their corresponding probability values (between 0 and 1).
+                                Present when `data_format` is set to `probs`.
+                              additionalProperties:
+                                type: number
+                                format: float
+                                example: 0.82
+                              example:
+                                cat: 0.82
+                                dog: 0.02
+                                rabbit: 0.13
+                                turtle: 0.03
+                          required:
+                            - index
+                            - probs
                   usage:
                     type: object
                     properties:
