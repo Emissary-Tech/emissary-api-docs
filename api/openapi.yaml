@@ -344,6 +344,10 @@ paths:
                     per_device_eval_batch_size:
                       type: number
                       example: 2
+                    dynamic_loss:
+                      type: boolean
+                      example: false
+                      description: (Default = false) Set to true if you want to enable dynamic loss function
                   description: The hyper parameters to use for fine-tuning (optional)
 #                lora_configs:
 #                  type: object
@@ -1563,6 +1567,7 @@ components:
               - type: string
               - type: number
               - type: integer
+              - type: boolean
         created_by:
           type: string
           example: "user-12345"
