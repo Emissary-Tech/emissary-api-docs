@@ -344,7 +344,34 @@ paths:
                     per_device_eval_batch_size:
                       type: number
                       example: 2
+                    dynamic_loss:
+                      type: boolean
+                      example: false
+                      description: (Default = false) Set to true if you want to enable dynamic loss function
                   description: The hyper parameters to use for fine-tuning (optional)
+                data_resample:
+                  description: (Optional) Currently only supported for classification task type.
+                  oneOf:
+                    - title: ratio
+                      type: object
+                      description: |
+                        A mapping from category labels (as keys) to the ratio for resampling the dataset. The total size of the dataset will remain consistently.
+                      additionalProperties:
+                        type: number
+                        format: float
+                      example:
+                        label1: 0.3
+                        label2: 0.7
+                    - title: number
+                      type: object
+                      description: |
+                        A mapping from category labels (as keys) to the number for resampling the dataset. The exact number of data will be created or deleted to fit the number that is provided
+                      additionalProperties:
+                        type: number
+                      example:
+                        label1: 300
+                        label2: 300
+                        label3: 500
 #                lora_configs:
 #                  type: object
 #                  description: Lora configurations
@@ -1563,6 +1590,7 @@ components:
               - type: string
               - type: number
               - type: integer
+              - type: boolean
         created_by:
           type: string
           example: "user-12345"
