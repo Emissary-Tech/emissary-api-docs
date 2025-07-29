@@ -349,7 +349,7 @@ paths:
                       example: false
                       description: (Default = false) Set to true if you want to enable dynamic loss function
                   description: The hyper parameters to use for fine-tuning (optional)
-                data_resample:
+                rebalance_data:
                   description: (Optional) Currently only supported for classification task type.
                   oneOf:
                     - title: ratio
