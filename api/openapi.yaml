@@ -1435,6 +1435,14 @@ components:
             - GRPO
           example: "SFT"
           description: "Training technique that has been used for this training job"
+        task_type:
+          type: string
+          enum:
+            - text-generation
+            - classification
+            - embedding
+            - regression
+          example: "classification"
         base_model_option:
           type: string
           enum:
@@ -1454,6 +1462,10 @@ components:
           type: int
           example: 5
           description: (base_model_option == "fine-tuned") Check point that is used as a base model for the training job
+        train_dataset_name:
+          type: string
+          example: "train-dataset-1"
+          description: Name of the dataset used for fine-tuning
         test_functions:
           type: array
           example: [ "test_similarity_shared" ]
@@ -1517,6 +1529,13 @@ components:
             - GRPO
           example: "SFT"
           description: "Training technique that has been used for this training job"
+        task_type:
+          type: string
+          enum:
+            - text-generation
+            - classification
+            - embedding
+            - regression
         base_model_option:
           type: string
           enum:
