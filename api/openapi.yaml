@@ -168,7 +168,7 @@ paths:
       tags:
         - Datasets
       summary: Upload dataset
-      description: Upload dataset to the project.
+      description: Upload dataset to the project (upto 200MB). Upload through UI if your dataset size is larger than 200MB.
       operationId: createDataset
       parameters:
         - $ref: '#/components/parameters/ProjectId'
