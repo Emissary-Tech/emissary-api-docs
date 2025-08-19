@@ -792,7 +792,7 @@ paths:
     post:
       tags:
         - Deployments
-      summary: Deactivate deployment
+      summary: Reactivate deployment
       description: Reactivate a deactivated deployment.
       operationId: reactivateDeploymentById
       parameters:
