@@ -1,0 +1,72 @@
+---
+id: reactivate-deployment-by-id
+title: "Deactivate deployment"
+description: "Reactivate a deactivated deployment."
+sidebar_label: "Deactivate deployment"
+hide_title: true
+hide_table_of_contents: true
+api: eJytVd9vmzAQ/lcsP21SEtKuT3latqZStKmtmk6bFEWRCya4A+zZJilC/O+7M06A0FXTtCeM7+67X9+dK2rZztDZml5zlcoy47k1dDOiETehFsoKmdMZfeAstGLPLCeMRKefCM5HqwkdUam4ZmiyjMBIn/Ra7E8liEZUMc0ybrlG1xXN4QcMlJbPPLRbgSoC/SpmEzibMOEZo7OK2lKhprFa5Dtan8f5mHCyvCYyJhZOHg8ANP9VCM0hKqsLXo9OLtv4h177Rm+7anHeCrfeIKpRMjfcoPxyeoWfPnJbLaI7pTZFGHJj4iJNS8z8ajod2n5PeN6xIpgDN5bIvBMiOSQiTIgwhKWgG5VeBk6kJqIDgKDO1Sth3kpLbmSRR4RrLTXkHcrcYgVAlSmVitABBM8G9athWeTToD1rqBWzhYHLFjXiyEjoJtDLiqZyXq0FE+B7x9Egljpjtrn6cIlILyxTKShBHvUReNCdjp7LLcbcMHsXwJvqTSLbXNqttwIzK6wTzpVYoEfAvPHCGuXA/0TinChprJsJYN2MBvuLwBPXBFU7EnXQNhAEPeLWQdty5B/X++NoFToF0MRaZWZBwJSYHAQQNhPGMF1OQpnRc2YvvJDM75ekwaLIXMPDQgtbOlxA2v7keN50ZSvscdOhk8apcnDzBS5Gx+H7MQYP4+bKDV4CZERnNf7H0pn6KnaDGkS8n04uJlO4ho2Smbt4BUGLkHcSPxwOg8QDpz2W8dh4/YbCUEn0DFwVWDt/9XFQN4gSOM5hllHd5zRXDEpALl04bfF9CMxJJ1LvAm9qgq/Lz4vb1WIMJpPEZiniYvua1JrM4ApZkrG84+q6HfPe+unVpmqn8m+3uO+W5S82UCkTbgW4VCpP0jXdX9DRcV/jsM56u7vDVJSdL9kOWYE6CdIfIKvqiRn+Tad1jdewt7SjF1SDacGekAZAvEgYPMPgxCw152u5m+67B79W3pM/vQuvpnpka4683LO0wD84OjJ3Hyl8R/5DOL3m/UNE/fLWGzDwg4T1anTm8HYo27EeLGic4tNKur9bPcIY/ga4T85O
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Deactivate deployment"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/projects/{project_id}/deployments/{deployment_id}/reactivate"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Reactivate a deactivated deployment.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true},{"name":"deployment_id","in":"path","required":true,"description":"The ID of the deployment","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Deployment reactivated successfully"},"400":{"description":"When reactivate request on deployment which is already deployed or in reactivation"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      
