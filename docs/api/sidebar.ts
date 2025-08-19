@@ -139,7 +139,7 @@ const sidebar: SidebarsConfig = {
         {
           type: "doc",
           id: "api/reactivate-deployment-by-id",
-          label: "Deactivate deployment",
+          label: "Reactivate deployment",
           className: "api-method post",
         },
         {
