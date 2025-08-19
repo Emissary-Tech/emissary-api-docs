@@ -788,6 +788,28 @@ paths:
           description: Deployment canceled successfully
         '404':
           $ref: '#/components/responses/NotFound'
+  '/v1/projects/{project_id}/deployments/{deployment_id}/reactivate':
+    post:
+      tags:
+        - Deployments
+      summary: Reactivate deployment
+      description: Reactivate a deactivated deployment.
+      operationId: reactivateDeploymentById
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: deployment_id
+          in: path
+          required: true
+          description: The ID of the deployment
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deployment reactivated successfully
+        '400':
+          description: When reactivate request on deployment which is already deployed or in reactivation
+        '404':
+          $ref: '#/components/responses/NotFound'
   '/v1/projects/{project_id}/deployments/{deployment_id}/deactivate':
     post:
       tags:
