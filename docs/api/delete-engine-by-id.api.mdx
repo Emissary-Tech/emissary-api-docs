@@ -1,0 +1,72 @@
+---
+id: delete-engine-by-id
+title: "Delete inference engine"
+description: "Delete an inference engine."
+sidebar_label: "Delete inference engine"
+hide_title: true
+hide_table_of_contents: true
+api: eJyFVN9P2zAQ/lciP21SmwDjqU/rRpCqITYNJiGhqjLJpTFLbGM7LVWU/313jtuGFI2nOHff/fjOn69ljq8tmz2yhSzAgMwgSuVaSLBsOWE52MwI7YSSbMauoAIHEZeROIDBg2M2YUqD4YRc5IjNPbZP9W2HpgnT3PAajYbqtUziDwL7BCtBCEFVNHclng28NMIA5nKmgXEr9yVEi6tIFZGj06h3DLdZCTVns5a5naY61hkh16zrlpTbaiUtckT/xdklfd7mH2eMej55ZJssA2uLpqp2rJuwy/eib5WLrlUj8wiMUQbbyZR0IB1BudaVyPykkmdL+Pa0W/X0DJl7M4ZHpMBdY9F4zJoDXZM2NHwnekIBdkwmsPYaKKBQpuauN325oEyvvNYVgpBHt098MrQBznMriBux9w38F94TWUnlViEKw5xw3jnXIqWKmPM6ODvyo0pKdVSR1w6KYsaSzXnSC8Ym7UE5Hd03mM1eWY2pEFs6p+0sSbgW8VagTGphLTe7OFM1G+spDc5o/msR9bkYKcVC1hjhdj4vZlr9BTovh747urx+9AfEYSRo+YGGyV7uD1OsMO1NXu4l8JyKdfRfKB8axjNs6qTjzVl8Hp+hGR9UbX8Wd9i0yGBAfLvdnhBPPHqqiqkN+F6bPPPaRBEKml0wfT2ZG3aJ4gV8OwQPnOaa4wiiC9/OcfihBe69sTLrJITa5GbxPb29S6cYEpeurigvXV9PrWeGJq2sq7kclAoraLx/xtNpjw/ug60VrsnBq0t0xfFKusChDaJ7ZJtzknTYihM2O64sVEGJPRKobZ+4hT+m6joyvzRgvFKQGDeCP9GNooZyYemM4i54Zcd7bdj3p9/h6X+OPtx277LYK1CS1ja8augPj16gg73bLREcZEgt9v457jntBpEne4vewOGlXqU36X2KMv4Hz+UnUg==
+sidebar_class_name: "delete api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Delete inference engine"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"delete"}
+  path={"/v1/engines/{engine_id}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Delete an inference engine.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"engine_id","in":"path","required":true,"description":"The ID of the Inference Engine","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Inference Engine deleted successfully"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

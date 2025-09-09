@@ -1,0 +1,72 @@
+---
+id: reactivate-engine-by-id
+title: "Reactivate Inference Engine"
+description: "Reactivate a inactive inference engine."
+sidebar_label: "Reactivate Inference Engine"
+hide_title: true
+hide_table_of_contents: true
+api: eJyVVVFv2jAQ/iuWnzYJCO36xNPYRiW0qa1Kp02qEHKTC3GX2J7tQFGU/747x0AK1aY94Zzvvrvv7vPRcC/Wjk8e+VzlYEGlwGZqLRU4vhzwDFxqpfFSKz7h9yBSLzfCAxNMqvABeNgHQggc8QHXBqygqHmGcfYQ10F/2qF5wI2wogIPlvI3XOEHOncgK0kekrIa4Qs8W/hdSwuI520Np6U9FMDmX5jOmafTCRcMd2kBleCThvudoTzOW6nWvG2XhO2MVg454/3l+Ip+XuOfIrIjp4y5Ok3Bubwuyx1vB/xqPD5H+FGA6kUx4gPOM61i39i2kGnBpGOiRL9sxzIwpd5hAm2xy8dgAgxp3ij0Rnt2rWuVMbBWW2SeauVBeXIVxpQyDQDJsyP/5rwx+ukZUv+q44/YLeFrh8YjagakEGNp1l52vYtuRzCJuddAAbm2lfCd6cMlIb2IypTohDzaPfDZfHp+gVtO3Ih9KOCv7h2RldJ+FaMwzEsfLqdGzigjYl7Hy5buUZCFJtEa7XwQKapvwpPNRdKNySXNQaJtchwoaQzsZq/m2pYYVnhv3CRJhJGjrURpVtI5YXejVFf8VMOzeMmmd3PWYXFSp4O0ttLvAi4irX4BnZf9uwVNsZvBwePQG7R8RcNg/8R+DjHDsDOFJ1ag3ChZS9+5DqGxT/2izirejEcXozGa8RFX7jZfYNEyhR7x7XZ7RjwJ3kOdD13070SKnaTMqEZJvYumj2d9wypRxYDvldwjp6kR2AJ2Gco5Nj+WIMLtSNt1EkNd8m3+eXazmA0xZFT4qiRcGl9HrWOGJtJBJVQvVW8NvrFoXnWoOb6+/9iecWweXnxiSiHDaw+cmqjHR765IK3HTT3gk/7a7IkSJVKQkDGiaZ6Eg++2bFsy4/axQUbIWlgpnmjcKLBMOjrjE8hF6U4XbZ/Qu/u4IN6zf67fNynt5alIiBtR1vSFx6De3h9Bu0TnqFEqsbuf4tI1vhd5tt3ogRze893t4gEV/gdAkWJ0
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Reactivate Inference Engine"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/engines/{engine_id}/reactivate"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Reactivate a inactive inference engine.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"engine_id","in":"path","required":true,"description":"The ID of the Inference Engine","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Inference Engine reactivated successfully"},"400":{"description":"When reactivate request on engine which is already deployed or in reactivation"},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      
