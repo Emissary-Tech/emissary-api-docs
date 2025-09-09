@@ -1,0 +1,72 @@
+---
+id: create-engine
+title: "Create Inference Engine"
+description: "Create a new inference engine."
+sidebar_label: "Create Inference Engine"
+hide_title: true
+hide_table_of_contents: true
+api: eJytVlFv4zYM/iuCnjYgTtIeMByyl+WKAhesdy3WDhtQFIVq07GutuRJctMsyH/fR9lN3CRND8PlIZAlkh9FfqS4kkHNvZzcypnJyZFJSZybuTbk5d1AZuRTp+ugrZETeeZIBRJKGFoIvZGnKD+UA2lrcoqFZxnE0yjeWsOho38a8uGTzZZysoqf2hEEg2toIFNrApnAR6quS51GQ6NvnqFX0qcFVYpXYVkTrNuHb5QG2K0dwwYNj3FqVEU9KR+cNnNI0bOq6pK3No4nAe4krfdyPZAPytN9ZTMqjxu4KFWlkg/D0+TkUzIzkGjgCAwE5R/vW71j+oGeQzIn08WKNR1527gU8MqoOVUIxD0Ckus5m7KGLnPkCEZ1iCZmRqVBP5G40RXZhsPwOlXXNaU6R0xEKEggPtpmwubIWlTUYTnAWngCSuYHQuWBnFgUOi2iRkZ1aZfsh1joshQPSHsTbAWPU1WWSwhEQ0hwJnQujIW51Fa4q+gS7YVyhI+U4Gg2FH8VuqS+3mAXCRYa59lWWig3J89KZEC4zqTQHi5DMlhs9l3YWsG9tj67ngh0QJWUfBuTzuSv+IDVjSDCtxVb1t1ttQnOZg12I26plhxM8NTZZ42gEGQ+MsLpWCAGDZgF+NwiADt3fEDEK5zmDdvdFIwquX6OU7vHjfdJ1iWa7kPHELDsILmOY27MZE3H1q0KgkJzcn3YD7+Mx7tUvDpAPrnm32BL6GuUd9aU9A6RfSfWY2pbv5uMt6FGuhc6FL3Ae/ETaErP2gfmKLK8Vf75B8f+xcv/GXPO2L+o+eMg0wpxTdXowvr7qZlTCeXd4N3girPp16l4MSlAyVeBZBd9UC5EnhxHPBlPxuODGNFCBNkD4C7z+fPkyxc+QaUwIJnse+A+vgUH/e8Hy9TS94CUc2rZx7mVFVpg3AtoCO1qQZl5WYcCTald5k63C69C47plE7XxWOpAlT94J9NUPw5ofSgkfEsuMY7GgujxQKL5d7deD3ov723/zbuLJSkrCoXl57u2PnJThQJfo6eTEXWDAXwh90TOxzepcXgvZRFC7Sejkar1kEuPKu29cssh2t1eEs+7QzG9monWllzfsVk8ANwe2C4s3T8Sr+/6Z9wpqrZQNhLb7Nb6d+JgtWOA/DsBQtJuaUYuSGUMhovyZPHHdiY5fyHEywzxxqDwek54Yxh4NQvsPfjvvfd7zWa/m7/RWA60a27JMbG4jm3bS9ty+0nYy9DTeHgy5OrDWFD5y/waSdIp9RK9WCz2Ej2K0onNE9/Jt3MdnGJkDHCaY9Zt/bbHE3iJwY+M76dhWiukXJxGd7Zk61xQ8XRo3XzUqfrRxezs/Ov1eQKVYRGqku0yXdurtTfDFhMcUexBdQPu7ii8G53Vdlh9fybucWBUl0rHeS9eY9XV1q18OoldYjN2F1x62F+tmGt/unK95m1w1cV6wHWU0+oh9i9uCB2tuWxiQciz1sHkhtFZvGza+tiZrLmyNhV/dXl9w/zuJnSmOHadWjBj8T+RccZn7Vh/cW8lS2XmDbiI89Ym//4DIB5SVQ==
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Create Inference Engine"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/engines"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Create a new inference engine.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","properties":{"name":{"type":"string","example":"inference-test-engine"},"base_model":{"type":"string","example":"Llama-3.2-1B-Instruct"},"task_type":{"type":"string","example":"text-generation"},"resource_management_config":{"oneOf":[{"title":"Inactive Timeout","description":"Specifies the period of inactivity, in seconds, after which the deployment will be automatically deactivated if no incoming requests are received. While deactivated, the deployment incurs no charges. When a request is sent to a deactivated deployment, it will be reactivated to process the request; this reactivation process typically introduces a delay of approximately 8 to 20 minutes before the deployment becomes fully operational.","type":"object","properties":{"management_type":{"type":"string","example":"inactive_timeout"},"management_config":{"type":"object","properties":{"inactive_duration":{"type":"integer","example":3600,"description":"Period of inactivity"}}}}},{"title":"Schedule","description":"Specifies the schedule which the engine will be deployed with deployments (if existing on the engine).","type":"object","properties":{"management_type":{"type":"string","example":"schedule"},"management_config":{"type":"object","properties":{"timezone":{"type":"string","example":"America/Los_Angeles","description":"The IANA timezone for the schedule"},"start_time":{"type":"string","example":"10:00","description":"The start time for the schedule in HH:MM format"},"end_time":{"type":"string","example":"18:00","description":"The end time for the schedule in HH:MM format"},"days":{"type":"array","example":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"items":{"type":"string","enum":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]},"description":"The days of the week for the schedule"}}}}}]}},"required":["base_model"]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={undefined}
+>
+  
+</StatusCodes>
+
+
+      

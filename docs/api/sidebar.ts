@@ -116,6 +116,18 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
+      label: "Inference Engines",
+      items: [
+        {
+          type: "doc",
+          id: "api/create-engine",
+          label: "Create Inference Engine",
+          className: "api-method post",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Deployments",
       items: [
         {
