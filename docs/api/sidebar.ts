@@ -124,6 +124,42 @@ const sidebar: SidebarsConfig = {
           label: "Create Inference Engine",
           className: "api-method post",
         },
+        {
+          type: "doc",
+          id: "api/list-engines",
+          label: "List inference engines",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "api/get-engine",
+          label: "Retrieve Inference Engine",
+          className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "api/delete-engine-by-id",
+          label: "Delete inference engine",
+          className: "api-method delete",
+        },
+        {
+          type: "doc",
+          id: "api/deploy-on-engine",
+          label: "Create deployment on Inference Engine",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "api/reactivate-engine-by-id",
+          label: "Reactivate Inference Engine",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
+          id: "api/deactivate-engine-by-id",
+          label: "Deactivate Inference Engine",
+          className: "api-method post",
+        },
       ],
     },
     {
@@ -302,6 +338,18 @@ const sidebar: SidebarsConfig = {
           type: "doc",
           id: "api/schemas/trainingjobcheckpoint",
           label: "TrainingJobCheckpoint",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "api/schemas/inferenceenginesummary",
+          label: "InferenceEngineSummary",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "api/schemas/inferenceenginedetail",
+          label: "InferenceEngineDetail",
           className: "schema",
         },
         {
