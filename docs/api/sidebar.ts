@@ -150,6 +150,12 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "api/un-deploy-from-engine",
+          label: "Undeploy from Inference Engine",
+          className: "api-method post",
+        },
+        {
+          type: "doc",
           id: "api/reactivate-engine-by-id",
           label: "Reactivate Inference Engine",
           className: "api-method post",
