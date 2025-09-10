@@ -698,7 +698,7 @@ paths:
     get:
       tags:
         - Inference Engines
-      summary: List inference engines
+      summary: List Inference Engines
       description: Returns a list of inference engines
       operationId: listEngines
       parameters:
@@ -751,7 +751,7 @@ paths:
     delete:
       tags:
         - Inference Engines
-      summary: Delete inference engine
+      summary: Delete Inference Engine
       description: Delete an inference engine.
       operationId: deleteEngineById
       parameters:
@@ -770,7 +770,7 @@ paths:
     post:
       tags:
         - Inference Engines
-      summary: Create deployment on Inference Engine
+      summary: Create Deployment on Inference Engine
       description: Create deployment on Inference Engine
       operationId: deployOnEngine
       parameters:
