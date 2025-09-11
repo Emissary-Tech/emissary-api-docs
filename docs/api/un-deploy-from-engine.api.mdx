@@ -1,0 +1,72 @@
+---
+id: un-deploy-from-engine
+title: "Undeploy from Inference Engine"
+description: "Undeploy the deployment from the Inference Engine"
+sidebar_label: "Undeploy from Inference Engine"
+hide_title: true
+hide_table_of_contents: true
+api: eJzVVVtv2jAU/iuRnzYJCFD2wtNoyyS0aa1KK02qUGUSh7hLYs92oCzKf985toEsYd20PY0H5Byf2/f5XCpi6EaT6SNZFAlTrIhYMC82vGCarHokZjpSXBouCjIlD0XMZCb2gUlZ4I45K0yQKJFbWdsH6REhmaJov4jBQ1lcW7MPYHFUkVTRnBmmMI+KFPABqsxeP/EYNDhGl9SkcFbsW8kVA29Glayd4j1mcR2I5Ff56ChlOSXTipi9xDjaKF5sSF2vnG+mzaWI96jRDhWJwgBevKJSZjyywMJnjaGrrmuxfmaRQYQKaTAcSIXbE3OIrpNJj7AXmssMRbHsj8YXk3eQXhP5Y8vHqq6dgpai0C7KeDhxwc69IIuDZRlFTOukzLI9AePJcNjVXxRbmvEYiJSlCZhSQpF/4KGJQBtqSo1orddVmyV/f/LCIeiGYfxEqJwaJ7oYNwkDEPXB46vEXtI48K9tuTXcWPlM8jlae+AWN3HsToajc4TS0qRC8e9A6f/Az+jP+GniOktQS8EyBE2cCmxzKbQte+zYKQm3o9B1sw6rY1vXYemLEbuSqe2h/0uVgVFqjNTTMKSSD3YcmjnnWlO1H0QiJ+2un/vLYHa7CJwvgv2sWVQqbvbWL3h6+srwvGreLfE1HKVHjSMzIPnIMEE/lL70IULfiexQShmNMRigx+e9Ow2Q+YHLTsM3uhq9JMIG9Pw2oXRwboeD0WAIYhiWub5JlgCVR6xB126369AVWu2+SPra67sSpZEtUahFjox70fsO25Al1DCDwYLqnomZpEBcMLbpnJ7Mp0Dt7UCoTehNdfhpcTX/vJz3wWSQmjxDv/joDppDBiKsnZwWjVDHtWP3zJmZ/hNJ1an9/mph+Zc37MWEMqPwyrUHWPmCfiTbETaLX5M9Mm3uqmNVQ42l2AegX1VrqtmDyuoaxVAjytYhEEAVp2t8eajQmGs8Q4kkNNPt3dYE9ubOT4q3wW833llAh/ousJJh1JX4BUdb/o3dW69A2Rc5pujur1wi/Xv0crLvDLu6d7CYwbKR5lXdVWOA3N4s70F57RdxLmK0UXSHQxL+ba7CEmM718oqktFiU9IN6jqf+PsBnPMPPA==
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Undeploy from Inference Engine"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/engines/{engine_id}/undeploy"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Undeploy the deployment from the Inference Engine
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"engine_id","in":"path","required":true,"description":"The ID of the Inference Engine","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","properties":{"deployment_id":{"type":"string","example":"dp-12345"}},"required":["deployment_id"]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"204":{"description":"Undeployed Successfully"},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}},"401":{"description":"Unauthorized error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":401},"error":{"type":"string","example":"Unauthorized"}},"title":"ApiErrorUnauthorized"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

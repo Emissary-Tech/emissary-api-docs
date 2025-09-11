@@ -698,7 +698,7 @@ paths:
     get:
       tags:
         - Inference Engines
-      summary: List inference engines
+      summary: List Inference Engines
       description: Returns a list of inference engines
       operationId: listEngines
       parameters:
@@ -751,7 +751,7 @@ paths:
     delete:
       tags:
         - Inference Engines
-      summary: Delete inference engine
+      summary: Delete Inference Engine
       description: Delete an inference engine.
       operationId: deleteEngineById
       parameters:
@@ -770,7 +770,7 @@ paths:
     post:
       tags:
         - Inference Engines
-      summary: Create deployment on Inference Engine
+      summary: Create Deployment on Inference Engine
       description: Create deployment on Inference Engine
       operationId: deployOnEngine
       parameters:
@@ -813,6 +813,39 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/DeploymentSummary"
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  '/v1/engines/{engine_id}/undeploy':
+    post:
+      tags:
+        - Inference Engines
+      summary: Undeploy from Inference Engine
+      description: Undeploy the deployment from the Inference Engine
+      operationId: unDeployFromEngine
+      parameters:
+        - name: engine_id
+          in: path
+          required: true
+          description: The ID of the Inference Engine
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deployment_id:
+                  type: string
+                  example: "dp-12345"
+              required:
+                - deployment_id
+      responses:
+        '204':
+          description: Undeployed Successfully
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -998,26 +1031,6 @@ paths:
           description: Deployment deleted successfully
         '404':
           $ref: '#/components/responses/NotFound'
-  '/v1/projects/{project_id}/deployments/{deployment_id}/cancel':
-    post:
-      tags:
-        - Deployments
-      summary: Cancel deployment
-      description: Cancel a deployment.
-      operationId: cancelDeploymentById
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - name: deployment_id
-          in: path
-          required: true
-          description: The ID of the deployment
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Deployment canceled successfully
-        '404':
-          $ref: '#/components/responses/NotFound'
   '/v1/projects/{project_id}/deployments/{deployment_id}/reactivate':
     post:
       tags:
@@ -1038,26 +1051,6 @@ paths:
           description: Deployment reactivated successfully
         '400':
           description: When reactivate request on deployment which is already deployed or in reactivation
-        '404':
-          $ref: '#/components/responses/NotFound'
-  '/v1/projects/{project_id}/deployments/{deployment_id}/deactivate':
-    post:
-      tags:
-        - Deployments
-      summary: Deactivate deployment
-      description: Deactivate a deployment.
-      operationId: deactivateDeploymentById
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - name: deployment_id
-          in: path
-          required: true
-          description: The ID of the deployment
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Deployment deactivated successfully
         '404':
           $ref: '#/components/responses/NotFound'
   '/v1/completions':
