@@ -1031,26 +1031,6 @@ paths:
           description: Deployment deleted successfully
         '404':
           $ref: '#/components/responses/NotFound'
-  '/v1/projects/{project_id}/deployments/{deployment_id}/cancel':
-    post:
-      tags:
-        - Deployments
-      summary: Cancel deployment
-      description: Cancel a deployment.
-      operationId: cancelDeploymentById
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - name: deployment_id
-          in: path
-          required: true
-          description: The ID of the deployment
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Deployment canceled successfully
-        '404':
-          $ref: '#/components/responses/NotFound'
   '/v1/projects/{project_id}/deployments/{deployment_id}/reactivate':
     post:
       tags:
@@ -1071,26 +1051,6 @@ paths:
           description: Deployment reactivated successfully
         '400':
           description: When reactivate request on deployment which is already deployed or in reactivation
-        '404':
-          $ref: '#/components/responses/NotFound'
-  '/v1/projects/{project_id}/deployments/{deployment_id}/deactivate':
-    post:
-      tags:
-        - Deployments
-      summary: Deactivate deployment
-      description: Deactivate a deployment.
-      operationId: deactivateDeploymentById
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - name: deployment_id
-          in: path
-          required: true
-          description: The ID of the deployment
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Deployment deactivated successfully
         '404':
           $ref: '#/components/responses/NotFound'
   '/v1/completions':
