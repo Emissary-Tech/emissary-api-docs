@@ -838,11 +838,11 @@ paths:
             schema:
               type: object
               properties:
-                deployment_id:
+                deployment_name:
                   type: string
-                  example: "dp-12345"
+                  example: "my-deployment"
               required:
-                - deployment_id
+                - deployment_name
       responses:
         '204':
           description: Undeployed Successfully
