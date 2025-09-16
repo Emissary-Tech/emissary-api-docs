@@ -1,0 +1,72 @@
+---
+id: deploy-on-engine
+title: "Create Deployment on Inference Engine"
+description: "Create deployment on Inference Engine"
+sidebar_label: "Create Deployment on Inference Engine"
+hide_title: true
+hide_table_of_contents: true
+api: eJzVVltvKjcQ/iuWX9pKwEJyGlU8NSehEr0lChypUoQis2vAObu2a3vhpGj/e2dsLyy7NBy1T80D8drjuXzzjWf21LG1peNnOpUrbrhMOZnItZDc0kWPZtymRmgnlKRjemc4c5xkXOfqreDSESVJ+x7tUaW5YXhnmsGtIP4gD8eaGVZwxw3a3VMJHyDG/fGLyEBCoDXN3AbWhv9ZCsNBkzMlb7s033AyvSdqRRyuur7YdMMLRsd76t402rHOCLmmVbUIurl1H1X2hhJtU6mSDqLEI6Z1LlIfVPJq0fS+q1otX3nqMEKDEDgBII7rANsO9Cj/wgqd45YDJ/pHWGnlVaAyxOPdq4Xtj66uP9x8T9vQ/KYynpMZN1uRIkio1RkmJKi4qNYZr7ardR41kJ/VEpF3iixrSgByYANQST9rJQJw0QR88TU3TRujDr0OF+t81u6SVzDWtlQ1ufHcBOw0zhOPFlUVLlqtpA35uRqO8F+XWKnne0buD5n5xhJbFgUzb+SQ7H/NklODRyNkFk08nOfTpdxl+p9yBzGVUgDnicjAkFgJbshKGQ/2Kf8uk/Yo3x+dNYUq6kyeKreOudKeVS/LArP5yGUWdgIuzTXHnP7ERO4XdwzqPQ/rOTeFkJgzL8xSJ7bx66n+CprmouDZQ+nwkTuG1NB/hg2lMZid4Pz5wCJjXtgl7t9cXw+vb34YDs9ZcuAcWCk02W24bJkhO2ZrZvoicMI1nEeRyB8auP5hOOzSeyq3LBcZvJi6dIQbo8x/oXKzEGNyIVqvddGmbyf5R3yAigVCh1vXV03AIIiq1vguKz+yjMRn/QSdWy0meDsG7uM+AHSm/j9JVrqNMuIveAD+D/iMvg6fZlxnAWoJeISgW28U9nKtrH+PsDWPabIdJaFt22R/6N9VEsiKzReaT93mS5PDlY1z2o6ThGkx2AlgdiGsBa4OUlV0qm4SD8nt45QEXRTbtuVQi8K9eb2g6eUzx/WieTbDXARADxIHXGDnF44Oxtnjjz5Y6IctP3tsOMvQGMSOyX06zgmTGsnD4NJu3qe9+6RBn7TfZo9t9kxMpJAr5f2NyWki0YFpOxyMBkNUD8+ffVjFlt9Ae7fbddBOvHRfrfo2ygd+wzOJloHIAhMWt37sJAu8hALg0EQbWNxqBqGQK+/OMePRBeZPB8qsk3jVJr9O7ya/zyZ9uDLYuCJHvciZEFqIDMchIF7BZMNUHEbvLw2jJ1jtjyX81dNs5IzjX1yic0gg+uNj28dCeKbbke9dYW7u0XFzmI3VANzcYPWA9H6/ZJZ/MnlV4TZwy3j+QuTMCLbElAOzM2FxDVRZsdy2R99mKN8+xfflO3JxID4bTl0XEisAHsgSv2Dpy6YxmlcLEI7FgS6G87vgSH+OWo73O09k1atv3KYp1+5d2UXj2Xl8mM1BeBnn9AImW9g1bIdPK/x6X5UHxle839vTnMl1ydYoG3Ti39/dynKx
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Create Deployment on Inference Engine"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/engines/{engine_id}/deploy"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Create deployment on Inference Engine
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"engine_id","in":"path","required":true,"description":"The ID of the Inference Engine","schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","properties":{"name":{"type":"string","example":"test-deployment"},"project_id":{"type":"string","example":"ms-123465","description":"Model Service ID"},"training_id":{"type":"string","example":"tr-12345","description":"Training Job ID to be deployed"},"checkpoint":{"type":"integer","example":1,"description":"Checkpoint of the training job to be deployed"}},"required":["project_id","training_id","checkpoint"]}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"201":{"description":"The created Deployment's summary object","content":{"application/json":{"schema":{"type":"object","description":"Deployment Summary Object","properties":{"id":{"type":"string","example":"dp-12345","description":"The unique identifier for the deployment"},"name":{"type":"string","example":"deployment-1","description":"The name of the deployment"},"status":{"type":"string","enum":["Pending","Deploying","Deployed","Failed","Cancelled","Terminated","Deactivated","Reactivating","TimedOut"],"example":"Deployed","description":"The current status of the deployment"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the deployment was created"}},"title":"DeploymentSummary"}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}},"401":{"description":"Unauthorized error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":401},"error":{"type":"string","example":"Unauthorized"}},"title":"ApiErrorUnauthorized"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

@@ -24,6 +24,8 @@ tags:
     description: Datasets are used to upload documents that can be used for fine-tuning
   - name: Training Jobs
     description: Deals with training jobs
+  - name: Inference Engines
+    description: Inference Engine API endpoints
   - name: Deployments
     description: Deals with deployments
   - name: Inference
@@ -372,30 +374,6 @@ paths:
                         label1: 300
                         label2: 300
                         label3: 500
-#                lora_configs:
-#                  type: object
-#                  description: Lora configurations
-#                  properties:
-#                    rank:
-#                      type: integer
-#                      example: 32
-#                      description: rank [0-256] (default = 32)
-#                    lora_alpha:
-#                      type: integer
-#                      example: 64
-#                      description: alpha [0-256] (default = 64)
-#                    lora_dropout:
-#                      type: number
-#                      example: 0.05
-#                      description: dropout [0-1] (default = 0.05)
-#                quantization:
-#                  type: string
-#                  enum:
-#                    - int4
-#                    - int8
-#                    - fp16
-#                  example: "int4"
-#                  description: "Quantization type for the model (default = int4)"
                 hf_model_link:
                   type: string
                   example: "https://huggingface.co/my_model"
@@ -629,6 +607,291 @@ paths:
                   "$ref": "#/components/schemas/TrainingJobCheckpoint"
         '404':
           $ref: '#/components/responses/NotFound'
+  '/v1/engines':
+    post:
+      tags:
+        - Inference Engines
+      summary: Create Inference Engine
+      description: Create a new inference engine.
+      operationId: createEngine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "inference-test-engine"
+                base_model:
+                  type: string
+                  example: "Llama-3.2-1B-Instruct"
+                task_type:
+                  type: string
+                  example: "text-generation"
+                resource_management_config:
+                  oneOf:
+                    - title: Inactive Timeout
+                      description: Specifies the period of inactivity, in seconds, after which the deployment will be automatically deactivated if no incoming requests are received. While deactivated, the deployment incurs no charges. When a request is sent to a deactivated deployment, it will be reactivated to process the request; this reactivation process typically introduces a delay of approximately 8 to 20 minutes before the deployment becomes fully operational.
+                      type: object
+                      properties:
+                        management_type:
+                          type: string
+                          example: "inactive_timeout"
+                        management_config:
+                          type: object
+                          properties:
+                            inactive_duration:
+                              type: integer
+                              example: 3600
+                              description: Period of inactivity
+                    - title: Schedule
+                      description: Specifies the schedule which the engine will be deployed with deployments (if existing on the engine).
+                      type: object
+                      properties:
+                        management_type:
+                          type: string
+                          example: "schedule"
+                        management_config:
+                          type: object
+                          properties:
+                            timezone:
+                              type: string
+                              example: "America/Los_Angeles"
+                              description: The IANA timezone for the schedule
+                            start_time:
+                              type: string
+                              example: "10:00"
+                              description: The start time for the schedule in HH:MM format
+                            end_time:
+                              type: string
+                              example: "18:00"
+                              description: The end time for the schedule in HH:MM format
+                            days:
+                              type: array
+                              example: [ "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday" ]
+                              items:
+                                type: string
+                                enum:
+                                  - monday
+                                  - tuesday
+                                  - wednesday
+                                  - thursday
+                                  - friday
+                                  - saturday
+                                  - sunday
+                              description: The days of the week for the schedule
+              required:
+                - base_model
+      responses:
+        '201':
+          description: The created Inference Engine's summary object
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/InferenceEngineSummary"
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    get:
+      tags:
+        - Inference Engines
+      summary: List Inference Engines
+      description: Returns a list of inference engines
+      operationId: listEngines
+      parameters:
+        - name: base_model
+          in: query
+          description: Filter engines by base model
+          required: false
+          schema:
+            type: string
+        - name: task_type
+          in: query
+          description: Filter engines by task type
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of Inference Engine's summary object.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/InferenceEngineSummary"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  '/v1/engines/{engine_id}':
+    get:
+      tags:
+        - Inference Engines
+      summary: Retrieve Inference Engine
+      description: Retrieve Inference Engine's Details
+      operationId: getEngine
+      parameters:
+        - name: engine_id
+          in: path
+          required: true
+          description: The ID of the Inference Engine
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The InferenceEngineDetail object matching the specified ID.
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/InferenceEngineDetail"
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Inference Engines
+      summary: Delete Inference Engine
+      description: Delete an inference engine.
+      operationId: deleteEngineById
+      parameters:
+        - name: engine_id
+          in: path
+          required: true
+          description: The ID of the Inference Engine
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Inference Engine deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/v1/engines/{engine_id}/deploy':
+    post:
+      tags:
+        - Inference Engines
+      summary: Create Deployment on Inference Engine
+      description: Create deployment on Inference Engine
+      operationId: deployOnEngine
+      parameters:
+        - name: engine_id
+          in: path
+          required: true
+          description: The ID of the Inference Engine
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "test-deployment"
+                project_id:
+                  type: string
+                  example: "ms-123465"
+                  description: Model Service ID
+                training_id:
+                  type: string
+                  example: "tr-12345"
+                  description: Training Job ID to be deployed
+                checkpoint:
+                  type: integer
+                  example: 1
+                  description: Checkpoint of the training job to be deployed
+              required:
+                - project_id
+                - training_id
+                - checkpoint
+      responses:
+        '201':
+          description: The created Deployment's summary object
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DeploymentSummary"
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  '/v1/engines/{engine_id}/undeploy':
+    post:
+      tags:
+        - Inference Engines
+      summary: Undeploy from Inference Engine
+      description: Undeploy the deployment from the Inference Engine
+      operationId: unDeployFromEngine
+      parameters:
+        - name: engine_id
+          in: path
+          required: true
+          description: The ID of the Inference Engine
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deployment_name:
+                  type: string
+                  example: "my-deployment"
+              required:
+                - deployment_name
+      responses:
+        '204':
+          description: Undeployed Successfully
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  '/v1/engines/{engine_id}/reactivate':
+    post:
+      tags:
+        - Inference Engines
+      summary: Reactivate Inference Engine
+      description: Reactivate a inactive inference engine.
+      operationId: reactivateEngineById
+      parameters:
+        - name: engine_id
+          in: path
+          required: true
+          description: The ID of the Inference Engine
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Inference Engine reactivated successfully
+        '400':
+          description: When reactivate request on engine which is already deployed or in reactivation
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/v1/engines/{engine_id}/deactivate':
+    post:
+      tags:
+        - Inference Engines
+      summary: Deactivate Inference Engine
+      description: Deactivate an inference engine.
+      operationId: deactivateEngineById
+      parameters:
+        - name: engine_id
+          in: path
+          required: true
+          description: The ID of the Inference Engine
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Inference Engine deactivated successfully
+        '400':
+          description: When deactivate request on engine which is not Active
+        '404':
+          $ref: '#/components/responses/NotFound'
   '/v1/projects/{project_id}/deployments':
     post:
       tags:
@@ -768,26 +1031,6 @@ paths:
           description: Deployment deleted successfully
         '404':
           $ref: '#/components/responses/NotFound'
-  '/v1/projects/{project_id}/deployments/{deployment_id}/cancel':
-    post:
-      tags:
-        - Deployments
-      summary: Cancel deployment
-      description: Cancel a deployment.
-      operationId: cancelDeploymentById
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - name: deployment_id
-          in: path
-          required: true
-          description: The ID of the deployment
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Deployment canceled successfully
-        '404':
-          $ref: '#/components/responses/NotFound'
   '/v1/projects/{project_id}/deployments/{deployment_id}/reactivate':
     post:
       tags:
@@ -808,26 +1051,6 @@ paths:
           description: Deployment reactivated successfully
         '400':
           description: When reactivate request on deployment which is already deployed or in reactivation
-        '404':
-          $ref: '#/components/responses/NotFound'
-  '/v1/projects/{project_id}/deployments/{deployment_id}/deactivate':
-    post:
-      tags:
-        - Deployments
-      summary: Deactivate deployment
-      description: Deactivate a deployment.
-      operationId: deactivateDeploymentById
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - name: deployment_id
-          in: path
-          required: true
-          description: The ID of the deployment
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Deployment deactivated successfully
         '404':
           $ref: '#/components/responses/NotFound'
   '/v1/completions':
@@ -1674,6 +1897,134 @@ components:
           type: integer
           example: 1633036800
           description: The timestamp when the checkpoint was created
+    InferenceEngineSummary:
+      type: object
+      description: Inference Engine Summary
+      properties:
+        id:
+          type: string
+          example: "engine-12345"
+          description: The unique identifier for the inference engine
+        name:
+          type: string
+          example: "inference-test-engine"
+        status:
+          type: string
+          enum:
+            - Creating
+            - Active
+            - Inactive
+          example: Creating
+        base_model:
+          type: string
+          example: "Llama-3.2-1B-Instruct"
+        server_type:
+          type: string
+          example: "on-demand"
+        task_type:
+          type: string
+          example: "text-generation"
+        deployment_counts:
+          type: integer
+          example: 1
+          description: Number of deployments on this inference engine
+        created_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the deployment was created
+    InferenceEngineDetail:
+      type: object
+      description: Inference Engine Object
+      properties:
+        id:
+          type: string
+          example: "engine-12345"
+          description: The unique identifier for the inference engine
+        name:
+          type: string
+          example: "test-inference-engine"
+        status:
+          type: string
+          enum:
+            - Creating
+            - Active
+            - Inactive
+          example: "Active"
+        base_model:
+          type: string
+          example: "Llama-3.2-3B-Instruct"
+        task_type:
+          type: string
+          example: "text-generation"
+        server_type:
+          type: string
+          example: "on-demand"
+        deployments:
+          type: array
+          items:
+            "$ref": "#/components/schemas/DeploymentSummary"
+        base_model_option:
+          type: string
+          example: "pre-trained"
+        last_access_timestamp:
+          type: integer
+          example: 1633036800
+        resource_management_config:
+          oneOf:
+            - title: Inactive Timeout
+              description: Specifies the period of inactivity, in seconds, after which the deployment will be automatically deactivated if no incoming requests are received. While deactivated, the deployment incurs no charges. When a request is sent to a deactivated deployment, it will be reactivated to process the request; this reactivation process typically introduces a delay of approximately 8 to 20 minutes before the deployment becomes fully operational.
+              type: object
+              properties:
+                management_type:
+                  type: string
+                  example: "inactive_timeout"
+                management_config:
+                  type: object
+                  properties:
+                    inactive_duration:
+                      type: integer
+                      example: 3600
+                      description: Period of inactivity
+            - title: Schedule
+              description: Specifies the schedule which the engine will be deployed with deployments (if existing on the engine).
+              type: object
+              properties:
+                management_type:
+                  type: string
+                  example: "schedule"
+                management_config:
+                  type: object
+                  properties:
+                    timezone:
+                      type: string
+                      example: "America/Los_Angeles"
+                      description: The IANA timezone for the schedule
+                    start_time:
+                      type: string
+                      example: "10:00"
+                      description: The start time for the schedule in HH:MM format
+                    end_time:
+                      type: string
+                      example: "18:00"
+                      description: The end time for the schedule in HH:MM format
+                    days:
+                      type: array
+                      example: [ "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday" ]
+                      items:
+                        type: string
+                        enum:
+                          - monday
+                          - tuesday
+                          - wednesday
+                          - thursday
+                          - friday
+                          - saturday
+                          - sunday
+                      description: The days of the week for the schedule
+        created_at:
+          type: integer
+          example: 1633036800
+          description: The timestamp when the deployment was last updated
     DeploymentSummary:
       type: object
       description: Deployment Summary Object

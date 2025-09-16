@@ -1,0 +1,72 @@
+---
+id: list-engines
+title: "List Inference Engines"
+description: "Returns a list of inference engines"
+sidebar_label: "List Inference Engines"
+hide_title: true
+hide_table_of_contents: true
+api: eJylVm2P2zYM/iuCvuxLnNeuGO5T0yItgh26YdcCAw5BoNhMrNaWXIlOmgX57yNlx/bF17Td7svFFMmHfPginSSqnZd3j3JptuDAxCAWZqcNeLkayAR87HSB2hp5J/8CLJ3xQolMexR2K3RjBLXRQNoCnGKLZUI2rLlozgrlVA4IjiFP0tAH6WyUh3VuE8hIRTPSlxLcUV7jv9UZmV6gxOYo2FJcLB18KbUDQt2qzMNA+jiFXMm7k8RjwUAenTY7eT4PGmxU/vM6HP8kNBuK2vAnkFes7QtrPBFC59PxmP89Rbuv6b2uyS9e+DLPlTsKu/kEMQ4JPLYGwSB7UUWR6TiQP/rk2dWpH4pyTnGCGiH3HXnlsZf5dQzioYqAq+m41qirTHTSz3cg4avKi4xFFXfRZDp78WsP5UMKojSayBc6oWz0VhPdW+sE0sl1m8nzoK7fLcDGKkLwGLWmHhWW/lljU+Y8DG8cEItBNI9R77nIS6Oqn6suSKNJfjt9fDOw+0zlKpoNp9HkdbQ0pFES8RwYuD24qh1verAmSqiqJmGrtoVv2iB8xWgHpp5OtkygyOwxJ77XsS0NdjnR1FU7cF0Xk+uqvS/zDZWJOrX15IU1VDTtn61azHRBslb4HaiXs9l49vK38fi5TkGdU0VJVRxSMKFF2gDEQXlR4/CoS9QYCGg6uWrkSx+f+W8gX4wn/UH8aFSJqXX6H0gEOGfdfxi4ZrDaNfF46UFKOXhdXU9Tr0dbkmgqcuaPRbNplzXK4XzxeLMXunk94Whe6AWbXykEhmhxp5Z3+g4w7HJM6WO0n4za5V91cLXdS0dzIFPEwt+NRqrQw4OmUuXae+J9GNu8twYW9aGY/7kUlS/JK9NDXDqNx+CXPK0/A/9edc8emPeKvEajXXqF/h14Z9Vr/++IEKJKFNZ+CiphsDN/b20wrTnpBtWLeD8eToZjEtP1kPs/tg8UtI6hk/jhcOglPgrakd1Gvtav2oo2DCNT/2jmrha96vFGUVLfAV0irF7nNC8UUSCmIZyW/DoEFU6H1u1Gtakf3S/fLN4/LCIyGaaYZ+yXy1elVmVGosJ6pGXTgQoXVP/FcEXOqR2VH3w71NXiVTUqMqXDlgqpnOp+e5T7SVjUzRslpehYfjrx/v3osvOZxdU9zv2SaK82Wed2/maQ33lgPBtd6LOnT5i9ykpWlPzO+D/o3TfGDfDuG6bFXvGH0wweRmVw6XHmpDKcxzEU2LHq7TP20sz9u8UHGpB/AbrdhBI=
+sidebar_class_name: "get api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"List Inference Engines"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/v1/engines"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Returns a list of inference engines
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"base_model","in":"query","description":"Filter engines by base model","required":false,"schema":{"type":"string"}},{"name":"task_type","in":"query","description":"Filter engines by task type","required":false,"schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"List of Inference Engine's summary object.","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","description":"Inference Engine Summary","properties":{"id":{"type":"string","example":"engine-12345","description":"The unique identifier for the inference engine"},"name":{"type":"string","example":"inference-test-engine"},"status":{"type":"string","enum":["Creating","Active","Inactive"],"example":"Creating"},"base_model":{"type":"string","example":"Llama-3.2-1B-Instruct"},"server_type":{"type":"string","example":"on-demand"},"task_type":{"type":"string","example":"text-generation"},"deployment_counts":{"type":"integer","example":1,"description":"Number of deployments on this inference engine"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the deployment was created"}},"title":"InferenceEngineSummary"}}}}},"401":{"description":"Unauthorized error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":401},"error":{"type":"string","example":"Unauthorized"}},"title":"ApiErrorUnauthorized"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      
