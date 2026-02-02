@@ -29,6 +29,8 @@ Prepare your dataset in the appropriate format for the classification task.
 ### For Multi-Class / Multi-Label Binary Classification
 
 In cases where multiple labels are evaluated independently, the completion should be a dictionary where each label is mapped to a binary value (0 or 1) to indicate its relevance.
+
+**Multiclass**
 ```json
 {
   "prompt": "This is a sample text for multiclass classification",
@@ -40,6 +42,7 @@ In cases where multiple labels are evaluated independently, the completion shoul
   }
 }
 ```
+**Multilabel**
 ```json
 {
   "prompt": "This is a sample text for multilabel classification",
