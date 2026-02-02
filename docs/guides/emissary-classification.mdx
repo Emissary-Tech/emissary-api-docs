@@ -116,18 +116,13 @@ Click **+ NEW TRAINING JOB button and fill in the configuration**
 **(Optional)**
 
 - **Test Dataset:** You can provide a test dataset which then will be used in testing (evaluation phase). If None selected, the testing phase will be skipped.
-
-    We also have two options for selecting test dataset
-
-    1. **Split Train/Test Dataset**: Use ratio of train dataset as a test set
-    2. **Select existing dataset:** Upload separate dataset for test
+    - **Split Train/Test Dataset**: Use ratio of train dataset as a test set
+    - **Select existing dataset:** Upload separate dataset for test
 - **Rebalance Dataset:** You can also rebalance your train dataset referring following format.
     - Binary Classification: Use "positive" and "negative" as keys. Values can be proportions (0.0-1.0) or counts.
-
-      e.g)`{"positive": 0.3, "negative": 0.7}` or `{"positive":200", "negative": 100}`
+      <br/> e.g)`{"positive": 0.3, "negative": 0.7}` or `{"positive":200", "negative": 100}`
     - Multiclass Classification: Use your label names as keys. Values can be proportions (0.0-1.0) or counts.
-
-      e.g) `{"cat": 0.25, "dog": 0.25, "bird": 0.5}` or `{"cat": 300, "dog": 300, "bird": 200}`
+      <br/> e.g) `{"cat": 0.25, "dog": 0.25, "bird": 0.5}` or `{"cat": 300, "dog": 300, "bird": 200}`
     - Multilabel Classification: Does not support rebalancing.
 - **Hyper Parameters:** Hyper parameters’ value is all set with GOOD default values but you can adjust the value if you want
 - **Test Functions:** When you select any Test Dataset option, you can also provide your own test functions which provides you an aggregate results. We recommend to try our `sample match combined metric shared`
