@@ -4,7 +4,7 @@ title: LLMs as Classifiers - Guide
 
 ## 1. Objective
 
-This guide provides step-by-step instructions on finetuning a model for **Text Classification** tasks on Emissary using our novel classification approach. In this approach, we add a classification head on top of the base LLMs that returns probabilities for a given set of labels. We recommend using **Llama3.1-8B-instruct** for this task.
+This guide provides step-by-step instructions on finetuning a model for **Text Classification** tasks on Emissary using our novel classification approach. In this approach, we add a classification head on top of the base LLMs that returns probabilities for a given set of labels. We recommend using **Qwen3-4B-Base** for this task.
 
 ## 2. Dataset Preparation
 
@@ -18,9 +18,6 @@ Prepare your dataset in the appropriate format for the classification task.
 - **Completion**: A dictionary with a single label with value 0 or 1 (0: negative / 1: positive)
 
 ### For Binary Classification Data (Single Label)
-
-**JSONL Format**
-
 ```json
 {
   "prompt": "This is a sample text for binary classification",
@@ -29,24 +26,23 @@ Prepare your dataset in the appropriate format for the classification task.
 
 ```
 
-**CSV Format**
-
-```
-input,expected_output
-"This is a sample text for binary classification",{"is_cat": 1}
-"This is another sample text for binary classification",{"is_cat": 0}
-
-```
-
-### For Multi-Class/Multi-Label Binary Classification
+### For Multi-Class / Multi-Label Binary Classification
 
 In cases where multiple labels are evaluated independently, the completion should be a dictionary where each label is mapped to a binary value (0 or 1) to indicate its relevance.
-
-**JSONL Format**
-
 ```json
 {
-  "prompt": "This is a sample text for classification",
+  "prompt": "This is a sample text for multiclass classification",
+  "completion": {
+    "Label_1": 1,
+    "Label_2": 0,
+    "Label_3": 0,
+    "Label_N": 0
+  }
+}
+```
+```json
+{
+  "prompt": "This is a sample text for multilabel classification",
   "completion": {
     "Label_1": 1,
     "Label_2": 0,
@@ -54,15 +50,6 @@ In cases where multiple labels are evaluated independently, the completion shoul
     "Label_N": 0
   }
 }
-
-```
-
-**CSV Format**
-
-```
-input,expected_output
-"This is a sample text for binary classification", "{"Label_1": 1, "Label_2": 0, "Label_3": 1, "Label_N": 0}"
-
 ```
 
 ## 3. Finetuning Preparation
@@ -131,8 +118,15 @@ Click **+ NEW TRAINING JOB button and fill in the configuration**
 
     1. **Split Train/Test Dataset**: Use ratio of train dataset as a test set
     2. **Select existing dataset:** Upload separate dataset for test
-- **Rebalance Dataset:** You can also rebalance your train dataset
-- **Hyper Parameters:** Default hyper parameters’ value is all set but you can adjust the value if you want
+- **Rebalance Dataset:** You can also rebalance your train dataset referring following format.
+    - Binary Classification: Use "positive" and "negative" as keys. Values can be proportions (0.0-1.0) or counts.
+
+      e.g)`{"positive": 0.3, "negative": 0.7}` or `{"positive":200", "negative": 100}`
+    - Multiclass Classification: Use your label names as keys. Values can be proportions (0.0-1.0) or counts.
+
+      e.g) `{"cat": 0.25, "dog": 0.25, "bird": 0.5}` or `{"cat": 300, "dog": 300, "bird": 200}`
+    - Multilabel Classification: Does not support rebalancing.
+- **Hyper Parameters:** Hyper parameters’ value is all set with GOOD default values but you can adjust the value if you want
 - **Test Functions:** When you select any Test Dataset option, you can also provide your own test functions which provides you an aggregate results. We recommend to try our `sample match combined metric shared`
 
     ![test_functions](/img/guides/test_functions.png)
