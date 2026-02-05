@@ -32,6 +32,7 @@ const sidebars: SidebarsConfig = {
             'guides/data-extraction',
             'guides/classification',
             'guides/embeddings',
+            'guides/clip-embedding',
             'guides/emissary-classification',
             'guides/emissary-regression',
             'guides/finetuning-pdf-docs'
