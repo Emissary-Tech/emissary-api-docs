@@ -30,6 +30,7 @@ const sidebars: SidebarsConfig = {
         label: 'Guides',
         items: [
             'guides/emissary-classification',
+            'guides/emissary-regression',
             'guides/text-generation',
             'guides/ner',
             'guides/clip-classification',

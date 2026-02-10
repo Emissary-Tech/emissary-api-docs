@@ -1,118 +1,130 @@
 ---
-title: LLMs for Regression - Guide
+title: LLMs as Regressor - Guide
 ---
-
 ## 1. Objective
 
-This guide provides step-by-step instructions on finetuning a model for **Regression** tasks on Emissary using our regression approach. In this approach, we add a regressive head on top of the base LLMs that returns score based on the given score. We recommend using **Llama3.1-8B-instruct** for this task.
+This guide provides step-by-step instructions on fine-tuning a model for **Regression** tasks on Emissary using our novel regression approach. In this approach, we add a regression head on top of the base LLMs that returns predicted values.
 
 ## 2. Dataset Preparation
 
-Prepare your dataset in the appropriate format for the regression task.
+Prepare your dataset in the appropriate format for the Regression task.
 
 ## Regression Data Format
 
-**Each entry should contain:**
+Each entry should contain:
 
-- **Prompt**: The input text for Regression.
-- **Completion**: A float value .
-
-
-**JSONL Format**
+- **prompt**: The input text for regression task.
+- **completion**: The ground-truth numeric target value (a JSON number, typically a float) that the model should predict for the given prompt. This represents a continuous label (e.g., a score), and the valid range depends on your task definition.
 
 ```json
 {
-  "prompt": "This is a sample text for regression",
-  "completion": 0.7
+    "prompt": "This is a sample text for regression task.",
+    "completion": 0.231
 }
 ```
 
+*Note: For large target values or wide-ranging scales, normalize targets before training for better stability.*
 
 ## 3. Finetuning Preparation
 
 Please refer to the in-depth guide on Finetuning on Emissary here - [Quickstart Guide](../).
 
-### Create Model Service
-Navigate to **Dashboard** arriving at **Model Services**, the default page on the Emissary platform.
+### Create Training Project
 
-1. Click **+ NEW SERVICE** in the dashboard.
-![project_create_1](/img/guides/project_create1.png)
-2. In the pop-up, enter a new model service name, and click **CREATE**.
-![project_create_2](/img/guides/project_create2.png)
+Navigate to **Dashboard** arriving at **Training**, the default page on the Emissary platform.
 
-### Uploading Datasets
+1. Click **+ NEW PROJECT** in the dashboard.
+
+    ![new_project](/img/guides/new_project.png)
+
+2. In the pop-up, enter a new training project name, and click **CREATE**.
+
+    ![create_project](/img/guides/create_new_project_general.png)
+
+### Uploading Dataset
 
 A tile is created for your task. Click **Manage** to enter the task workspace.
-![project_manage_1](/img/guides/project_manage1.png)
 
+![manage_project](/img/guides/mange_project_general.png)
 
-1. Click **MANAGE** in the **Datasets Available** tile.
-![project_manage_1](/img/guides/project_manage2.png)
+1. Click **Manage Datasets** in the **Datasets Available** tile.
+
+    ![manage_dataset](/img/guides/manage_dataset_general.png)
+
 2. Click on **+ UPLOAD DATASET** and select training and test datasets.
-![dataset1](/img/guides/dataset1.png)
 
-3. Name datasets clearly to distinguish between training and test data (e.g., <span style={{ color: 'green' }}>train_regression_data.csv</span>, <span style={{ color: 'green' }}>test_regression_data.csv</span>).
+    ![upload_dataset](/img/guides/upload_dataset_general.png)
+
+3. Name dataset and upload the file
+
+    ![upload_dataset_button](/img/guides/upload_dataset_button_general.png)
 
 ## 4. Model Finetuning
-Now, go back one panel by clicking **OVERVIEW** and then click **MANAGE** in the **Training Jobs** tile.
-![project_manage_1](/img/guides/project_manage3.png)
 
-Here, we’ll kick off finetuning. The shortest path to finetuning a model is by clicking **+ NEW TRAINING JOB**, naming the output model, picking a backbone (**base model**), selecting the training dataset (you must have uploaded it in the step before), and finally hitting **START NEW TRAINING JOB**.
+Now, go back one panel by clicking **OVERVIEW** and then click **Manage Training Jobs** in the **Training Jobs** tile.
 
-### Selecting Regression Option
-When creating a new training job, you need to specify that you are performing a regression task to utilize the regression approach.
+![manage_training_job](/img/guides/mange_training_jobs_general.png)
 
-In the Training Job Creation page, locate the Task Type option.
-Select **Regression** from the given options.
+Click **+ NEW TRAINING JOB button and fill in the configuration**
 
-This selection ensures that a **regression head** is added on top of the base LLM, enabling the model to return **scores** for the specified text.
+![new_training_job](/img/guides/new_training_jobs_regression.png)
 
-![new_traning_job](/img/guides/train_regression.png)
+![hyper_parameters](/img/guides/parameters_regression.png)
 
-A custom function that calculates a matching score for the given expected and predicted outputs.
-Uncomment the suitable regression metric function to use it.
+**Required Fields**
 
-![classification_metric](/img/guides/regression_metric.png)
-### Training Parameter Configuration
-Please refer to the in-depth guide on configuring training parameters here - [Finetuning Parameter Guide](../fine-tuning/parameters).
+- Name: Name of your training job (fine-tuned model)
+- Base Model: Choose the backbone pre-trained / fine-tuned model from the drop down list
+- Training Technique Choose training technique to use, regression is only supported in SFT
+- Task Type: Select task type ner
+- Train Dataset: Select dataset you would like to train on the backbone model
 
+**(Optional)**
 
-## 5. Model Monitoring & Evaluation
+- Test Dataset: You can provide a test dataset which then will be used in testing (evaluation phase). If None selected, the testing phase will be skipped.
+    - **Split Train/Test Dataset**: Use ratio of train dataset as a test set
+    - **Select existing dataset**: Upload separate dataset for test
+- Hyper Parameters: Hyper Parameters’ value is all set with Good default values but you can adjust the value if you want.
+- **Test Functions:** When you select any Test Dataset option, you can also provide your own test functions which provides you an aggregate results. We recommend to try our `regression mae`
 
-### Using Test Datasets
+    ![test_functions](/img/guides/test_functions_regression.png)
 
-Including a test dataset allows you to evaluate the model's performance during training.
+After initiating the training job you will see your training job on the list
 
-- **Per Epoch Evaluation**: The platform evaluates the model at each epoch using the test dataset.
-- **Metrics and Outputs**: View evaluation metrics and generated outputs for test samples.
-- Post completion of training, check scores in **Training Job --> Artifacts**.
-  <br></br>For the **LLM model**, expect the following:
+![training_jobs](/img/guides/training_jobs_regression.png)
 
-![evaluate_classification](/img/guides/evaluate_regression.png)
+If you click the row you will be navigated to the training job detail page
 
-## 6. Deployment
-Refer to the in-depth walkthrough on deploying a model on Emissary here - [Deployment Guide](../fine-tuning/deployment).
+![training_job_details](/img/guides/training_job_details_regression.png)
 
-Deploying your models allows you to serve them and integrate them into your applications.
+You can check the `Status` and `Progress` from the summary and you can also check the live logs and loss graph when you click the tab on the side
 
-### Finetuned Model Deployment
-1. Navigate to the **Training Jobs Page**. From the list of finetuning jobs, select the one you want to deploy.
-![deployment_fine_tuned](/img/guides/deployment_fine_tuned.png)
-2. Go to the **ARTIFACTS** tab.
-![artifacts1](/img/guides/artifacts1.png)
-3. Select a **Checkpoint** to Deploy.
-![checkpoint_evaluate](/img/guides/checkpoint_evaluate.png)
-4. Go to **Deployments** to check the status of you deployed model
-![checkpoint_evaluate](/img/guides/Deployment.png)
-5. Once the model is deployed (as shown in the status), go to the testing tab.
-![checkpoint_evaluate](/img/guides/deployment_status.png)
-6. Test your samples in the the input box.
-![checkpoint_evaluate](/img/guides/testing_tab.png)
+![training_job_logs](/img/guides/training_logs_regression.png)
 
+![training_loss_graph](/img/guides/training_loss_regression.png)
 
+Go to Artifacts tab to check checkpoints and test results (if test dataset and functions provided).
 
-## 7. Best Practices
-- **Start Small**: Begin with a smaller dataset to validate your setup.
-- **Monitor Training**: Keep an eye on training logs and metrics.
-- **Iterative Testing**: Use the test dataset to iteratively improve your model.
-- **Data Format**: Use the recommended data formats for your chosen model to ensure compatibility and optimal performance.
+![artifacts](/img/guides/artifacts_regression.png)
+
+## 5. Deployment
+
+From the Artifacts tab you can deploy any checkpoint from the training job by hitting `DEPLOY` button.
+
+![fine_tuned_model_deployment_modal](/img/guides/deployment_regression.png)
+
+(Optional) You can also set resource management when creating a deployment. Setting a inactivity timeout will shutdown your deployment (inference engine) after a period of inactivity. Also you can schedule your deployment to be run in specific date and time.
+
+Once you initiate your deployment you go to Inference dashboard and you will see your recent / previous deployments.
+
+![engine_list](/img/guides/engine_regression.png)
+
+By clicking the card you can see the details of your deployment (inference engine).
+
+![deployment_detail](/img/guides/regression_engine_detail.png)
+
+Once your deployment status becomes `Deployed` then it means your inference server is ready to be used. You can test your deployment on Testing tab (UI) or you can also call by API referring the API examples tab.
+
+![ui_testing](/img/guides/ui_testing_regression.png)
+
+![api_example](/img/guides/api_example_regression.png)
