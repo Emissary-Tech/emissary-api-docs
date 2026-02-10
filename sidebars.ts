@@ -31,6 +31,7 @@ const sidebars: SidebarsConfig = {
         items: [
             'guides/emissary-classification',
             'guides/text-generation',
+            'guides/clip-classification',
             'guides/clip-embedding',
         ]
       }
