@@ -1192,32 +1192,21 @@ paths:
               properties:
                 model:
                   type: string
-                  example: "Llama-3.2-1B-Instruct"
-                  description: "Deployment name or shared serverless base model name"
+                  example: "YOUR_DEPLOYMENT_NAME"
+                  description: "Name of the deployment"
                 input:
-                  type: string
+                  oneOf:
+                    - title: single
+                      type: string
+                    - title: multi
+                      type: array
+                      items:
+                        type: string
                   example: "What is the capital of France?"
-                  description: The input for which to get embeddings
-                target:
-                  type: string
-                  example: "Paris is the capital of France."
-                  description: The target sentence for comparison
-                cosine:
-                  type: boolean
-                  example: true
-                  description: Whether to return cosine similarity
-                manhattan:
-                  type: boolean
-                  example: false
-                  description: Whether to return Manhattan distance
-                euclidean:
-                  type: boolean
-                  example: false
-                  description: Whether to return Euclidean distance
+                  description: A string or array of strings to get embeddings for
               required:
                 - model
                 - input
-                - target
       responses:
         '200':
           description: Successful operation
@@ -1226,32 +1215,16 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: string
-                    example: "rq-12345"
-                    description: The unique identifier for the embedding
-                  response:
-                    type: object
-                    properties:
-                      input_embedding:
-                        type: array
-                        items:
-                          type: number
-                        description: The embedding vector for the input
-                      target_embedding:
-                        type: array
-                        items:
-                          type: number
-                        description: The embedding vector for the target
-                      cosine_score:
-                        type: number
-                        description: The cosine similarity between the embeddings if target not none
-                      manhattan_distance:
-                        type: number
-                        description: The Manhattan distance between the embeddings if manhattan = true
-                      euclidean_distance:
-                        type: number
-                        description: The Euclidean distance between the embeddings if euclidean = true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        embedding:
+                          type: array
+                          items:
+                            type: number
+                          description: The embedding vector
         '404':
           $ref: '#/components/responses/NotFound'
         '400':
