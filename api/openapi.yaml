@@ -1196,8 +1196,10 @@ paths:
                   description: "Name of the deployment"
                 input:
                   oneOf:
-                    - type: string
-                    - type: array
+                    - title: single
+                      type: string
+                    - title: multi
+                      type: array
                       items:
                         type: string
                   example: "What is the capital of France?"
