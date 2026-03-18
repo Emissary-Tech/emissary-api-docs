@@ -29,13 +29,12 @@ const sidebars: SidebarsConfig = {
         type: 'category',
         label: 'Guides',
         items: [
-            'guides/data-extraction',
-            'guides/classification',
-            'guides/embeddings',
-            'guides/clip-embedding',
             'guides/emissary-classification',
             'guides/emissary-regression',
-            'guides/finetuning-pdf-docs'
+            'guides/text-generation',
+            'guides/ner',
+            'guides/clip-classification',
+            'guides/clip-embedding',
         ]
       }
   ],

@@ -1,29 +1,39 @@
 ---
-title: LLMs as Regressor - Guide
+title: Text Generation
 ---
 ## 1. Objective
 
-This guide provides step-by-step instructions on fine-tuning a model for **Regression** tasks on Emissary using our novel regression approach. In this approach, we add a regression head on top of the base LLMs that returns predicted values.
+This guide provides step-by-step instructions on fine-tuning a model for **Text Generation** tasks on Emissary.
 
 ## 2. Dataset Preparation
 
-Prepare your dataset in the appropriate format for the Regression task.
+Prepare your dataset in the appropriate format for the text generation task.
 
-## Regression Data Format
+## Text generation Data Format
 
-Each entry should contain:
+For text generation, your dataset could have two formats.
 
-- **prompt**: The input text for regression task.
-- **completion**: The ground-truth numeric target value (a JSON number, typically a float) that the model should predict for the given prompt. This represents a continuous label (e.g., a score), and the valid range depends on your task definition.
+### Completion:
+
+- **Prompt**: The input text for generation
+- **Completion**: The output text that the model should generate
+
+```json
+{ "prompt": "input", "completion": "output" }
+```
+
+### Chat
+
+- **Messages**: A list of messages, each containing a role and its corresponding content.
 
 ```json
 {
-    "prompt": "This is a sample text for regression task.",
-    "completion": 0.231
+	"messages": [
+		{ "role": "user", "content": "input" },
+		{ "role": "assistant", "content": "response" }
+	]
 }
 ```
-
-*Note: For large target values or wide-ranging scales, normalize targets before training for better stability.*
 
 ## 3. Finetuning Preparation
 
@@ -37,11 +47,11 @@ Navigate to **Dashboard** arriving at **Training**, the default page on the Emis
 
     ![new_project](/img/guides/new_project.png)
 
-2. In the pop-up, enter a new training project name, and click **CREATE**.
+2. In the pop-up, enter a new training project name, and click **CREATE**.###
 
     ![create_project](/img/guides/create_new_project_general.png)
 
-### Uploading Dataset
+### Upload Dataset
 
 A tile is created for your task. Click **Manage** to enter the task workspace.
 
@@ -67,17 +77,24 @@ Now, go back one panel by clicking **OVERVIEW** and then click **Manage Training
 
 Click **+ NEW TRAINING JOB button and fill in the configuration**
 
-![new_training_job](/img/guides/new_training_jobs_regression.png)
+![new_training_job](/img/guides/new_training_jobs_text_gen.png)
 
-![hyper_parameters](/img/guides/parameters_regression.png)
+SFT Hyper Parameters
+
+![sft_hyper_parameters](/img/guides/sft_hyper_params_text_gen.png)
+
+GRPO Hyper Parameters
+
+![grpo_parameters](/img/guides/grpo_hyper_parameters_text_gen.png)
 
 **Required Fields**
 
 - Name: Name of your training job (fine-tuned model)
 - Base Model: Choose the backbone pre-trained / fine-tuned model from the drop down list
-- Training Technique Choose training technique to use, regression is only supported in SFT
+- Training Technique Choose training technique to use
 - Task Type: Select task type ner
 - Train Dataset: Select dataset you would like to train on the backbone model
+- Reward Function **(GRPO ONLY)**: Select or add your reward function used in GRPO training. The total reward should be must sum to 1.
 
 **(Optional)**
 
@@ -85,46 +102,48 @@ Click **+ NEW TRAINING JOB button and fill in the configuration**
     - **Split Train/Test Dataset**: Use ratio of train dataset as a test set
     - **Select existing dataset**: Upload separate dataset for test
 - Hyper Parameters: Hyper Parameters’ value is all set with Good default values but you can adjust the value if you want.
-- **Test Functions:** When you select any Test Dataset option, you can also provide your own test functions which provides you an aggregate results. We recommend to try our `regression mae`
+- **Test Functions:** When you select any Test Dataset option, you can also provide your own test functions which provides you an aggregate results. We recommend to try our `test similarity`
 
-    ![test_functions](/img/guides/test_functions_regression.png)
+    ![test_functions](/img/guides/test_function_text_gen.png)
+
+    ![reward_functions](/img/guides/reward_functions_text_gen.png)
 
 After initiating the training job you will see your training job on the list
 
-![training_jobs](/img/guides/training_jobs_regression.png)
+![training_jobs](/img/guides/training_job_list_text_gen.png)
 
 If you click the row you will be navigated to the training job detail page
 
-![training_job_details](/img/guides/training_job_details_regression.png)
+![training_job_details](/img/guides/training_job_details_text_gen.png)
 
 You can check the `Status` and `Progress` from the summary and you can also check the live logs and loss graph when you click the tab on the side
 
-![training_job_logs](/img/guides/training_logs_regression.png)
+![training_job_logs](/img/guides/training_logs_text_gen.png)
 
-![training_loss_graph](/img/guides/training_loss_regression.png)
+![training_loss_graph](/img/guides/training_loss_text_gen.png)
 
 Go to Artifacts tab to check checkpoints and test results (if test dataset and functions provided).
 
-![artifacts](/img/guides/artifacts_regression.png)
+![artifacts](/img/guides/artifacts_text_gen.png)
 
 ## 5. Deployment
 
-From the Artifacts tab you can deploy any checkpoint from the training job by hitting `DEPLOY` button.
+From the Artifacts tab you can deploy any checkpoint from the training job by hitting `DEPLOY` button.
 
-![fine_tuned_model_deployment_modal](/img/guides/deployment_regression.png)
+![fine_tuned_model_deployment_modal](/img/guides/deployment_text_gen.png)
 
 (Optional) You can also set resource management when creating a deployment. Setting a inactivity timeout will shutdown your deployment (inference engine) after a period of inactivity. Also you can schedule your deployment to be run in specific date and time.
 
 Once you initiate your deployment you go to Inference dashboard and you will see your recent / previous deployments.
 
-![engine_list](/img/guides/engine_regression.png)
+![engine_list](/img/guides/sft_engine.png)
 
 By clicking the card you can see the details of your deployment (inference engine).
 
-![deployment_detail](/img/guides/regression_engine_detail.png)
+![deployment_detail](/img/guides/text_gen_engine_details.png)
 
-Once your deployment status becomes `Deployed` then it means your inference server is ready to be used. You can test your deployment on Testing tab (UI) or you can also call by API referring the API examples tab.
+Once your deployment status becomes `Deployed` then it means your inference server is ready to be used. You can test your deployment on Testing tab (UI) or you can also call by API referring the API examples tab.
 
-![ui_testing](/img/guides/ui_testing_regression.png)
+![ui_testing](/img/guides/ui_testing_text_gen.png)
 
-![api_example](/img/guides/api_example_regression.png)
+![api_example](/img/guides/api_testing_text_gen.png)

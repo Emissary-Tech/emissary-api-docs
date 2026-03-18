@@ -1,0 +1,139 @@
+---
+title: Vision Language Classification
+---
+## 1. Objective
+
+This guide provides step-by-step instructions on fine-tuning a classification model for image pair comparison tasks on Emissary. The model learns to classify whether two images are similar or violating based on visual features.
+
+*Note: This task is only supported in dino-v2 and siglip.*
+
+## 2. Dataset Preparation
+
+Prepare your dataset in JSON format with the following structure.
+
+## CLIP Classification Data Format
+
+**Each entry should contain**:
+
+- **prompt.content**: A list of exactly 2 image objects to compare. Each object must have `type` set to `"image"` and `image` containing either a URL or base64-encoded image string.
+- **completion**: A dictionary containing a `violation` field with a binary label — `1` for violation and `0` for no violation.
+
+```json
+[
+  {
+    "prompt": {
+      "content": [
+        {"type": "image", "image": "<base64_or_url>"},
+        {"type": "image", "image": "<base64_or_url>"}
+      ]
+    },
+    "completion": {
+      "violation": 1
+    }
+  }
+]
+```
+
+## 3. Finetuning Preparation
+
+Please refer to the in-depth guide on Finetuning on Emissary here - [Quickstart Guide](../).
+
+### Create Training Project
+
+Navigate to **Dashboard** arriving at **Training**, the default page on the Emissary platform.
+
+1. Click **+ NEW PROJECT** in the dashboard.
+
+    ![new_project](/img/guides/new_project.png)
+
+2. In the pop-up, enter a new training project name, and click **CREATE**.
+
+    ![create_project](/img/guides/create_new_project_general.png)
+
+### Uploading Dataset
+
+A tile is created for your task. Click **Manage** to enter the task workspace.
+
+![manage_project](/img/guides/mange_project_general.png)
+
+1. Click **Manage Datasets** in the **Datasets Available** tile.
+
+    ![manage_dataset](/img/guides/manage_dataset_general.png)
+
+2. Click on **+ UPLOAD DATASET** and select training and test datasets.
+
+    ![upload_dataset](/img/guides/upload_dataset_general.png)
+
+3. Name dataset and upload the file
+
+    ![upload_dataset_button](/img/guides/upload_dataset_button_general.png)
+
+## 4. Model Finetuning
+
+Now, go back one panel by clicking **OVERVIEW** and then click **Manage Training Jobs** in the **Training Jobs** tile.
+
+![manage_training_job](/img/guides/mange_training_jobs_general.png)
+
+Click **+ NEW TRAINING JOB button and fill in the configuration**
+
+![new_training_job](/img/guides/new_job_clip_classification.png)
+
+![hyper_parameters](/img/guides/parameters_clip_classification.png)
+
+**Required Fields**
+
+- **Name**: Name of your training job (fine-tuned model)
+- **Base Model**: Choose the backbone pre-trained / fine-tuned model from the drop down list
+- **Training Technique**: Choose training technique to use, clip-classification is only supported in SFT
+- **Task Type**: Select task type clip-embedding
+- **Train Dataset**: Select dataset you would like to train on the backbone model
+
+**(Optional)**
+
+- **Test Dataset**: You can provide a test dataset which then will be used in testing (evaluation phase). If None selected, the testing phase will be skipped.
+    - **Split Train/Test Dataset**: Use ratio of train dataset as a test set
+    - **Select existing dataset:** Upload separate dataset for test
+- **Rebalance Dataset**: It does not work for clip-classification.
+- **Hyper Parameters**: Hyper Parameters’ value is all set with Good default values but you can adjust the value if you want.
+
+    *Note: The loss_type for dino only supports “dino” for clip-classification.*
+
+- **Test Functions**: When you select any Test Dataset option, you can also provide your own test functions which provides you an aggregate results. However for default, clip-classification will evaluate the violation probability for each image pair in your test dataset and shows the optimal cutoff to make your classification accuracy highest.
+
+After initiating the training job you will see your training job on the list
+
+![training_jobs](/img/guides/training_job_clip_classification.png)
+
+If you click the row you will be navigated to the training job detail page
+
+![training_job_details](/img/guides/training_job_details_clip_class.png)
+
+You can check the `Status` and `Progress` from the summary and you can also check the live logs and loss graph when you click the tab on the side
+
+![training_job_logs](/img/guides/training_logs_clip_classification.png)
+
+![training_loss_graph](/img/guides/train_loss_clip_classification.png)
+
+Go to Artifacts tab to check checkpoints and test results (if test dataset and functions provided).
+
+![artifacts](/img/guides/artifacts_clip_classification.png)
+
+## 5. Deployment
+
+From the Artifacts tab you can deploy any checkpoint from the training job by hitting `DEPLOY` button.
+
+![fine_tuned_model_deployment_modal](/img/guides/deployment_clip_classification.png)
+
+(Optional) You can also set resource management when creating a deployment. Setting a inactivity timeout will shutdown your deployment (inference engine) after a period of inactivity. Also you can schedule your deployment to be run in specific date and time.
+
+Once you initiate your deployment you go to Inference dashboard and you will see your recent / previous deployments.
+
+![engine_list](/img/guides/engine_clip_classification.png)
+
+By clicking the card you can see the details of your deployment (inference engine).
+
+![deployment_detail](/img/guides/clip_classification_engine_detail.png)
+
+Once your deployment status becomes deployed then it means your inference server is ready to be used. You can test your deployment on calling the API referring the API examples tab.
+
+![api_example](/img/guides/api_example_clip_classification.png)
