@@ -1561,10 +1561,6 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/TrainingJobSummary"
-        deployments:
-          type: array
-          items:
-            "$ref": "#/components/schemas/DeploymentSummary"
     DatasetSummary:
       type: object
       description: Dataset Summary Object
