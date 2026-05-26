@@ -1592,10 +1592,24 @@ components:
           type: string
           example: "my_dataset"
           description: The name of the dataset
+        file_name:
+          type: string
+          example: "dataset.jsonl"
+          description: The name of the file
         is_uploaded:
           type: boolean
           example: true
           description: Whether the dataset has been uploaded
+        is_profiled:
+          type: boolean
+          example: true
+          description: Whether the uploaded dataset has been profiled
+        compatible_task_types:
+          type: array
+          example: [ "classification" ]
+          items:
+            type: string
+            description: List of compatible task type the dataset can be used
         dataset_download_url:
           type: string
           example: "s3:/my_dataset"
