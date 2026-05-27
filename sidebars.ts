@@ -15,7 +15,6 @@ import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
 const sidebars: SidebarsConfig = {
   docs: [
       'home-doc',
-      'quickstart-experiment',
       {
         type: 'category',
         label: 'Fine-Tuning',
@@ -25,6 +24,13 @@ const sidebars: SidebarsConfig = {
             'fine-tuning/testing',
             'fine-tuning/deployment',
         ],
+      },
+      {
+        type: 'category',
+        label: 'Playground',
+        items: [
+            'playground/experiments'
+        ]
       },
       {
         type: 'category',
