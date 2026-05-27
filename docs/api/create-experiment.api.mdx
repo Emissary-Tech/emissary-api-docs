@@ -19,6 +19,7 @@ import StatusCodes from "@theme/StatusCodes";
 import OperationTabs from "@theme/OperationTabs";
 import TabItem from "@theme/TabItem";
 import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
 
 <Heading
   as={"h1"}
@@ -43,28 +44,21 @@ Create a new experiment. Same as creating a new zero-shot deployment which you c
   id={"request"}
   as={"h2"}
   className={"openapi-tabs__heading"}
-  children={"Request"}
 >
+  <Translate id="theme.openapi.request.title">Request</Translate>
 </Heading>
 
-<ParamsDetails
-  parameters={undefined}
->
+<ParamsDetails>
   
 </ParamsDetails>
 
 <RequestSchema
-  title={"Body"}
-  body={{"content":{"application/json":{"schema":{"type":"object","properties":{"name":{"type":"string","example":"my_experiment","description":"The name of the experiment"},"mode":{"type":"string","enum":["tool_calling","judge","decision","routing","ner","regression"],"example":"judge","description":"The mode of the experiment. The mode determines how `classes` must be specified:\n  - `tool_calling`: Agentic tool use. Each item in `classes` represents a tool the model can call.\n  - `judge`: LLM-as-judge for scoring outputs against a single metric. `classes` must contain exactly one item.\n  - `decision`: Multi-class decision/classification. Each item in `classes` represents a possible decision label.\n  - `routing`: Route an input between possible destinations. Each item in `classes` represents a route.\n  - `ner`: Named entity recognition. Each item in `classes` represents an entity type to extract.\n  - `regression`: Score an input on a numeric scale. `classes` must contain exactly one item.\n"},"classes":{"type":"array","description":"The classes for the experiment. The shape and length constraints depend on `mode`:\n  - `tool_calling`, `decision`, `routing`, `ner`: one or more items, each with `name` and `description`.\n  - `judge`: exactly one item where `name` is the metric name and `description` is the judgment criteria.\n  - `regression`: exactly one item with `name`, `description`, plus the additional required fields `min_value`, `max_value`, `low_description`, `high_description`, and `higher_means`.\n","items":{"oneOf":[{"type":"object","title":"Class","description":"Used for `tool_calling`, `decision`, `routing`, and `ner` modes.","properties":{"name":{"type":"string","example":"my_class","description":"The name of the class."},"description":{"type":"string","example":"Description of the class","description":"A description of the class."}},"required":["name","description"]},{"type":"object","title":"JudgeClass","description":"Used for `judge` mode. `classes` must contain exactly one item of this type.","properties":{"name":{"type":"string","example":"helpfulness","description":"The name of the metric being judged."},"description":{"type":"string","example":"Rate how helpful the response is in addressing the user's question.","description":"The criteria the judge should use to evaluate the response."}},"required":["name","description"]},{"type":"object","title":"RegressionClass","description":"Used for `regression` mode. `classes` must contain exactly one item of this type.","properties":{"name":{"type":"string","example":"quality_score","description":"The name of the metric."},"description":{"type":"string","example":"Overall quality of the response.","description":"A description of what the metric measures."},"min_value":{"type":"integer","example":1,"description":"The minimum value of the score range."},"max_value":{"type":"integer","example":10,"description":"The maximum value of the score range."},"low_description":{"type":"string","example":"Poor quality response that does not address the question.","description":"A description of what a score at `min_value` represents."},"high_description":{"type":"string","example":"Excellent response that fully addresses the question.","description":"A description of what a score at `max_value` represents."},"higher_means":{"type":"string","example":"better","description":"What a higher score indicates (e.g. `better`, `worse`)."}},"required":["name","description","min_value","max_value","low_description","high_description","higher_means"]}]}}},"required":["name","mode","classes"]}}}}}
+  {...require("./create-experiment.RequestSchema.json")}
 >
   
 </RequestSchema>
 
-<StatusCodes
-  id={undefined}
-  label={undefined}
-  responses={undefined}
->
+<StatusCodes>
   
 </StatusCodes>
 

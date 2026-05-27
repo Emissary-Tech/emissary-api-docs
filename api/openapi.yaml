@@ -250,8 +250,36 @@ paths:
       tags:
         - Datasets
       summary: Upload dataset
-      description: Upload dataset to the project (upto 5MB). Upload through UI if your dataset size is larger than 5MB.
+      description: Upload dataset to the project (upto 100MB). Upload through UI if your dataset size is larger than 100MB.
       operationId: createDataset
+#      x-codeSamples:
+#        - lang: Python
+#          source: |
+#            import requests
+#
+#            url = "https://api.withemissary.com/v1/projects/{project_id}/datasets"
+#
+#            # Use the `files` parameter for multipart/form-data uploads.
+#            # Don't set Content-Type manually — requests sets it (with the
+#            # boundary) automatically when you pass `files`.
+#            files = {
+#                "file": ("dataset.jsonl", open("./dataset.jsonl", "rb"), "application/json"),
+#            }
+#
+#            # Optional metadata as additional form fields.
+#            data = {
+#                "name": "my_dataset",
+#            }
+#
+#            headers = {
+#                "Accept": "application/json",
+#                "X-API-Key": "YOUR_API_KEY",
+#            }
+#
+#            response = requests.post(url, headers=headers, files=files, data=data)
+#
+#            print(response.status_code)
+#            print(response.json())
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       requestBody:

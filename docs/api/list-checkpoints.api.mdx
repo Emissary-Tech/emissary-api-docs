@@ -19,6 +19,7 @@ import StatusCodes from "@theme/StatusCodes";
 import OperationTabs from "@theme/OperationTabs";
 import TabItem from "@theme/TabItem";
 import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
 
 <Heading
   as={"h1"}
@@ -43,27 +44,24 @@ Returns a list of checkpoints for a training job.
   id={"request"}
   as={"h2"}
   className={"openapi-tabs__heading"}
-  children={"Request"}
 >
+  <Translate id="theme.openapi.request.title">Request</Translate>
 </Heading>
 
 <ParamsDetails
-  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true},{"name":"training_job_id","in":"path","required":true,"description":"The ID of the training job","schema":{"type":"string"}}]}
+  {...require("./list-checkpoints.ParamsDetails.json")}
 >
   
 </ParamsDetails>
 
 <RequestSchema
-  title={"Body"}
-  body={undefined}
+  {...require("./list-checkpoints.RequestSchema.json")}
 >
   
 </RequestSchema>
 
 <StatusCodes
-  id={undefined}
-  label={undefined}
-  responses={{"200":{"description":"List of TrainingJobCheckpoint object.","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","description":"Training Job Checkpoint Object","properties":{"checkpoint":{"type":"integer","example":3,"description":"The checkpoint number"},"model_download_url":{"type":"string","example":"s3:/my_model","description":"The URL to download the model checkpoint"},"test_results":{"type":"object","properties":{"general_test_result":{"type":"string","example":"s3://"},"aggregated_test_result":{"type":"object","additionalProperties":{"type":"string"}}}},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the checkpoint was created"},"updated_at":{"type":"integer","example":1633036800,"description":"The timestamp when the checkpoint was created"}},"title":"TrainingJobCheckpoint"}}}}},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+  {...require("./list-checkpoints.StatusCodes.json")}
 >
   
 </StatusCodes>

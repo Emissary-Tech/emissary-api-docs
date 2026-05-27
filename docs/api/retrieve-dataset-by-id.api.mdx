@@ -19,6 +19,7 @@ import StatusCodes from "@theme/StatusCodes";
 import OperationTabs from "@theme/OperationTabs";
 import TabItem from "@theme/TabItem";
 import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
 
 <Heading
   as={"h1"}
@@ -43,27 +44,24 @@ Retrieve a dataset.
   id={"request"}
   as={"h2"}
   className={"openapi-tabs__heading"}
-  children={"Request"}
 >
+  <Translate id="theme.openapi.request.title">Request</Translate>
 </Heading>
 
 <ParamsDetails
-  parameters={[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true},{"name":"dataset_id","in":"path","required":true,"description":"The ID of the dataset.","schema":{"type":"string"}}]}
+  {...require("./retrieve-dataset-by-id.ParamsDetails.json")}
 >
   
 </ParamsDetails>
 
 <RequestSchema
-  title={"Body"}
-  body={undefined}
+  {...require("./retrieve-dataset-by-id.RequestSchema.json")}
 >
   
 </RequestSchema>
 
 <StatusCodes
-  id={undefined}
-  label={undefined}
-  responses={{"200":{"description":"The DatasetDetail object matching the specified ID.","content":{"application/json":{"schema":{"type":"object","description":"Dataset Object","properties":{"id":{"type":"string","example":"ds-12345","description":"The unique identifier for the dataset"},"name":{"type":"string","example":"my_dataset","description":"The name of the dataset"},"file_name":{"type":"string","example":"dataset.jsonl","description":"The name of the file"},"is_uploaded":{"type":"boolean","example":true,"description":"Whether the dataset has been uploaded"},"is_profiled":{"type":"boolean","example":true,"description":"Whether the uploaded dataset has been profiled"},"compatible_task_types":{"type":"array","example":["classification"],"items":{"type":"string","description":"List of compatible task type the dataset can be used"}},"dataset_download_url":{"type":"string","example":"s3:/my_dataset","description":"The URL to download the dataset"},"upload_by":{"type":"string","example":"user-12345","description":"The user ID who uploaded the dataset"},"created_at":{"type":"integer","example":1633036800,"description":"The timestamp when the dataset was created"},"updated_at":{"type":"integer","example":1633036800,"description":"The timestamp when the dataset was last updated"}},"title":"DatasetDetail"}}}},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+  {...require("./retrieve-dataset-by-id.StatusCodes.json")}
 >
   
 </StatusCodes>

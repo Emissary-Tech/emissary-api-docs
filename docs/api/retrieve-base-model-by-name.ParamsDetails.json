@@ -1,0 +1,1 @@
+{"parameters":[{"name":"base_model_name","in":"path","required":true,"description":"The name of the base model to use for this request","schema":{"type":"string"}}]}

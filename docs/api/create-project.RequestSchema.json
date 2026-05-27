@@ -1,0 +1,1 @@
+{"title":"Body","body":{"content":{"application/json":{"schema":{"type":"object","properties":{"name":{"type":"string","example":"my_project","description":"The name of the project"}}}}},"required":false}}

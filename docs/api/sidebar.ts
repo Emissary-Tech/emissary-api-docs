@@ -90,15 +90,15 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
-          id: "api/create-grpo-training-job",
-          label: "Create GRPO training job",
-          className: "api-method post",
-        },
-        {
-          type: "doc",
           id: "api/list-training-jobs",
           label: "List training jobs",
           className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "api/create-grpo-training-job",
+          label: "Create GRPO training job",
+          className: "api-method post",
         },
         {
           type: "doc",

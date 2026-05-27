@@ -12,7 +12,6 @@ const config: Config = {
   url: "https://docs2.withemissary.com",
   baseUrl: "/",
   onBrokenLinks: "warn",
-  onBrokenMarkdownLinks: "warn",
   favicon: "img/emissary.svg",
 
   // GitHub pages deployment config.
