@@ -1989,17 +1989,17 @@ components:
           "$ref": "#/components/schemas/DatasetSummary"
         test_dataset:
           "$ref": "#/components/schemas/DatasetSummary"
-        training_loss:
-          type: array
-          items:
-            type: object
-            properties:
-              timestamp:
-                type: number
-                example: 1633036800.0
-              loss:
-                type: number
-                example: 0.1234
+#        training_loss:
+#          type: array
+#          items:
+#            type: object
+#            properties:
+#              timestamp:
+#                type: number
+#                example: 1633036800.0
+#              loss:
+#                type: number
+#                example: 0.1234
         hyper_parameters:
           type: object
           additionalProperties:
