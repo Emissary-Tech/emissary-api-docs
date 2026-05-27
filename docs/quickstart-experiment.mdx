@@ -36,7 +36,7 @@ All requests require your API key in the `X-API-Key` header.
 
 ---
 
-## `judge` — LLM-as-Judge
+## judge — LLM-as-Judge
 
 Score a model's output against a single quality criterion. The model returns a probability that the criterion holds, which you can threshold or log for offline analysis.
 
@@ -138,11 +138,9 @@ curl https://api.withemissary.com/v1/classification \
 }
 ```
 
-A near-zero probability for `helpful` confirms the judge correctly flagged a dismissive response.
-
 ---
 
-## `decision`
+## decision
 
 Classify an input into exactly one of several mutually exclusive labels. The model returns a probability distribution across all classes that sums to 1.
 
@@ -254,7 +252,7 @@ curl https://api.withemissary.com/v1/classification \
 
 ---
 
-## `routing`
+## routing
 
 A specialized form of classification designed for picking the right downstream destination for each request. Behaves like `decision` but is optimized for routing patterns where each class represents a target model, agent, or pipeline.
 
@@ -366,7 +364,7 @@ curl https://api.withemissary.com/v1/classification \
 
 ---
 
-## `tool_calling`
+## tool_calling
 
 Select the right tool for a user query *and* extract the arguments needed to call it. Each class is a tool defined with a JSON Schema for its parameters; the model returns both the tool's probability and a structured `generation` payload ready to pass to your function.
 
@@ -555,7 +553,7 @@ curl https://api.withemissary.com/v1/classify-generate \
 
 ---
 
-## `regression`
+## regression
 
 Score inputs on a continuous scale rather than choosing a discrete label. You define each scale by its min/max range and what the endpoints mean; the model returns a single numeric value.
 
@@ -666,7 +664,7 @@ curl https://api.withemissary.com/v1/regression \
 
 ---
 
-## `ner` — Text Extraction
+## ner — Text Extraction
 
 Extract structured entities from unstructured text. Unlike a classifier, NER returns spans of text grouped by type, and you fully define what counts as an entity through the class descriptions — so you're not limited to a fixed taxonomy like PERSON/ORG/LOC.
 
