@@ -1,0 +1,1 @@
+{"parameters":[{"name":"base_model","in":"query","description":"Filter engines by base model","required":false,"schema":{"type":"string"}},{"name":"task_type","in":"query","description":"Filter engines by task type","required":false,"schema":{"type":"string"}}]}

@@ -27,6 +27,13 @@ const sidebars: SidebarsConfig = {
       },
       {
         type: 'category',
+        label: 'Playground',
+        items: [
+            'playground/experiments'
+        ]
+      },
+      {
+        type: 'category',
         label: 'Guides',
         items: [
             'guides/emissary-classification',

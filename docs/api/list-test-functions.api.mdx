@@ -19,6 +19,7 @@ import StatusCodes from "@theme/StatusCodes";
 import OperationTabs from "@theme/OperationTabs";
 import TabItem from "@theme/TabItem";
 import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
 
 <Heading
   as={"h1"}
@@ -39,23 +40,18 @@ import Heading from "@theme/Heading";
 
 Returns a list of test functions
 
-<ParamsDetails
-  parameters={undefined}
->
+<ParamsDetails>
   
 </ParamsDetails>
 
 <RequestSchema
-  title={"Body"}
-  body={undefined}
+  {...require("./list-test-functions.RequestSchema.json")}
 >
   
 </RequestSchema>
 
 <StatusCodes
-  id={undefined}
-  label={undefined}
-  responses={{"200":{"description":"List of Testing Function's summary object.","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","description":"Testing Function Summary Object","properties":{"name":{"type":"string","example":"similarity_score_shared","description":"Name of the test function (matched with exact python method name)"},"content":{"type":"string","example":"def similarity_score_shared(input_text: str, expected_output: str, predicted_output: str): \n ...","description":"Contents of test function"},"dependencies":{"type":"array","example":["external-library"],"items":{"type":"string","description":"List of external dependencies that needs to be downloaded with pip to run"}}},"title":"TestingFunctionSummary"}}}}},"401":{"description":"Unauthorized error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":401},"error":{"type":"string","example":"Unauthorized"}},"title":"ApiErrorUnauthorized"}}}}}}
+  {...require("./list-test-functions.StatusCodes.json")}
 >
   
 </StatusCodes>

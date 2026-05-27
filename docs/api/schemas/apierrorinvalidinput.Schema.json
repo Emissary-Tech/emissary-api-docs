@@ -1,0 +1,1 @@
+{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"},"schemaType":"response"}
