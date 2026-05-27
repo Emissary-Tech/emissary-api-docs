@@ -5,6 +5,9 @@ sidebar_position: 2
 slug: /quickstart-experiment
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 **Experiment** is the fastest way to try the Emissary platform. In under a minute, you can spin up a customized model and call it from your application through a ready-made API endpoint — no training data, no tuning, no infrastructure setup required.
 
 Every experiment starts as a **zero-shot model** built from the class definitions you provide. You can begin sending traffic immediately, then iterate by uploading data, labeling, and re-training as your use case matures.
@@ -41,6 +44,9 @@ Score a model's output against a single quality criterion. The model returns a p
 
 **Create the experiment:**
 
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
+
 ```python
 import json
 import requests
@@ -62,11 +68,33 @@ response = requests.post(
 print(response.json())
 ```
 
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/experiments \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "name": "MyJudge",
+    "mode": "judge",
+    "classes": [
+      {"name": "helpful", "description": "Is the response to the query helpful?"}
+    ]
+  }'
+```
+
+  </TabItem>
+</Tabs>
+
 ```json
 {"id": "ex-ahejacuehandheha", "latest_version": "0.0.0"}
 ```
 
 **Call the model:**
+
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
 
 ```python
 response = requests.post(
@@ -83,6 +111,23 @@ response = requests.post(
 )
 print(response.json())
 ```
+
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/classification \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "model": "ex-ahejacuehandheha/0.0.0",
+    "input": "User: Explain quantum computing in simple terms.\nAssistant: I don'\''t know, Google it.",
+    "data_format": "probs"
+  }'
+```
+
+  </TabItem>
+</Tabs>
 
 ```json
 {
@@ -105,6 +150,9 @@ Classify an input into exactly one of several mutually exclusive labels. The mod
 
 **Create the experiment:**
 
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
+
 ```python
 response = requests.post(
     'https://api.withemissary.com/v1/experiments',
@@ -125,11 +173,35 @@ response = requests.post(
 print(response.json())
 ```
 
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/experiments \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "name": "MyDecision",
+    "mode": "decision",
+    "classes": [
+      {"name": "positive", "description": "The text expresses a positive sentiment, satisfaction, or approval."},
+      {"name": "negative", "description": "The text expresses a negative sentiment, dissatisfaction, or complaint."},
+      {"name": "neutral",  "description": "The text is factual or does not express a strong opinion."}
+    ]
+  }'
+```
+
+  </TabItem>
+</Tabs>
+
 ```json
 {"id": "ex-ahejacuehandhehe", "latest_version": "0.0.0"}
 ```
 
 **Call the model:**
+
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
 
 ```python
 response = requests.post(
@@ -146,6 +218,23 @@ response = requests.post(
 )
 print(response.json())
 ```
+
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/classification \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "model": "ex-ahejacuehandhehe/0.0.0",
+    "input": "This product is absolutely wonderful!",
+    "data_format": "probs"
+  }'
+```
+
+  </TabItem>
+</Tabs>
 
 ```json
 {
@@ -173,6 +262,9 @@ A specialized form of classification designed for picking the right downstream d
 
 **Create the experiment:**
 
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
+
 ```python
 response = requests.post(
     'https://api.withemissary.com/v1/experiments',
@@ -193,11 +285,35 @@ response = requests.post(
 print(response.json())
 ```
 
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/experiments \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "name": "MyRouter",
+    "mode": "routing",
+    "classes": [
+      {"name": "simple_task",   "description": "Simple, straightforward queries that can be handled by a small, fast model."},
+      {"name": "complex_task",  "description": "Complex queries requiring reasoning, code generation, or multi-step analysis."},
+      {"name": "creative_task", "description": "Creative writing, brainstorming, or content generation tasks."}
+    ]
+  }'
+```
+
+  </TabItem>
+</Tabs>
+
 ```json
 {"id": "ex-ahejacuehandheheee", "latest_version": "0.0.0"}
 ```
 
 **Call the model:**
+
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
 
 ```python
 response = requests.post(
@@ -214,6 +330,23 @@ response = requests.post(
 )
 print(response.json())
 ```
+
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/classification \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "model": "ex-ahejacuehandheheee/0.0.0",
+    "input": "Write a poem about autumn leaves",
+    "data_format": "probs"
+  }'
+```
+
+  </TabItem>
+</Tabs>
 
 ```json
 {
@@ -240,6 +373,9 @@ Select the right tool for a user query *and* extract the arguments needed to cal
 **Use it for:** building lightweight, low-latency function-calling agents without a general-purpose LLM in the hot path — database query dispatchers, API gateways, voice assistants, or any system where you need both routing and structured argument extraction in one call.
 
 **Create the experiment:**
+
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
 
 ```python
 response = requests.post(
@@ -296,6 +432,62 @@ response = requests.post(
 print(response.json())
 ```
 
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/experiments \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "name": "MyToolCalling",
+    "mode": "tool_calling",
+    "classes": [
+      {
+        "name": "sql.execute",
+        "description": "Execute SQL queries based on user-defined parameters like SQL keyword, table name, column names, and conditions.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "sql_keyword": {"type": "string", "enum": ["SELECT", "INSERT", "UPDATE", "DELETE", "CREATE"]},
+            "table_name":  {"type": "string"},
+            "columns":     {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["sql_keyword", "table_name"]
+        }
+      },
+      {
+        "name": "Movies_3_FindMovies",
+        "description": "Retrieves a list of movies based on the director, genre, and cast specified by the user.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "directed_by": {"type": "string"},
+            "genre":       {"type": "string", "enum": ["Fantasy", "Mystery", "Thriller", "Comedy", "Drama", "Action"]},
+            "cast":        {"type": "string"}
+          },
+          "required": []
+        }
+      },
+      {
+        "name": "Weather_1_GetWeather",
+        "description": "Retrieves the weather forecast for a specified city on a particular date.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {"type": "string"},
+            "date": {"type": "string"}
+          },
+          "required": ["city"]
+        }
+      }
+    ]
+  }'
+```
+
+  </TabItem>
+</Tabs>
+
 ```json
 {"id": "ex-ahejacuehandhehedfe", "latest_version": "0.0.0"}
 ```
@@ -303,6 +495,9 @@ print(response.json())
 **Call the model:**
 
 Tool calling uses the `/v1/classify-generate` endpoint, which returns both the selected tool and its arguments.
+
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
 
 ```python
 response = requests.post(
@@ -318,6 +513,22 @@ response = requests.post(
 )
 print(response.json())
 ```
+
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/classify-generate \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "model": "ex-ahejacuehandhehedfe/0.0.0",
+    "input": "Find action movies directed by Christopher Nolan"
+  }'
+```
+
+  </TabItem>
+</Tabs>
 
 ```json
 {
@@ -352,6 +563,9 @@ Score inputs on a continuous scale rather than choosing a discrete label. You de
 
 **Create the experiment:**
 
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
+
 ```python
 response = requests.post(
     'https://api.withemissary.com/v1/experiments',
@@ -376,11 +590,39 @@ response = requests.post(
 print(response.json())
 ```
 
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/experiments \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "name": "MyRegressor",
+    "mode": "regression",
+    "classes": [{
+      "name": "valence",
+      "description": "How positive the emotional tone is.",
+      "min_value": 0,
+      "max_value": 1,
+      "low_description":  "very negative emotional tone",
+      "high_description": "very positive emotional tone",
+      "higher_means":     "more positive emotional tone"
+    }]
+  }'
+```
+
+  </TabItem>
+</Tabs>
+
 ```json
 {"id": "ex-ahejacuehandhehedfedaew", "latest_version": "0.0.0"}
 ```
 
 **Call the model:**
+
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
 
 ```python
 response = requests.post(
@@ -396,6 +638,22 @@ response = requests.post(
 )
 print(response.json())
 ```
+
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/regression \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "model": "ex-ahejacuehandhehedfedaew/0.0.0",
+    "input": "I absolutely love this product — best purchase I have made all year!"
+  }'
+```
+
+  </TabItem>
+</Tabs>
 
 ```json
 {
@@ -415,6 +673,9 @@ Extract structured entities from unstructured text. Unlike a classifier, NER ret
 **Use it for:** pulling structured data from emails, contracts, or chat messages; extracting PII for redaction; lifting custom entities like ticker symbols, drug names, product SKUs, or contract clauses from your domain.
 
 **Create the experiment:**
+
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
 
 ```python
 response = requests.post(
@@ -436,11 +697,35 @@ response = requests.post(
 print(response.json())
 ```
 
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/experiments \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "name": "MyExtractor",
+    "mode": "ner",
+    "classes": [
+      {"name": "PERSON",       "description": "human names"},
+      {"name": "ORGANIZATION", "description": "companies and institutions"},
+      {"name": "LOCATION",     "description": "cities and places"}
+    ]
+  }'
+```
+
+  </TabItem>
+</Tabs>
+
 ```json
 {"id": "ex-ahejacuehandhehedqeef", "latest_version": "0.0.0"}
 ```
 
 **Call the model:**
+
+<Tabs groupId="lang">
+  <TabItem value="python" label="Python" default>
 
 ```python
 response = requests.post(
@@ -456,6 +741,22 @@ response = requests.post(
 )
 print(response.json())
 ```
+
+  </TabItem>
+  <TabItem value="curl" label="cURL">
+
+```bash
+curl https://api.withemissary.com/v1/ner \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $YOUR_API_KEY" \
+  -d '{
+    "model": "ex-ahejacuehandhehedqeef/0.0.0",
+    "input": "Sundar Pichai announced that Google will open a new research lab in Zurich next year."
+  }'
+```
+
+  </TabItem>
+</Tabs>
 
 ```json
 {
