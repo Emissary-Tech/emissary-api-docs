@@ -1,0 +1,1 @@
+{"parameters":[{"name":"project_id","in":"path","schema":{"type":"string"},"description":"The ID of the project","required":true},{"name":"training_job_id","in":"path","required":true,"description":"The ID of the training job.","schema":{"type":"string"}}]}

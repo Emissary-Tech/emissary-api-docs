@@ -8,6 +8,18 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
+      label: "Experiments (Playground)",
+      items: [
+        {
+          type: "doc",
+          id: "api/create-experiment",
+          label: "Create new experiment (zero-shot deployment)",
+          className: "api-method post",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Projects",
       items: [
         {
@@ -78,15 +90,15 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
-          id: "api/create-grpo-training-job",
-          label: "Create GRPO training job",
-          className: "api-method post",
-        },
-        {
-          type: "doc",
           id: "api/list-training-jobs",
           label: "List training jobs",
           className: "api-method get",
+        },
+        {
+          type: "doc",
+          id: "api/create-grpo-training-job",
+          label: "Create GRPO training job",
+          className: "api-method post",
         },
         {
           type: "doc",
@@ -138,15 +150,15 @@ const sidebar: SidebarsConfig = {
         },
         {
           type: "doc",
-          id: "api/reactivate-deployment-by-id",
-          label: "Reactivate deployment",
-          className: "api-method post",
-        },
-        {
-          type: "doc",
           id: "api/delete-deployment-by-id",
           label: "Delete deployment",
           className: "api-method delete",
+        },
+        {
+          type: "doc",
+          id: "api/reactivate-deployment-by-id",
+          label: "Reactivate deployment",
+          className: "api-method post",
         },
       ],
     },
@@ -284,6 +296,12 @@ const sidebar: SidebarsConfig = {
           type: "doc",
           id: "api/schemas/basemodelsummary",
           label: "BaseModelSummary",
+          className: "schema",
+        },
+        {
+          type: "doc",
+          id: "api/schemas/basemodeldetail",
+          label: "BaseModelDetail",
           className: "schema",
         },
         {

@@ -19,6 +19,7 @@ import StatusCodes from "@theme/StatusCodes";
 import OperationTabs from "@theme/OperationTabs";
 import TabItem from "@theme/TabItem";
 import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
 
 <Heading
   as={"h1"}
@@ -43,27 +44,22 @@ Get completions from a deployment using the provided input.
   id={"request"}
   as={"h2"}
   className={"openapi-tabs__heading"}
-  children={"Request"}
 >
+  <Translate id="theme.openapi.request.title">Request</Translate>
 </Heading>
 
-<ParamsDetails
-  parameters={undefined}
->
+<ParamsDetails>
   
 </ParamsDetails>
 
 <RequestSchema
-  title={"Body"}
-  body={{"required":true,"description":"Provide you prompt input for completions","content":{"application/json":{"schema":{"type":"object","properties":{"model":{"type":"string","example":"Llama-3.2-1B-Instruct","description":"Deployment name or shared serverless base model name"},"prompt":{"type":"string","example":"The capital of France is","description":"The input prompt for the deployment"},"temperature":{"type":"number","example":0.7,"description":"The sampling temperature to use"},"max_completion_tokens":{"type":"integer","example":500,"description":"The maximum number of new tokens to generate"},"top_p":{"type":"number","example":0.9,"description":"The cumulative probability for token selection"},"top_k":{"type":"integer","example":50,"description":"The number of highest probability tokens to keep for top-k-filtering"}},"required":["model","prompt"]}}}}}
+  {...require("./get-completions-from-deployment.RequestSchema.json")}
 >
   
 </RequestSchema>
 
 <StatusCodes
-  id={undefined}
-  label={undefined}
-  responses={{"200":{"description":"Successful operation","content":{"application/json":{"schema":{"type":"object","properties":{"id":{"type":"string","example":"cmpl-8565e8d5db17438291a189255c36c558"},"object":{"type":"string","example":"text_completion"},"created":{"type":"number","example":1741570283},"model":{"type":"string","example":"Llama-3.2-1B-Instruct"},"choices":{"type":"array","items":{"type":"object","properties":{"index":{"type":"number","example":0},"text":{"type":"string","example":" Paris. The French language is a Romance language and the official language of France."},"logprobs":{"type":["string",null]},"prompt_logprobs":{"type":["string",null]},"stop_reason":{"type":["string",null]},"finish_reason":{"type":"string","example":"length"}}}},"usage":{"type":"object","properties":{"prompt_tokens":{"type":"number","example":6},"completion_tokens":{"type":"number","example":16},"total_tokens":{"type":"number","example":44},"prompt_tokens_details":{"type":["string",null]}}}},"title":"CompletionObject"}}}},"400":{"description":"Invalid Input error","content":{"application/json":{"schema":{"type":"object","required":["status","error"],"properties":{"status":{"type":"integer","format":"int32","example":400},"error":{"type":"string","example":"Bad request"}},"title":"ApiErrorInvalidInput"}}}},"404":{"description":"Not Found error","content":{"application/json":{"schema":{"type":"object","required":["status","error","code"],"properties":{"status":{"type":"integer","format":"int32","example":404},"error":{"type":"string","example":"Not found"},"code":{"type":"string","example":"object_not_found"}},"title":"ApiErrorNotFound"}}}}}}
+  {...require("./get-completions-from-deployment.StatusCodes.json")}
 >
   
 </StatusCodes>

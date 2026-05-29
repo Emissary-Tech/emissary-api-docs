@@ -12,7 +12,6 @@ const config: Config = {
   url: "https://docs2.withemissary.com",
   baseUrl: "/",
   onBrokenLinks: "warn",
-  onBrokenMarkdownLinks: "warn",
   favicon: "img/emissary.svg",
 
   // GitHub pages deployment config.
@@ -56,7 +55,7 @@ const config: Config = {
             type: "doc",
             docId: "home-doc",
             position: "left",
-            label: "Docs",
+            label: "Documentation",
           },
           // { to: "/blog", label: "Blog", position: "left" },
           {
@@ -69,11 +68,11 @@ const config: Config = {
             label: "Dashboard",
             position: "right",
           },
-          {
-            href: "https://github.com/Emissary-Tech/emissary-api-docs",
-            label: "GitHub",
-            position: "right",
-          },
+          // {
+          //   href: "https://github.com/Emissary-Tech/emissary-api-docs",
+          //   label: "GitHub",
+          //   position: "right",
+          // },
         ],
       },
       footer: {
