@@ -27,6 +27,7 @@ const sidebars: SidebarsConfig = {
         type: 'category',
         label: 'Fine-Tuning',
         items: [
+            'fine-tuning/quickstart',
             'fine-tuning/datasets',
             'fine-tuning/parameters',
             'fine-tuning/testing',

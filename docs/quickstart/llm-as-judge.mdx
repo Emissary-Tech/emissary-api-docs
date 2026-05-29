@@ -7,9 +7,9 @@ Emissary runs these judges as small, purpose-built classifiers rather than full 
 
 You can create your first judge three ways. Pick whichever fits:
 
-- **Path A — Public Playground (no signup):** the fastest way to see it work.
-- **Path B — Dashboard (UI):** build and save a judge from your dashboard.
-- **Path C — Dashboard (API):** create the same judge programmatically.
+- **[Path A — Public Playground (no signup)](#path-a--public-playground-no-signup):** the fastest way to see it work.
+- **[Path B — Dashboard (UI)](#path-b--dashboard-ui):** build and save a judge from your dashboard.
+- **[Path C — Dashboard (API)](#path-c--dashboard-api):** create the same judge programmatically.
 
 All three share the same two building blocks, defined once below.
 
@@ -53,7 +53,7 @@ When you're ready, hit **Deploy** in the **Ready to integrate?** section to turn
 
 ![deploy-public](/img/quickstart/llm-as-judge/deploy-public.png)
 
-Your judge is saved as an **Experiment**, and the **Integration** tab gives you a copy-paste snippet with your real model name and key prefilled. See [Integration](https://app.notion.com/p/Quick-Start-LLM-as-Judge-36f626e3f69a8030bbe1e58cdd37730a?pvs=21) below.
+Your judge is saved as an **Experiment**, and the **Integration** tab gives you a copy-paste snippet with your real model name and key prefilled. See [Integration](#integration) below.
 
 ---
 
@@ -70,7 +70,7 @@ From the **Playground** tab, click **New experiment**.
 
 ### 2. Judge config
 
-Fill in the **Metric** and **Criteria** ([defined above](https://app.notion.com/p/Quick-Start-LLM-as-Judge-36f626e3f69a8030bbe1e58cdd37730a?pvs=21)). We'll use the same `anger` judge as in Path A.
+Fill in the **Metric** and **Criteria** ([defined above](#customize-your-judge)). We'll use the same `anger` judge as in Path A.
 
 ![judge-config](/img/quickstart/llm-as-judge/judge-config.png)
 
@@ -82,7 +82,7 @@ From the Playground tab, type any input ("I'm so mad!") and hit **Run** to see y
 
 ![test-judge](/img/quickstart/llm-as-judge/test-judge.png)
 
-Ready to ship it? Head to [Integration](https://claude.ai/chat/85b716b8-ac1c-4f5f-9009-3f5cad24fcba#integration).
+Ready to ship it? Head to [Integration](#integration).
 
 ---
 
@@ -185,9 +185,9 @@ curl -X POST "https://api.withemissary.com/v1/classification" \
 
 That's it — your judge is live wherever you need it.
 
----
+{/* --- */}
 
-## Improve your judge *(TBD)*
+{/* ## Improve your judge *(TBD)* */}
 
-- Quick train - explain and lead to Quick train doc
-- Fine-tuning - explain and lead to Fine-tune doc
+{/* - Quick train - explain and lead to Quick train doc */}
+{/* - Fine-tuning - explain and lead to Fine-tune doc */}
