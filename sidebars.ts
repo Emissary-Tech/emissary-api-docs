@@ -16,6 +16,13 @@ const sidebars: SidebarsConfig = {
   docs: [
       'home-doc',
       {
+          type: 'category',
+          label: 'Quickstart',
+          items: [
+              'quickstart/llm-as-judge',
+          ],
+      },
+      {
         type: 'category',
         label: 'Fine-Tuning',
         items: [
