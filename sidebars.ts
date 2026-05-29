@@ -20,6 +20,7 @@ const sidebars: SidebarsConfig = {
           label: 'Quickstart',
           items: [
               'quickstart/llm-as-judge',
+              'quickstart/router',
           ],
       },
       {
