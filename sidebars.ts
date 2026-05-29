@@ -16,9 +16,18 @@ const sidebars: SidebarsConfig = {
   docs: [
       'home-doc',
       {
+          type: 'category',
+          label: 'Quickstart',
+          items: [
+              'quickstart/llm-as-judge',
+              'quickstart/router',
+          ],
+      },
+      {
         type: 'category',
         label: 'Fine-Tuning',
         items: [
+            'fine-tuning/quickstart',
             'fine-tuning/datasets',
             'fine-tuning/parameters',
             'fine-tuning/testing',
