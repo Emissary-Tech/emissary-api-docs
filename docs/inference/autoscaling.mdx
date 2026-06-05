@@ -139,6 +139,15 @@ requests never wait for a GPU to come online in steady state. Raise min replicas
 you want guaranteed headroom for redundancy or to absorb sudden spikes without waiting on a
 scale‑up.
 
+:::info Scale‑to‑zero is on the roadmap
+Scaling all the way down to zero replicas when an engine is idle — and paying nothing for GPU
+while it sits idle — is something we're actively working toward. We're holding off until we've
+settled two things: how to gracefully handle requests that arrive **while a replica is warming
+up from zero** (so those requests wait rather than fail), and shortening **warm‑up time** itself
+so that the cold start after an idle period is short enough to be acceptable. Until then, the
+minimum is `1`.
+:::
+
 **Max replicas** is your safety ceiling. The engine will never exceed it, even under heavy load —
 excess traffic is served by the existing replicas (at higher per‑replica load) rather than by
 provisioning unbounded GPUs. Set it from your expected peak: roughly
