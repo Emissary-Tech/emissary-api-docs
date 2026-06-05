@@ -1,5 +1,222 @@
 ---
 title: 'Autoscaling'
+description: 'How cluster engines scale GPU replicas up and down with traffic on Emissary.'
+---
+Serving a model means choosing how much GPU capacity to keep running. Provision for peak load
+and you pay for idle GPUs whenever traffic is low; provision for average load and requests pile
+up when traffic spikes. **Autoscaling** removes that trade‑off: Emissary adds replicas when load
+rises and removes them when load falls, so capacity tracks demand and you pay closer to what you
+actually use.
+
+This page explains when autoscaling applies, the settings you control, how the scaling decision
+is made, and how to tune it.
+
+:::note
+Autoscaling applies to **cluster** engines only. An engine becomes a cluster engine when you
+enable autoscaling at creation time; without it, the engine runs as a single fixed‑capacity
+[on‑demand](./concept#server-types) instance. See [Concepts](./concept) for the difference.
+:::
+
 ---
 
-TBD
+## What a replica is
+
+A **replica** is one GPU‑backed copy of your engine — a single inference server, on its own
+GPU(s), capable of handling a share of your traffic. Autoscaling is the process of changing how
+many replicas are running. Two replicas serve roughly twice the traffic of one; scaling to zero
+means no replicas (and no GPU cost) while the engine is idle.
+
+Every replica serves the engine's base model plus all of its fine‑tuned
+[LoRA deployments](./concept), so adding a replica adds capacity for every deployment on the
+engine at once.
+
+---
+
+## Settings
+
+You configure autoscaling when you create a cluster engine. The settings below are what you
+control; everything else (which GPU, how replicas are provisioned, how requests are routed) is
+handled for you.
+
+| Setting | Controls | Default |
+|---|---|---|
+| **Min replicas** | The floor — replicas never drop below this. Set to `0` to allow scale‑to‑zero. | `1` |
+| **Max replicas** | The ceiling — replicas never rise above this. Caps cost and protects against runaway scaling. | `3` |
+| **Autoscaling metric** | What the scaler measures: request rate (QPS) or concurrency. | `request_rate` |
+| **Target per replica** | The per‑replica load the scaler aims to hold (QPS or concurrent requests, depending on the metric). | `10` QPS |
+| **Upscale delay** | How long elevated load must persist before a replica is added. | `10s` |
+| **Downscale delay** | How long load must stay low before a replica is removed. | `1800s` (30 min) |
+
+Min replicas must be ≤ max replicas. Leaving a setting unset falls back to the platform default
+for that field.
+
+---
+
+## How autoscaling works
+
+A dedicated **controller** watches your engine's traffic and decides how many replicas it should
+have. The loop is straightforward:
+
+1. **Measure load.** The controller continuously samples traffic over a rolling **60‑second
+   window** — either the request rate or the number of concurrent in‑flight requests, depending
+   on your chosen metric.
+2. **Compute the desired replica count.** It divides measured load by your per‑replica target
+   and rounds up, then clamps the result between your min and max replicas:
+
+   ```
+   desired_replicas = clamp( ceil(load / target_per_replica), min_replicas, max_replicas )
+   ```
+
+3. **Apply hysteresis.** The controller re‑evaluates roughly every 20 seconds. A change isn't
+   applied the instant the number moves — the new desired count must hold for the **upscale
+   delay** (to add replicas) or the **downscale delay** (to remove them). This keeps brief
+   spikes and dips from thrashing the replica count.
+4. **Act.** If the engine currently has zero replicas, the first request scales it up
+   immediately (no delay) so a cold engine starts serving as fast as possible. Otherwise it adds
+   or removes replicas to reach the desired count.
+
+### Worked example
+
+Your engine uses the **request rate** metric with a **target of 10 QPS per replica**, a min of
+`1`, and a max of `5`.
+
+- Traffic is steady at ~8 requests/second → `ceil(8 / 10) = 1` replica.
+- Traffic climbs to ~32 requests/second → `ceil(32 / 10) = 4` replicas (once the upscale delay
+  has elapsed).
+- Traffic falls back to ~8 requests/second → returns to `1` replica, but only after the
+  downscale delay has elapsed.
+
+The same math applies to the **concurrency** metric, except `load` is the peak number of
+simultaneous in‑flight requests over the window rather than requests per second.
+
+---
+
+## Choosing a scaling metric
+
+Emissary offers two ways to measure load. Pick the one that matches how your workload behaves.
+
+### Request rate
+
+Scales on **requests per second**. The controller counts completed requests over the 60‑second
+window, computes QPS, and divides by your **target QPS per replica**. This is the default and is
+a good fit for steady, request‑oriented traffic where each request takes a similar amount of
+time.
+
+### Concurrency
+
+Scales on the **number of in‑flight requests**. The controller takes the peak concurrency over
+the window and divides by your **target concurrency per replica**. Because it provisions for the
+peak rather than the average, it reacts more aggressively to bursts — useful for spiky traffic
+or for long‑running requests (such as streaming generations) where request count is a poor proxy
+for actual load.
+
+:::note
+Emissary also sets a per‑replica admission limit automatically based on task type — classification
+replicas accept far more concurrent requests than text‑generation replicas, because a
+classification call is a single fast forward pass while text generation streams tokens over a
+longer period. You don't configure this; it's tuned for you per task.
+:::
+
+---
+
+## Min replicas, max replicas, and scale‑to‑zero
+
+**Min replicas** is your warm baseline. Keeping it at `1` or higher means there's always a
+replica ready to serve, so requests never wait for a GPU to come online.
+
+Setting **min replicas to `0`** enables **scale‑to‑zero**: when the engine sits idle, Emissary
+removes its last replica and you stop paying for GPU time. The trade‑off is a **cold start** —
+the next request after the engine has scaled to zero must wait for a fresh GPU to be provisioned
+and the model to load, which can take several minutes. Scale‑to‑zero is ideal for development
+and intermittent workloads; for latency‑sensitive or production traffic, keep min replicas at
+`1` or more.
+
+**Max replicas** is your safety ceiling. The engine will never exceed it, even under heavy load —
+excess traffic is served by the existing replicas (at higher per‑replica load) rather than by
+provisioning unbounded GPUs. Set it from your expected peak: roughly
+`peak_load / target_per_replica`, plus a little headroom.
+
+---
+
+## Scaling dynamics and oscillation
+
+The two delays are how you balance responsiveness against stability:
+
+- **Upscale delay** (default `10s`) — short, so the engine adds capacity quickly when load
+  rises.
+- **Downscale delay** (default `30 min`) — deliberately long, so the engine holds warm capacity
+  through brief lulls instead of tearing down replicas that it will need again moments later.
+  Because spinning a replica back up incurs a cold start, it's usually cheaper to keep one warm
+  for a while than to remove it prematurely.
+
+If you see replicas repeatedly scaling up and down (oscillation), **increase the downscale
+delay** first — it's the most effective lever for smoothing the replica count. A short upscale
+delay paired with a long downscale delay gives you fast scale‑up while protecting capacity
+during temporary dips.
+
+---
+
+## Replica lifecycle
+
+When the controller decides to add a replica, it goes through a few stages before it serves
+traffic:
+
+1. **Provisioning** — a GPU instance is requested from a cloud provider.
+2. **Warm‑up** — the replica boots, pulls the model, and starts its inference server. Emissary
+   allows up to **20 minutes** for a single‑GPU replica (**25 minutes** for multi‑GPU) to become
+   healthy; this is the cost you pay on a cold start.
+3. **Ready** — once the replica passes its `/health` check it joins the pool and the load
+   balancer begins routing requests to it.
+
+On **scale‑down**, a replica is **drained** before it's removed: it stops receiving new requests
+and is given a grace period (about two minutes) to finish in‑flight requests, after which its GPU
+instance is released. In‑flight requests are not dropped when the engine scales in.
+
+---
+
+## LoRA adapters under autoscaling
+
+On a cluster engine, your fine‑tuned deployments are LoRA adapters, and the replica set is
+constantly changing. Emissary keeps adapters consistent automatically:
+
+- When a **new replica** comes online, the controller loads every registered adapter onto it
+  before routing adapter traffic there, so a request for any deployment can be served by any
+  ready replica.
+- The load balancer maintains a map of which replicas have which adapters loaded and routes each
+  request — keyed by the `model` you specify — to a replica that can serve it.
+- When you **add or remove** a fine‑tuned deployment, the change is propagated across the live
+  replicas without recreating the engine.
+
+You don't have to think about any of this; you point requests at a deployment by name and the
+engine handles placement.
+
+---
+
+## Cost
+
+Replicas are billed for the time they run, so your cost scales with the replica count:
+
+- **Min replicas** sets your baseline spend — the capacity you always pay for. `0` means no GPU
+  cost while idle (at the price of cold starts); higher means more warm capacity and higher
+  baseline cost.
+- **Max replicas** caps your worst‑case spend during a spike.
+- **Downscale delay** trades cost for stability — a longer hold keeps replicas (and their cost)
+  alive through lulls.
+
+Emissary shows an estimated hourly cost **range** before you create an autoscaling engine,
+spanning the min‑replica and max‑replica cases, so you can see both your floor and your ceiling
+up front.
+
+---
+
+## Recommended starting points
+
+- **Development / intermittent use** — min `0`, max `1–2`, default delays. Costs nothing when
+  idle; accept the cold start on the first request.
+- **Steady production traffic** — min `1+`, max sized from your peak, **request rate** metric.
+  No cold starts, capacity follows demand.
+- **Bursty or streaming traffic** — **concurrency** metric, a short upscale delay, and a longer
+  downscale delay so the engine reacts fast to bursts but doesn't thrash on the way down.
+
+When in doubt, start with the defaults and adjust max replicas to your observed peak and the
+downscale delay to dampen any oscillation you see.
