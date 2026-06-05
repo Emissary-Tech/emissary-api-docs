@@ -1,0 +1,241 @@
+---
+title: 'Concepts'
+description: 'Engines, deployments, server types, resources, autoscaling, and lifecycle on Emissary.'
+---
+The **Inference Engine** is how you serve models on Emissary. When you create an engine,
+Emissary provisions GPU compute, loads a base model, and exposes an OpenAI‑compatible API (comment: only for `text-generation` task type) you
+can call from your application. Once an engine is running you can deploy one or more
+fine‑tuned checkpoints onto it (comment: currently for limited task type only `text-generation`, `classification`, `regression`), scale it to traffic, and put it on a schedule to control cost.
+
+This page explains the core concepts you'll work with: engines, deployments, server types,
+resources, autoscaling, resource management, the engine lifecycle, and how requests are served.
+
+---
+
+## Inference Engines
+
+An **Inference Engine** is a managed, GPU‑backed serving unit. It is the foundational resource
+in Emissary inference — everything else (deployments, replicas, autoscaling) lives on top of an
+engine. Each engine is scoped to a single base model and a single task type, and is owned by
+your organization.
+
+When you create an engine you choose:
+
+- **Base model** — the foundation model the engine serves (for example a Llama or Qwen model).
+  You can serve the published pre‑trained weights, or point the engine at a custom fine‑tuned
+  base model you've produced on Emissary.
+- **Task type** — what kind of work the engine does. The task type determines which API
+  endpoint the engine exposes and which features (such as multi‑adapter serving) are available.
+  Supported task types include:
+  - `text-generation` — chat and completion LLM inference
+  - `classification` — text and multi‑class classification
+  - `regression` — numerical prediction
+  - `embedding` — dense vector embeddings
+  - `ner` — named‑entity recognition
+  - `image-detection` — object/instance detection
+  - `vlm-classification` / `vlm-generation` — vision‑language models
+  - `clip-classification` / `clip-embedding` — CLIP‑based models
+
+Which task types are available depends on the base model you pick — Emissary only offers the
+tasks a given model supports.
+
+:::note
+An engine is bound to one base model and one task type for its lifetime. To serve a different
+base model or a different task, create a separate engine.
+:::
+
+---
+
+## Deployments
+
+A **deployment** is a specific model version being served on an engine. A single engine can
+host multiple deployments at once (comment: currently only for `text-generation`, `classification`, `regression`), which lets you serve many fine‑tuned variants of the same
+base model from one pool of GPUs without provisioning separate hardware for each.
+
+There are two kinds of deployments:
+
+- **Base model deployment** — serves the engine's base model directly, with no fine‑tuning.
+  This is what an engine serves out of the box when no adapter is specified on a request.
+- **Fine‑tuned deployment** — serves a checkpoint produced by a fine‑tuning job or a Playground
+  experiment. You pick the training job and the checkpoint (epoch) you want, give the
+  deployment a name, and Emissary loads it onto the engine.
+
+### LoRA adapters and multi‑tenancy
+
+Fine‑tuned deployments are served as **LoRA adapters** — lightweight weights layered on top of
+the shared base model rather than full copies of it. Because the base model stays resident in
+GPU memory and only the small adapter weights are swapped in, many fine‑tuned deployments can
+coexist on the same engine cheaply.
+
+Multi‑adapter serving is available for the `text-generation`, `classification`, and
+`regression` task types. Other task types (such as VLM, CLIP, NER, image‑detection, and
+embedding) serve a single model per engine.
+
+You can add and remove fine‑tuned deployments on a running engine. Each request you send names
+the deployment (model) it should be routed to, so you can A/B test versions or serve many
+customers' adapters from one endpoint.
+
+---
+
+## Resources (comment: we only have deployment option for one model currently exceptional use case. Most of the part what we are doing is automatically selecting GPU type by calculating based on their base model etc)
+
+**Resources** are the hardware an engine runs on — the GPU type and the number of GPUs. They
+trade off inference speed and cost: larger or faster GPUs and higher GPU counts serve bigger
+models and more traffic, at a higher hourly rate.
+
+When you select a base model and task type, Emissary offers a set of **deployment options** —
+preset hardware configurations validated for that model. Each option fixes:
+
+- **GPU type** — the accelerator the engine runs on (for example A100 80GB or H100).
+- **Number of GPUs** — how many accelerators are allocated. Larger models are sharded across
+  multiple GPUs with tensor parallelism.
+- **Maximum context length** (`max_model_len`) — the largest prompt + completion the engine
+  will accept, sized to fit the model on the chosen hardware.
+
+Emissary shows the estimated hourly cost (or cost range, when autoscaling is enabled) before
+you create the engine. Billing starts once the engine reaches the **Active** state and stops
+when it is deactivated.
+
+---
+
+## Server types
+
+Every engine runs in one of two serving modes. You don't set this directly — Emissary picks the
+server type based on whether you enable autoscaling.
+
+### On‑demand
+
+A single GPU instance dedicated to your engine. The inference server runs directly on that
+instance and serves all traffic. On‑demand is simple and well suited to development and steady,
+low‑to‑moderate request rates. It runs at fixed capacity — it does not scale replicas up or
+down with traffic.
+
+This is the default server type, used whenever autoscaling is **not** enabled.
+
+### Cluster
+
+A horizontally scalable, multi‑replica service that runs in Emissary's managed inference
+cluster. A controller fronts a pool of GPU replicas, routes requests across them, loads and
+unloads LoRA adapters at runtime, and adds or removes replicas as traffic changes. Cluster mode
+is the right choice for production and bursty or high‑throughput workloads.
+
+Cluster mode is used automatically whenever you **enable autoscaling** on the engine.
+
+| | On‑demand | Cluster |
+|---|---|---|
+| Capacity | Fixed (single instance) | Elastic (multiple replicas) |
+| Autoscaling | No | Yes |
+| Scales to traffic | No | Up and down between min/max replicas |
+| Best for | Development, steady traffic | Production, bursty/high traffic |
+| Enabled when | Autoscaling off (default) | Autoscaling on |
+
+---
+
+## Autoscaling
+
+**Autoscaling** lets a cluster engine adjust its number of GPU **replicas** automatically in
+response to load, instead of you managing capacity by hand. You set the boundaries and the
+target, and Emissary handles the rest.
+
+Key settings:
+
+- **Min / max replicas** — the floor and ceiling on how many replicas can run. The engine never
+  drops below the minimum or rises above the maximum.
+- **Autoscaling metric** — what the autoscaler scales on:
+  - **Request rate** (`request_rate`) — scales toward a target requests‑per‑second per replica.
+  - **Batch / concurrency** (`batch_request`) — scales toward a target number of concurrent
+    requests per replica.
+- **Upscale delay** — how long sustained high load must persist before adding a replica.
+- **Downscale delay** — how long load must stay low before removing a replica. A longer
+  downscale delay keeps capacity warm and avoids thrashing under spiky traffic.
+
+When demand rises past the target, the controller adds replicas (up to the max); when it falls,
+it removes them (down to the min) after the downscale delay. New replicas need time to pull the
+model and start their inference server before they begin serving, so the engine accounts for
+that warm‑up when scheduling capacity.
+
+:::tip
+For a full walkthrough of autoscaling settings and tuning, see [Autoscaling](./autoscaling).
+:::
+
+---
+
+## Resource management
+
+Beyond scaling replicas, you can control **when an engine runs at all** to keep costs down on
+engines that aren't needed around the clock. An engine uses one of these management strategies:
+
+- **Inactive timeout** — automatically deactivate the engine after a period with no inference
+  requests. Good for development engines that are used in bursts and shouldn't sit idle.
+- **Schedule** — run the engine only during defined hours and days, in a timezone you choose
+  (for example, weekdays 9:00–17:00 in `America/New_York`). The engine starts at the beginning
+  of each window and stops at the end. An engine created outside its window starts in the
+  **Scheduled** state and activates when the window opens.
+
+Deactivating an engine — whether manually, on a timeout, or on a schedule — releases its
+compute and stops billing. Its deployments are remembered and restored when the engine becomes
+active again.
+
+---
+
+## Engine lifecycle
+
+An engine moves through a well‑defined set of states:
+
+| Status | Meaning |
+|---|---|
+| **Creating** | Compute is being provisioned and the model is loading. The engine is not yet serving. |
+| **Active** | The engine is running and ready to serve inference. Billing is active. |
+| **Scheduled** | The engine is configured with a schedule and is waiting for its next start window. |
+| **Inactive** | The engine has been deactivated. Compute is released and billing has stopped; it can be reactivated. |
+| **Failed** | Provisioning or startup did not succeed. |
+| **Deleted** | The engine has been permanently removed. |
+
+Typical transitions:
+
+- **Creating → Active** once compute is provisioned and the model passes its readiness check.
+- **Creating → Scheduled** when the engine is created outside its scheduled window.
+- **Active → Inactive** when you deactivate it, or when an inactive‑timeout or schedule fires.
+- **Inactive → Active** when you reactivate it (or the next schedule window opens).
+- **Any → Deleted** when you delete the engine.
+
+When an engine becomes **Active**, any fine‑tuned deployments that were attached while it was
+provisioning or deactivated are reloaded automatically, so it comes back up serving the same set
+of models.
+
+---
+
+## Serving requests
+
+A running engine exposes an **OpenAI‑compatible** HTTP API. You call it the same way regardless
+of whether the engine is on‑demand or cluster — the server type is an implementation detail
+handled behind a single stable endpoint.
+
+- **Base URL:** `https://api.withemissary.com`
+- **Authentication:** send your key in the `X-API-Key` header.
+- **Model field:** set `model` to the deployment you want to serve — the base model, or a
+  fine‑tuned deployment by name.
+
+The endpoint you call depends on the engine's task type:
+
+| Task type | Endpoint |
+|---|---|
+| `text-generation` (chat) | `POST /v1/chat/completions` |
+| `text-generation` (completions) | `POST /v1/completions` |
+| `embedding` | `POST /v1/embeddings` |
+| `classification` | `POST /v1/classification` |
+| `regression` | `POST /v1/regression` |
+| `ner` | `POST /v1/ner` |
+| `image-detection` | `POST /v1/image-detection` |
+| `vlm-classification` | `POST /v1/vlm/classification` |
+
+For text generation you can stream responses token‑by‑token and pass the usual sampling
+parameters (`temperature`, `top_p`, `top_k`, `max_completion_tokens`, and friends). On cluster
+engines, requests are routed across replicas and the correct LoRA adapter is selected from the
+`model` field automatically; if the engine is mid‑scale or briefly unavailable, the cluster
+absorbs the retry rather than surfacing it to your application.
+
+:::note
+Emissary logs each request's latency, token counts, and throughput so you can monitor an
+engine's performance from the dashboard.
+:::

@@ -36,6 +36,14 @@ const sidebars: SidebarsConfig = {
       },
       {
         type: 'category',
+        label: 'Inference',
+        items: [
+            'inference/concept',
+            'inference/autoscaling'
+        ]
+      },
+      {
+        type: 'category',
         label: 'Playground',
         items: [
             'playground/experiments'
