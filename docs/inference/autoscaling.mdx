@@ -40,12 +40,12 @@ is handled for you.
 
 | Configuration | Controls | Default |
 |---|---|---|
-| **Min replicas** | The floor — replicas never drop below this. Minimum is `1`. | `1` |
-| **Max replicas** | The ceiling — replicas never rise above this. Caps cost and protects against runaway scaling. | `3` |
-| **Autoscaling metric** | What the scaler measures: concurrency (in‑flight requests) or request rate (QPS). | `concurrency` |
-| **Target per replica** | The per‑replica load the scaler aims to hold (concurrent requests or QPS, depending on the metric). | `100` concurrent requests |
-| **Upscale delay** | How long elevated load must persist before a replica is added. | `10s` |
-| **Downscale delay** | How long load must stay low before a replica is removed. | `1800s` (30 min) |
+| **Min replicas** | The floor — replicas never drop below this. Minimum is `1`. | 1 |
+| **Max replicas** | The ceiling — replicas never rise above this. Caps cost and protects against runaway scaling. | 3 |
+| **Autoscaling metric** | What the scaler measures: concurrency (in‑flight requests) or request per seconds (QPS). | Concurrency (`batch_request`) |
+| **Target per replica** | The per‑replica load the scaler aims to hold (concurrent requests or QPS, depending on the metric). | 10 |
+| **Upscale delay** | How long elevated load must persist before a replica is added. | 10s |
+| **Downscale delay** | How long load must stay low before a replica is removed. | 1800s (30 min) |
 
 Min replicas is at least `1` — cluster engines do not scale to zero, so there's always a warm
 replica ready to serve. Min replicas must be ≤ max replicas. Leaving a configuration unset falls
@@ -75,7 +75,7 @@ have. The loop is straightforward:
 4. **Act.** The controller adds or removes replicas to reach the desired count, then waits for
    the next evaluation.
 
-### Worked example: concurrency
+### Worked example 1: Concurrency (`batch_request`)
 
 Your engine uses the **concurrency** metric (the default) with a **target of 100 concurrent
 requests per replica**, a min of `1`, and a max of `5`. Here `load` is the peak number of
@@ -87,7 +87,7 @@ simultaneous in‑flight requests over the window.
 - Concurrency settles back to ~80 → returns to `1` replica, but only after the downscale delay
   has elapsed.
 
-### Worked example: request rate
+### Worked example: Requests per seconds (`request_rate`)
 
 The same math applies to the **request rate** metric, except `load` is requests per second. With
 a **target of 10 QPS per replica**, a min of `1`, and a max of `5`:
@@ -115,7 +115,7 @@ signal — requests vary widely in how long they take, so two engines serving th
 under very different real load. Concurrency measures the work actually in flight, which tracks
 how busy each replica is far more reliably across the range of workloads our clients run.
 
-### Request rate
+### Requests per second
 
 Scales on **requests per second**. The controller counts completed requests over the 60‑second
 window, computes QPS, and divides by your **target QPS per replica**. It's a good fit for steady,
