@@ -1,14 +1,14 @@
 ---
 title: 'Concepts'
-description: 'Engines, deployments, server types, resources, autoscaling, and lifecycle on Emissary.'
+description: 'Engines, deployments, server types, autoscaling, and lifecycle on Emissary.'
 ---
 The **Inference Engine** is how you serve models on Emissary. When you create an engine,
-Emissary provisions GPU compute, loads a base model, and exposes an OpenAI‑compatible API (comment: only for `text-generation` task type) you
-can call from your application. Once an engine is running you can deploy one or more
-fine‑tuned checkpoints onto it (comment: currently for limited task type only `text-generation`, `classification`, `regression`), scale it to traffic, and put it on a schedule to control cost.
+Emissary provisions GPU compute, loads a base model, and exposes an HTTP API you can call from
+your application. Once an engine is running you can deploy one or more fine‑tuned checkpoints
+onto it, scale it to traffic, and put it on a schedule to control cost.
 
 This page explains the core concepts you'll work with: engines, deployments, server types,
-resources, autoscaling, resource management, the engine lifecycle, and how requests are served.
+autoscaling, resource management, the engine lifecycle, and how requests are served.
 
 ---
 
@@ -39,6 +39,12 @@ When you create an engine you choose:
 Which task types are available depends on the base model you pick — Emissary only offers the
 tasks a given model supports.
 
+You don't choose hardware. Emissary automatically selects the GPU type and number of GPUs based
+on the base model and task, and shows you an estimated hourly cost (a range when autoscaling is
+enabled) before you create the engine — so you can reason about cost without thinking about
+accelerators. Billing starts once the engine reaches the **Active** state and stops when it is
+deactivated.
+
 :::note
 An engine is bound to one base model and one task type for its lifetime. To serve a different
 base model or a different task, create a separate engine.
@@ -48,9 +54,10 @@ base model or a different task, create a separate engine.
 
 ## Deployments
 
-A **deployment** is a specific model version being served on an engine. A single engine can
-host multiple deployments at once (comment: currently only for `text-generation`, `classification`, `regression`), which lets you serve many fine‑tuned variants of the same
-base model from one pool of GPUs without provisioning separate hardware for each.
+A **deployment** is a specific model version being served on an engine. For supported task
+types, a single engine can host multiple deployments at once, which lets you serve many
+fine‑tuned variants of the same base model from one pool of GPUs without provisioning separate
+hardware for each.
 
 There are two kinds of deployments:
 
@@ -74,27 +81,6 @@ embedding) serve a single model per engine.
 You can add and remove fine‑tuned deployments on a running engine. Each request you send names
 the deployment (model) it should be routed to, so you can A/B test versions or serve many
 customers' adapters from one endpoint.
-
----
-
-## Resources (comment: we only have deployment option for one model currently exceptional use case. Most of the part what we are doing is automatically selecting GPU type by calculating based on their base model etc)
-
-**Resources** are the hardware an engine runs on — the GPU type and the number of GPUs. They
-trade off inference speed and cost: larger or faster GPUs and higher GPU counts serve bigger
-models and more traffic, at a higher hourly rate.
-
-When you select a base model and task type, Emissary offers a set of **deployment options** —
-preset hardware configurations validated for that model. Each option fixes:
-
-- **GPU type** — the accelerator the engine runs on (for example A100 80GB or H100).
-- **Number of GPUs** — how many accelerators are allocated. Larger models are sharded across
-  multiple GPUs with tensor parallelism.
-- **Maximum context length** (`max_model_len`) — the largest prompt + completion the engine
-  will accept, sized to fit the model on the chosen hardware.
-
-Emissary shows the estimated hourly cost (or cost range, when autoscaling is enabled) before
-you create the engine. Billing starts once the engine reaches the **Active** state and stops
-when it is deactivated.
 
 ---
 
@@ -207,9 +193,10 @@ of models.
 
 ## Serving requests
 
-A running engine exposes an **OpenAI‑compatible** HTTP API. You call it the same way regardless
-of whether the engine is on‑demand or cluster — the server type is an implementation detail
-handled behind a single stable endpoint.
+A running engine exposes an HTTP API. For text generation it is **OpenAI‑compatible**, so you
+can point an existing OpenAI client at it; other task types use Emissary's task‑specific
+endpoints. You call the engine the same way regardless of whether it is on‑demand or cluster —
+the server type is an implementation detail handled behind a single stable endpoint.
 
 - **Base URL:** `https://api.withemissary.com`
 - **Authentication:** send your key in the `X-API-Key` header.
@@ -227,6 +214,7 @@ The endpoint you call depends on the engine's task type:
 | `regression` | `POST /v1/regression` |
 | `ner` | `POST /v1/ner` |
 | `image-detection` | `POST /v1/image-detection` |
+| `vlm-generation` | `POST /v1/vlm/generation` |
 | `vlm-classification` | `POST /v1/vlm/classification` |
 
 For text generation you can stream responses token‑by‑token and pass the usual sampling
