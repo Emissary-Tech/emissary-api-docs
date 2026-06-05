@@ -59,7 +59,7 @@ const config: Config = {
           },
           // { to: "/blog", label: "Blog", position: "left" },
           {
-            label: "API",
+            label: "API Reference",
             position: "left",
             to: "/api",
           },
