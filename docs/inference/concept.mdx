@@ -171,19 +171,16 @@ An engine moves through a well‑defined set of states:
 | Status | Meaning |
 |---|---|
 | **Creating** | Compute is being provisioned and the model is loading. The engine is not yet serving. |
-| **Active** | The engine is running and ready to serve inference. Billing is active. |
+| **Active** | The engine is running and ready to serve deployments (inference). Billing is active. |
 | **Scheduled** | The engine is configured with a schedule and is waiting for its next start window. |
 | **Inactive** | The engine has been deactivated. Compute is released and billing has stopped; it can be reactivated. |
-| **Failed** | Provisioning or startup did not succeed. |
-| **Deleted** | The engine has been permanently removed. |
 
 Typical transitions:
 
 - **Creating → Active** once compute is provisioned and the model passes its readiness check.
-- **Creating → Scheduled** when the engine is created outside its scheduled window.
+- **Active → Scheduled** when the engine is created outside its scheduled window.
 - **Active → Inactive** when you deactivate it, or when an inactive‑timeout or schedule fires.
 - **Inactive → Active** when you reactivate it (or the next schedule window opens).
-- **Any → Deleted** when you delete the engine.
 
 When an engine becomes **Active**, any fine‑tuned deployments that were attached while it was
 provisioning or deactivated are reloaded automatically, so it comes back up serving the same set
