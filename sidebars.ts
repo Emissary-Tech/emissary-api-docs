@@ -38,6 +38,7 @@ const sidebars: SidebarsConfig = {
         label: 'Inference',
         items: [
             'inference/concept',
+            'inference/deployments',
             'inference/autoscaling'
             // {
             //   type: 'category',

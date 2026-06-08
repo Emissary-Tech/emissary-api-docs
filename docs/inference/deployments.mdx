@@ -1,0 +1,181 @@
+---
+title: 'Deployments'
+description: 'How deployments serve base and fine-tuned models on an inference engine — creating, calling, and managing them.'
+---
+
+## Deployments
+
+A **deployment** is a served model version running on an [inference engine](./concept). The
+engine provides the GPU compute; deployments are the individual models you actually call. One
+engine can host **many deployments at once**, which lets you serve a base model and several
+fine-tuned variants from a single pool of GPUs and address each one by name.
+
+This page covers the kinds of deployments, how to create them, how they move through their
+lifecycle alongside the engine, and how to call and manage them. For the higher-level picture of
+how deployments fit into engines, see [Concepts](./concept#deployments).
+
+---
+
+## Base vs. fine-tuned deployments
+
+Every deployment is one of two kinds.
+
+### Base model deployment
+
+When an engine becomes active it automatically exposes a **base model deployment** — the engine's
+underlying base model, with no fine-tuning. It's always present for the lifetime of the engine,
+requires no setup, and is what you call when you want the raw base model. You can't remove it
+independently; it goes away only when the engine is deleted.
+
+### Fine-tuned deployment
+
+A **fine-tuned deployment** serves a specific checkpoint you produced — either from a
+[fine-tuning job](../fine-tuning/quickstart) or a [Playground experiment](../playground/experiments).
+You give it a name, and from then on you address it by that name in your inference requests. A
+fine-tuned deployment's task type must match the engine's task type.
+
+How a fine-tuned deployment is served depends on the engine's task type:
+
+- For **`text-generation`**, **`classification`**, and **`regression`**, fine-tuned deployments
+  are served as **LoRA adapters** layered on the shared base model — so many of them can coexist
+  on one engine cheaply (see [multiple deployments](#multiple-deployments-on-one-engine) below).
+- For other task types (**VLM**, **CLIP**, **NER**, **image-detection**, **embedding**), the
+  fine-tuned model is loaded as the engine's model directly, so the engine serves a single
+  fine-tuned model.
+
+---
+
+## Creating a deployment
+
+There are three ways to create a deployment, all from the dashboard.
+
+### Deploy a checkpoint onto an existing engine
+
+If you already have a running engine for the right task type, deploy a checkpoint straight onto
+it. You provide:
+
+- a **deployment name** (unique within your organization),
+- the **training job** the checkpoint comes from, and
+- the **checkpoint** (epoch) to serve.
+
+The deployment is added to the engine and, if the engine is active, begins loading immediately.
+
+### Create a deployment together with a new engine
+
+If you don't have a suitable engine yet, you can spin one up and deploy onto it in a single step.
+In addition to the deployment name, training job, and checkpoint, you configure the engine itself:
+
+- the **deployment option** (or let Emissary size the hardware for you), and
+- optional **autoscaling** (which makes it a [cluster engine](./concept#server-types)) and
+  **resource management** (schedule or inactive-timeout).
+
+Emissary provisions the engine first; the deployment activates once the engine reaches the
+**Active** state.
+
+### Deploy a Playground experiment
+
+You can also deploy a [Playground experiment](../playground/experiments) version instead of a
+training-job checkpoint. The flow is the same — pick the experiment and version, name the
+deployment, and choose an existing engine or create one alongside it.
+
+:::note
+A deployment must match its engine's **task type**. You can't deploy a classification checkpoint
+onto a text-generation engine — create a separate engine for each task type.
+:::
+
+---
+
+## Deployment lifecycle
+
+A deployment's status follows the model's progress onto the engine, and tracks the engine's own
+[lifecycle](./concept#engine-lifecycle): when the engine is up, deployments come up with it; when
+it's deactivated, they stand down.
+
+| Status | Meaning |
+|---|---|
+| **Pending** | Created while the engine is still provisioning; waiting for the engine to become active. |
+| **Deploying** | The model (or LoRA adapter) is loading onto an active engine. |
+| **Deployed** | Ready and serving inference. |
+| **Reactivating** | The engine is coming back up and the deployment is being reloaded. |
+| **Deactivated** | The engine is inactive, so the deployment isn't serving. It's remembered, not deleted. |
+| **Failed** | The deployment couldn't be loaded. |
+
+Typical transitions:
+
+- **Pending → Deploying → Deployed** as a new engine provisions, activates, and loads the model.
+- **Deployed → Deactivated** when the engine is deactivated (manually, on a schedule, or on an
+  inactive timeout).
+- **Deactivated → Reactivating → Deployed** when the engine is reactivated — Emissary reloads the
+  deployments the engine had before, so it comes back serving the same set of models.
+
+If an active deployment hits a transient backend issue, the engine self-heals and the deployment
+returns to **Deployed** without your intervention.
+
+---
+
+## Multiple deployments on one engine
+
+For the LoRA-capable task types (`text-generation`, `classification`, `regression`), a single
+engine can host the base model deployment **plus many fine-tuned deployments at the same time**.
+Each fine-tuned deployment is a lightweight adapter over the shared base model, so adding one
+doesn't require new GPUs — you serve all of them from the same engine and pick which to call per
+request.
+
+This is what makes an engine a good home for many variants: A/B testing two fine-tunes, serving
+per-customer adapters, or keeping several task-specific models behind one endpoint. On a
+[cluster engine](./autoscaling), every replica loads the full set of the engine's deployments, so
+any ready replica can serve any of them.
+
+---
+
+{/* ## Calling a deployment */}
+
+{/* A deployment is reached through the engine's [OpenAI-compatible API](./concept#serving-requests). */}
+{/* You select **which** deployment to serve with the `model` field in your request body: */}
+
+{/* - set `model` to a **fine-tuned deployment's name** to serve that deployment, or */}
+{/* - set it to the **base model** to serve the engine's base model deployment. */}
+
+{/* Everything else — base URL, `X-API-Key` authentication, and the task-specific endpoint — is the */}
+{/* same regardless of which deployment you target. For the endpoint table and request details, see */}
+{/* [Serving requests](./concept#serving-requests). */}
+
+{/* ```bash */}
+{/* curl https://api.withemissary.com/v1/chat/completions \ */}
+{/*   -H "Content-Type: application/json" \ */}
+{/*   -H "X-API-Key: YOUR_API_KEY" \ */}
+{/*   -d '{ */}
+{/*     "model": "my-finetuned-deployment", */}
+{/*     "messages": [{"role": "user", "content": "Hello!"}] */}
+{/*   }' */}
+{/* ``` */}
+
+{/* On a cluster engine, the request is routed to a ready replica that has the named deployment */}
+{/* loaded; you don't manage placement. */}
+
+{/* --- */}
+
+## Managing deployments
+
+**Remove a deployment.** Removing (undeploying) a fine-tuned deployment unloads it from the
+engine and frees its slot; the rest of the engine's deployments keep serving. The base model
+deployment can't be removed on its own — it exists for as long as the engine does.
+
+**When the engine is deactivated** (manually, on a schedule, or on an inactive timeout), its
+deployments move to **Deactivated** rather than being removed. They're restored automatically
+when the engine is reactivated.
+
+**When the engine is deleted**, all of its deployments — base and fine-tuned — are removed with
+it.
+
+---
+
+## What you see per deployment
+
+Each deployment on an engine surfaces a small summary so you can tell them apart at a glance:
+
+- **Deployment name** and **ID** — the name is what you pass as `model`.
+- **Source** — the training job and checkpoint it was created from (the base model deployment is
+  labelled as such).
+- **Status** — its current [lifecycle](#deployment-lifecycle) state.
+- **Created** — when the deployment was created.
