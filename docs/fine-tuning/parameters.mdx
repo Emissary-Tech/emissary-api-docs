@@ -1,163 +1,274 @@
 ---
-title: Fine-Tuning Parameters
-description: 'Detailed guide on fine-tuning parameters, selecting base models, and optimizing for large models'
+title: Hyperparameters
+description: 'The hyperparameters you can tune when post-training on Emissary (SFT and GRPO), what each one does, and how to adjust them.'
 ---
 
-## Fine-Tuning Parameters
+## Overview
 
-Fine-tuning adjusts a pre-trained model to better fit your specific task. Understanding and configuring the right parameters is crucial for optimal performance.
+When you post-train a model on Emissary, **hyperparameters** are the knobs that control *how*
+training runs — how fast the model learns, how long it trains, how much memory it uses, and how
+strongly it's regularized. Every job ships with defaults that reflect our recommended starting
+points, so you can train a solid model without touching any of them. This page is for when you
+*do* want to adjust: it explains each parameter, its range, and how to change it for common
+situations.
 
-### Selecting the Base Model
+Emissary supports two post-training techniques, and they expose slightly different
+hyperparameters:
 
-Choosing the appropriate base model is a critical decision that can significantly impact your fine-tuning results.
+- **SFT (Supervised Fine-Tuning)** — trains the model to imitate the input→output pairs in your
+  dataset. Available for all fine-tunable task types.
+- **GRPO (Group Relative Policy Optimization)** — a reinforcement-learning technique that
+  optimizes the model against a reward by comparing multiple sampled completions per prompt.
+  Available for the `text-generation` task type only.
 
-#### Available Base Models
+Both techniques fine-tune with **LoRA adapters** rather than updating the full model, so
+memory-related guidance below assumes LoRA.
 
-Our platform provides the following base models for fine-tuning:
+You set these in the **Hyperparameters (Advanced)** section when creating a training job; every
+field is prefilled with the default and has an inline tooltip.
 
-- **Mistral Models**:
-- **`mistral-7b-instruct-v0.2`**: `mistralai/Mistral-7B-Instruct-v0.2`
-- **`mistral-7b-instruct-v0.1`**: `mistralai/Mistral-7B-Instruct-v0.1`
-- **`mistral-7b-completion`**: `mistralai/Mistral-7B-v0.1`
-- **`codestral`**: `mistralai/Codestral-22B-v0.1`
+---
 
-- **Llama Models**:
-- **`llama2-7b-chat`**: `meta-llama/Llama-2-7b-chat-hf`
-- **`llama2-7b-completion`**: `meta-llama/Llama-2-7b-hf`
-- **`llama3-8b-chat`**: `meta-llama/Meta-Llama-3-8B-Instruct`
-- **`llama3-8b-completion`**: `meta-llama/Meta-Llama-3-8B`
-- **`llama3.1-8b-instruct`**: `meta-llama/Llama-3.1-8B-Instruct`
-- **`llama3.1-8b-completion`**: `meta-llama/Llama-3.1-8B`
+## How to read this page
 
-- **Falcon Models**:
-- **`falcon-7b-chat`**: `tiiuae/falcon-7b-instruct`
-- **`falcon-7b-completion`**: `tiiuae/falcon-7b`
+Each parameter lists the technique(s) it applies to, its type, its allowed range, and the
+default for each technique. A few conventions:
 
-- **Other Models**:
-- **`opencodeinterpreter-7B-chat`**: `m-a-p/OpenCodeInterpreter-DS-6.7B`
-- **`phi-3-mini-4k-instruct`**: `microsoft/Phi-3-mini-4k-instruct`
+- **Range** shows the lower and upper bounds. `≥ 1` means there is no fixed upper bound — use a
+  value appropriate to your dataset and hardware.
+- **Default** columns show the value used by SFT and by GRPO. A dash (—) means the parameter
+  isn't exposed for that technique.
+- **Effective batch size** appears throughout. It's the number of examples that contribute to
+  one optimizer step:
 
-#### Using Custom Hugging Face Models
+  ```
+  effective_batch_size = per_device_train_batch_size × gradient_accumulation_steps × num_gpus
+  ```
 
-In addition to the provided base models, our platform allows you to use any Hugging Face model by providing the model's Hugging Face repository link.
+---
 
-**Guidelines for Using Custom Models:**
+## Training duration & data
 
-- **Model Size Limitation**: Currently, we recommend using models with less than **8B parameters**. Support for larger models will be added soon.
-- **Compatibility**: Ensure the model is compatible with the Transformers library and supports the tasks you intend to perform.
-- **Access Permissions**: If the model is private, make sure you have the necessary permissions or access tokens to use it.
+| Parameter | Type | Range | SFT default | GRPO default |
+|---|---|---|---|---|
+| **`num_train_epochs`** — Number of Training Epochs | int | ≥ 1 | 5 | 15 |
+| **`downsample_size`** — Downsample Ratio | int | 1–100 | 100 | — |
 
-**How to Use a Custom Model:**
+**`num_train_epochs`** is how many full passes the model makes over your training data. Too few
+epochs and the model underfits (it hasn't learned enough); too many and it starts to overfit,
+memorizing the training set at the expense of generalization — a bigger risk on small datasets.
+Watch eval loss to find the sweet spot. GRPO defaults higher because each epoch makes smaller
+policy updates.
 
-1. **Select Custom Model Option**:
-- In the base model selection dropdown, choose the option to **enter a custom Hugging Face model link**.
+**`downsample_size`** (SFT) is the percentage of your dataset to actually train on, from 1 to
+100. Leave it at `100` for real runs; drop it lower to train on a random subsample for fast
+experimentation or debugging without waiting for the full dataset.
 
-2. **Provide the Model Link**:
-- Enter the full Hugging Face repository link of the model you wish to use.
+---
 
+## Learning rate & schedule
 
-![hf-model-1](/img/finetuning/HF-model1.png)
-![hf-model-2](/img/finetuning/HF-model-link.png)
+| Parameter | Type | Range | SFT default | GRPO default |
+|---|---|---|---|---|
+| **`learning_rate`** — Learning Rate | float | 0–1 | 2e-4 | 5e-6 |
+| **`lr_scheduler_type`** — LR Scheduler Type | str | see values | `linear` | `cosine` |
+| **`warmup_ratio`** — Warm-up Ratio | float | 0–1 | 0.03 | 0.1 |
 
+**`learning_rate`** is the single most impactful knob. It sets how big a step the optimizer
+takes on each update. Too high causes instability or divergence (loss spikes, NaNs); too low
+makes training crawl or stall. Typical ranges are **1e-4 to 5e-4 for LoRA** and **1e-5 to 5e-5
+for full fine-tuning**. GRPO uses a much smaller rate (`5e-6`) because RL updates are noisier and
+need to be gentle to stay stable.
 
+**`lr_scheduler_type`** controls how the learning rate changes over the run.
+Available values: `linear`, `cosine`, `constant`, `constant_with_warmup`, `polynomial`.
 
-**Important Considerations:**
+- `linear` — decays linearly to 0.
+- `cosine` — decays smoothly along a cosine curve; often the best choice for LLM fine-tuning.
+- `constant` — holds the rate fixed.
+- `constant_with_warmup` — warms up, then holds constant.
+- `polynomial` — decays along a polynomial curve.
 
-- **Resource Requirements**: Larger models require more computational resources.
-- **Support for Larger Models**: While we currently recommend models under 8B parameters, support for larger models will be available soon.
+**`warmup_ratio`** is the fraction of total steps spent ramping the learning rate up from 0 to
+its target at the start of training. Warmup prevents large, destabilizing early updates. Typical
+values are `0.03`–`0.1`; raise it if early training is unstable.
 
+---
 
-#### Model Selection Criteria
+## Optimizer & regularization
 
-- **Domain Relevance**: Choose a base model that aligns with your specific domain or industry.
-- **Model Size**:
-- **Larger Models**: Provide better performance but require more computational resources.
-- **Smaller Models**: Faster and less resource-intensive but may have lower accuracy.
-- **Instruction vs. Completion Models**:
-- **Instruction (Chat) Models**: Designed for conversational tasks and follow instruction prompts effectively.
-- **Completion Models**: Ideal for tasks requiring the model to continue from a given input.
+| Parameter | Type | Range | SFT default | GRPO default |
+|---|---|---|---|---|
+| **`optim`** — Optimizer | str | see values | `adamw_torch` | `paged_adamw_8bit` |
+| **`weight_decay`** — Weight Decay | float | 0–1 | 0 | 0.1 |
+| **`max_grad_norm`** — Max Gradient Norm | float | 0–10 | 0.3 | 0.1 |
+| **`adam_beta1`** — Adam Beta 1 | float | 0–1 | — | 0.9 |
+| **`adam_beta2`** — Adam Beta 2 | float | 0–1 | — | 0.99 |
 
-#### How to Select a Base Model
+**`optim`** selects the optimizer and, with it, the memory/precision trade-off.
+Available values: `adamw_torch`, `paged_adamw_8bit`, `adamw_8bit`, `adamw_bnb_8bit`,
+`paged_adamw_32bit`, `adafactor`.
 
-1. **Navigate to the Fine-Tuning Section**: In your model service workspace, go to the training jobs panel.
-2. **Create a New Training Job**: Click on `+ NEW TRAINING JOB`.
-3. **Select a Base Model**: In the base model dropdown, choose from the list of available models.
+- `adamw_torch` — standard, high-precision; the safe default.
+- `adamw_8bit` / `adamw_bnb_8bit` — store optimizer state in 8-bit to cut memory significantly.
+- `paged_*` — page optimizer state to CPU to avoid out-of-memory errors on tight GPUs.
+- `adafactor` — lowest memory, at the cost of slower convergence.
 
-### Understanding Hyperparameters
+**`weight_decay`** is L2 regularization that discourages large weights and curbs overfitting.
+Common values are `0`–`0.1` (`0` disables it). With LoRA it applies to the adapter weights, not
+the frozen base model.
 
-Fine-tuning involves several hyperparameters that control the training process.
+**`max_grad_norm`** caps the gradient norm: any update larger than this is rescaled down, which
+prevents exploding gradients. Lower values (`0.3`–`1.0`) make training more stable; `1.0` is the
+common default outside LoRA setups.
 
-#### Default Hyperparameters for Mistral 7B Model
+**`adam_beta1`** / **`adam_beta2`** (GRPO) are the Adam momentum terms — the decay rates for the
+running averages of the gradient and the squared gradient. `adam_beta1` (`0.9`) rarely needs
+changing. `adam_beta2` defaults to `0.99` here (below the library's usual `0.999`) so the
+optimizer adapts faster to recent gradients, which helps stabilize LLM training.
 
-For running the `mistral-7b` model on 24GB GPU A10 machines, we recommend the following default parameters:
+---
 
-```json
-{
-  "num_train_epochs": 5,
-  "per_device_train_batch_size": 1,
-  "gradient_accumulation_steps": 4,
-  "optim": "adamw_8bit",
-  "weight_decay": 0.01,
-  "logging_steps": 10,
-  "learning_rate": 0.0002,
-  "warmup_steps": 5,
-  "lr_scheduler_type": "linear",
-  "downsample_size": 100,
-  "eval_accumulation_steps": 50,
-  "per_device_eval_batch_size": 1
-}
-```
-**Explanation of Key Parameters:**
+## Batch size & memory
 
-- **`num_train_epochs`**: Number of times the model will see the entire dataset during training. Set to `5` for sufficient learning.
-- **`per_device_train_batch_size`**: Number of samples processed before the model parameters are updated. Set to `1` due to GPU memory constraints.
-- **`gradient_accumulation_steps`**: Number of steps to accumulate gradients before updating model parameters. Set to `4` to simulate a larger batch size.
-- **`optim`**: Optimizer used for training. Using `"adamw_8bit"` reduces memory usage with 8-bit precision.
-- **`learning_rate`**: Controls the step size during optimization. Set to `0.0002` for stable convergence.
-- **`downsample_size`**: Percentage of the dataset used for training. Set to `100` to use the full dataset.
+| Parameter | Type | Range | SFT default | GRPO default |
+|---|---|---|---|---|
+| **`per_device_train_batch_size`** — Training Batch Size | int | ≥ 1 | 4 | 4 |
+| **`gradient_accumulation_steps`** — Gradient Accumulation Steps | int | ≥ 1 | 4 | 1 |
+| **`per_device_eval_batch_size`** — Evaluation Batch Size | int | ≥ 1 | 4 | — |
+| **`eval_accumulation_steps`** — Evaluation Accumulation Steps | int | ≥ 1 | 50 | — |
 
-**Note:** These parameters are optimized for the `mistral-7b` model. When fine-tuning other models, you may need to adjust these settings based on their specific requirements and your hardware capabilities.
+**`per_device_train_batch_size`** is how many examples each GPU processes at once. Larger batches
+give smoother, more stable gradients but use more GPU memory — it's the first thing to reduce if
+you hit out-of-memory errors.
 
-### Techniques for Efficient Fine-Tuning
+**`gradient_accumulation_steps`** lets you simulate a larger batch without the memory cost: the
+optimizer waits this many forward/backward passes before updating. Raising it increases the
+**effective batch size** while keeping per-step memory flat. To keep effective batch size
+constant while lowering memory, halve the batch size and double accumulation steps.
 
-To optimize fine-tuning large models on limited hardware resources, consider the following techniques:
+**`per_device_eval_batch_size`** (SFT) is the same idea for evaluation. It can usually be larger
+than the training batch size since no gradients or optimizer state are stored during eval.
 
-#### 1. Quantization
+**`eval_accumulation_steps`** (SFT) is how many prediction steps accumulate on the GPU before
+results move to CPU during evaluation. Higher is faster but uses more GPU memory; lower it to
+relieve memory pressure on large eval sets.
 
-- **Purpose**: Reduce the memory footprint of the model by representing weights with lower precision.
-- **Methods**:
-- **4-bit Quantization**: Uses 4 bits to represent weights.
-- **8-bit Quantization**: Uses 8 bits for a balance between performance and resource usage.
-- **Benefit**: Allows training of larger models on GPUs with less memory.
+---
 
-#### 2. Gradient Accumulation
+## LoRA capacity
 
-- **Purpose**: Simulate a larger batch size without increasing memory usage.
-- **How It Works**: Accumulates gradients over several steps before performing an update.
-- **Configuration**:
-- Set `gradient_accumulation_steps` to the desired number of steps to accumulate.
-- Effective batch size = `per_device_train_batch_size` × `gradient_accumulation_steps`.
+| Parameter | Type | Allowed values | SFT default | GRPO default |
+|---|---|---|---|---|
+| **`lora_rank`** — LoRA Rank | int | 4, 8, 16, 32, 64 | 8 | — |
 
-#### 3. Low-Rank Adaptation (LoRA)
+**`lora_rank`** sets the rank of the low-rank adapter matrices — effectively the adapter's
+capacity. Higher ranks add trainable parameters (more ability to fit complex behavior) but use
+more memory and can overfit on small datasets. Use **8–16** for most tasks; reach for **32–64**
+only when the task genuinely demands more representational capacity and you have the data to
+support it.
 
-- **Purpose**: Efficiently fine-tune large models by updating only a small subset of parameters.
-- **How It Works**: Adds trainable rank decomposition matrices to existing weights, significantly reducing the number of trainable parameters.
-- **Benefit**: Saves memory and speeds up training while maintaining performance.
+{/* --- */}
 
-### Implementing the Techniques
+{/* ## Loss */}
 
-These techniques are integrated into our training pipeline:
+{/* | Parameter | Type | Range | SFT default | GRPO default | */}
+{/* |---|---|---|---|---| */}
+{/* | **`dynamic_loss`** — Dynamic Loss | bool | true / false | `False` | — | */}
 
-- **Quantization**:
-- We currnetly support 4-bit quantization by default on our platform. You can update that in the setup model function given in the script.
-- **Gradient Accumulation**:
-- Set `gradient_accumulation_steps` in the training configuration.
-- **LoRA**:
-- We have enabled LoRA in the training settings to reduce trainable parameters.
+{/* **`dynamic_loss`** (SFT) turns on dynamic loss scaling, which reweights the loss during training */}
+{/* to better handle **class imbalance or token-level imbalance**. Enable it when your dataset is */}
+{/* skewed — for example a classification set dominated by one label, or generation data where the */}
+{/* signal you care about is a small part of each sequence. */}
 
-### Best Practices for Fine-Tuning
+---
 
-- **Monitor Resource Usage**: Keep an eye on GPU memory and utilization to prevent out-of-memory errors.
-- **Experiment with Hyperparameters**: Adjust parameters like learning rate and batch size to find the optimal settings for your model and dataset.
-- **Use Appropriate Base Models**: Choose a base model that aligns closely with your task to reduce the amount of fine-tuning required.
-- **Leverage Advanced Techniques**: Utilize quantization, gradient accumulation, and LoRA to efficiently fine-tune large models.
+## GRPO sampling
+
+| Parameter | Type | Range | SFT default | GRPO default |
+|---|---|---|---|---|
+| **`num_generations`** — Number of Generations | int | ≥ 1 | — | 4 |
+
+**`num_generations`** (GRPO) is how many completions are sampled per prompt. GRPO computes each
+completion's advantage *relative to the others* for the same prompt, so this must be **at least
+2** — and it should evenly divide the effective batch size. More generations give a better
+reward comparison (lower-variance updates) but cost more memory and generation time per step.
+
+---
+
+## Logging & checkpointing
+
+| Parameter | Type | Range | SFT default | GRPO default |
+|---|---|---|---|---|
+| **`logging_steps`** — Logging Steps | int | ≥ 1 | 10 | 1 |
+| **`save_steps`** — Save Steps | int | ≥ 1 | — | 250 |
+
+**`logging_steps`** controls how often (in steps) training metrics like loss and learning rate
+are recorded. Lower values give finer-grained loss curves at the cost of more log volume.
+
+**`save_steps`** (GRPO) controls how often a checkpoint is written, in steps. Lower values
+checkpoint more frequently — finer recovery and more points to evaluate — but use more storage.
+It applies only when the save strategy is step-based rather than epoch-based.
+
+---
+
+## Recommendations
+
+Start from the defaults and change one thing at a time, watching the **eval loss** (and your
+test-function metrics) after each run. The scenarios below are the most common reasons to adjust.
+
+### The model is overfitting
+
+*Symptom: training loss keeps falling but eval loss flattens or rises.*
+
+- **Lower `num_train_epochs`**, or deploy an earlier checkpoint from before eval loss turned up.
+- **Increase `weight_decay`** (e.g. `0.01`–`0.1`).
+- **Lower `lora_rank`** (e.g. `16` → `8`) to reduce adapter capacity.
+- Enable **`dynamic_loss`** if the overfitting is driven by an imbalanced dataset (SFT).
+
+### The model is underfitting
+
+*Symptom: both training and eval loss stay high; outputs don't reflect your data.*
+
+- **Increase `num_train_epochs`**.
+- **Raise `learning_rate`** within the LoRA range (`1e-4`–`5e-4`).
+- **Increase `lora_rank`** (`8` → `16`/`32`) to give the adapter more capacity.
+- Confirm `downsample_size` is `100` so you're training on the full dataset.
+
+### Training is unstable or diverging
+
+*Symptom: loss spikes, oscillates, or becomes NaN.*
+
+- **Lower `learning_rate`** — the most common fix.
+- **Tighten `max_grad_norm`** (e.g. `1.0` → `0.3`).
+- **Increase `warmup_ratio`** (e.g. `0.03` → `0.1`) for a gentler start.
+- Use the **`cosine`** scheduler for smoother decay.
+- GRPO: keep `adam_beta2` around `0.99` so the optimizer adapts to recent gradients.
+
+### Training is too slow / you want to iterate faster
+
+- **Lower `downsample_size`** to train on a representative subsample while experimenting (SFT).
+- **Reduce `num_train_epochs`** for quick signal.
+- **Increase the effective batch size** (larger batch or more accumulation) if memory allows.
+- GRPO: **lower `num_generations`** to cut generation cost per step.
+
+### Small dataset
+
+- Keep `num_train_epochs` modest and watch eval loss closely — overfitting comes fast.
+- Favor a **lower `lora_rank`** (`4`–`8`) and some **`weight_decay`**.
+- A slightly **higher `warmup_ratio`** can help stabilize the few steps you have.
+
+### Imbalanced dataset (SFT)
+
+- Enable **`dynamic_loss`** to reweight under-represented classes or tokens.
+
+### GRPO reward isn't improving
+
+- **Increase `num_generations`** for lower-variance advantage estimates (memory permitting).
+- Keep `learning_rate` small (around `5e-6`); RL destabilizes easily at higher rates.
+- Give it **more `num_train_epochs`** — GRPO improvements accrue gradually.
+
+:::tip
+Change one hyperparameter per run and compare against the previous job. Tuning several at once
+makes it impossible to tell which change helped.
+:::
