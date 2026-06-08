@@ -1,112 +1,315 @@
 ---
 title: Datasets
+description: 'How to format and upload datasets for fine-tuning on Emissary — supported formats, per-task schemas, and best practices.'
 ---
 
-# Dataset Preparation Best Practices
+## Overview
 
-Guidelines for preparing datasets for fine-tuning models
+Your dataset is the single biggest lever on the quality of a fine-tuned model. This page covers
+the file formats Emissary accepts, the exact schema each task type expects, and best practices
+for preparing clean, high-quality data.
 
-## Supported File Formats
+Each example in your dataset is an **input → expected output** pair. The precise shape of that
+pair depends on your task type (text classification looks different from a vision-language chat),
+so jump to the [schema for your task type](#schemas-by-task-type) below.
 
-Our platform supports datasets in two formats:
+---
 
-- CSV (.csv)
-- JSON Lines (.jsonl)
+## Supported file formats
 
-## Format Specifications
+Emissary supports `JSONL`, `JSON`, and `CSV`.
 
-### CSV Format
+:::tip Upload JSONL whenever you can
+We **strongly recommend JSONL** (JSON Lines). When you upload a dataset, Emissary runs a
+**profiling** pass that validates every row against your task's schema and surfaces key metadata
+— row counts, class balance, token-length distributions, and outlier samples — before you train.
+Because each line in a JSONL file is one self-contained record, profiling is faster and far more
+reliable on JSONL than on any other format. It's also the only format that cleanly represents the
+structured and multimodal schemas (classification label maps, NER entities, image content
+blocks). CSV is fine for simple text input→output tasks, but JSONL is the safe default for
+everything.
+:::
 
-Your CSV dataset should contain exactly two columns:
+### JSONL (recommended)
 
-1. **input**: This column should include the text input data.
-2. **expected_output**: This column should contain the corresponding expected output or response.
+One JSON object per line, no enclosing array, no trailing commas. Each line is one training
+example.
 
-Example:
+```jsonl
+{"prompt": "What is the capital of France?", "completion": "Paris."}
+{"prompt": "Explain photosynthesis.", "completion": "Plants convert light into chemical energy."}
+```
+
+### JSON
+
+A single JSON array of example objects. Functionally equivalent to JSONL but parsed as one
+document, which makes profiling and error-reporting coarser-grained.
+
+### CSV
+
+Two columns, `input` and `expected_output`, for simple text-in / text-out tasks
+(completion, regression, single-text classification). Structured and multimodal task types
+(NER, embedding, CLIP, VLM, and label-map classification) require JSONL.
 
 ```csv
 input,expected_output
-"What is AI?","Artificial intelligence (AI) is the simulation of human intelligence in machines."
-"Define machine learning.","Machine learning is a subset of AI that involves the use of algorithms and statistical models to perform tasks without explicit instructions."
+"What is AI?","Artificial intelligence is the simulation of human intelligence in machines."
+"Define machine learning.","A subset of AI where models learn patterns from data."
 ```
 
-### JSON Lines Format
+---
 
-We support two types of JSON Lines (.jsonl) formats, depending on your use case:
+## Schemas by task type
 
-#### a. Completion Format
+The examples below mirror the **Schema guide** drawer in the dataset upload screen — open it any
+time from the upload page to copy a sample or download a starter `.jsonl`. All examples are shown
+as JSONL (one object per line; multi-line here only for readability).
 
-Ideal for text completion tasks where the model generates text based on a prompt.
+### Classification
 
-Keys:
+Assign labels from a fixed schema to each input. The `completion` is a map of `label → 1/0`
+(applies / doesn't), and the label set is auto-detected from the keys across your file — so keep
+the same keys on every row.
 
-- `prompt`: The text prompt you want the model to respond to.
-- `completion`: The desired output or completion you expect from the model.
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `prompt` | `string` | required | The input text to classify. |
+| `completion` | `object<string, 0 \| 1>` | required | Map of label → binary relevance. |
 
-Example:
+Pick the variant that matches how your labels relate:
+
+- **Binary** — a single label key with value `0` or `1`.
+- **Multi-class** — labels are mutually exclusive; exactly one key is `1`, the rest `0`.
+- **Multi-label** — an input can have several labels; more than one key may be `1`.
 
 ```json
-{"prompt": "What is the capital of France?", "completion": "Paris."}
-{"prompt": "Explain photosynthesis.", "completion": "Photosynthesis is a process used by plants to convert light energy into chemical energy."}
+{
+  "prompt": "This is a sample text for multi-class classification",
+  "completion": { "Label_1": 1, "Label_2": 0, "Label_3": 0 }
+}
 ```
 
-#### b. Chat Template
+Profiling warns if any class has fewer than ~20 examples — aim for balanced representation across
+labels.
 
-Use this format for chat-based datasets with multiple conversational exchanges between roles.
+### Completion
 
-Key:
+Teach a base model to produce a target completion for a given prompt.
 
-- `messages`: Contains a list of message objects, each with a role and content.
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `prompt` | `string` | required | The input text shown to the model. |
+| `completion` | `string` | required | The target response. Exclude the prompt itself. |
 
-Roles:
+```json
+{"prompt": "Summarize the article in one sentence.", "completion": "The article argues that…"}
+{"prompt": "Translate to French: I'm hungry", "completion": "J'ai faim."}
+```
 
-- `system`: Defines initial instructions or context for the conversation.
-- `user`: Represents the user's input.
-- `assistant`: Represents the model's response.
+### Chat
 
-Example:
+Fine-tune a conversational model on ordered multi-turn exchanges.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `messages` | `array<object>` | required | Ordered turns, each with a role and content. |
+| `messages[].role` | `"user" \| "assistant" \| "system"` | required | Who is speaking on this turn. |
+| `messages[].content` | `string` | required | The text of the turn. |
 
 ```json
 {"messages": [
-    {"role": "system", "content": "You are a helpful assistant."},
-    {"role": "user", "content": "Tell me a joke."},
-    {"role": "assistant", "content": "Why did the scarecrow win an award? Because he was outstanding in his field!"},
-    {"role": "user", "content": "That's funny! Do you know any puns?"},
-    {"role": "assistant", "content": "I was wondering why the baseball was getting bigger. Then it hit me."}
+  {"role": "system", "content": "You are a helpful assistant."},
+  {"role": "user", "content": "Tell me a joke."},
+  {"role": "assistant", "content": "Why did the scarecrow win an award? He was outstanding in his field."}
 ]}
 ```
 
-## Data Formatting Guidelines
+System messages are optional and prepended to the conversation at training time. By default, the
+last assistant turn is used as the training target.
 
-- **Consistent Structure**: Ensure that all entries in your dataset follow the specified format without deviation.
-- **UTF-8 Encoding**: Use UTF-8 encoding to support a wide range of characters and symbols.
-- **No Missing Fields**: Every entry should include all the required fields (input and expected_output for CSV, or the necessary keys for JSONL formats).
+### Regression
 
-## Data Cleaning and Preprocessing
+Predict a continuous numeric value for each input.
 
-- **Remove Noise**: Eliminate irrelevant content, typos, special characters, and duplicate entries.
-- **Normalize Text**: Standardize text formatting (e.g., consistent capitalization, punctuation).
-- **Spell Check**: Correct spelling errors to improve data quality.
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `prompt` | `string` | required | The input text. |
+| `completion` | `float` | required | The ground-truth numeric target. |
 
-## Ensuring Data Quality and Diversity
+```json
+{"prompt": "This is a sample text for a regression task.", "completion": 0.231}
+```
 
-- **Relevance**: Include data that is directly related to your AI use case to enhance model effectiveness.
-- **Diversity**: Incorporate a variety of examples to help the model generalize better across different inputs.
-- **Balanced Representation**: For tasks like classification, ensure all classes are adequately represented.
+For large or wide-ranging targets, normalize before training for stability. In CSV, use the
+`input` and `expected_output` columns.
 
-## Handling Special Cases
+### Embedding
 
-- **Multi-Turn Conversations**: Use the Chat Template in JSONL format for datasets involving dialogues or multiple interactions.
-- **Long Texts**: If dealing with long inputs or outputs, ensure they are properly formatted and do not exceed any platform-specific length limitations.
+Train a text embedder so that similar inputs map close together in vector space.
 
-## Data Privacy and Compliance
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `itemA.text` | `string` | required | First text in the pair. |
+| `itemB.text` | `string` | required | Second text in the pair. |
+| `similarity` | `float · -1 to 1` | required | Target similarity; `1` = identical, `-1` = opposite. |
 
-- **Anonymization**: Remove or mask any personally identifiable information (PII) in your dataset to protect individual privacy.
-- **Compliance**: Ensure your data collection and usage comply with relevant laws and regulations such as GDPR, CCPA, etc.
+```json
+{
+  "itemA": { "text": "Example Text A" },
+  "itemB": { "text": "Example Text B" },
+  "similarity": 1
+}
+```
 
+Cover both high- and low-similarity pairs for balanced training, and keep each text within the
+base model's context length.
 
-## Tips for Successful Dataset Preparation
+### NER (named-entity recognition)
 
-- **Start Small**: Begin with a smaller subset of your data to validate formatting and upload processes.
-- **Validate Format**: Use tools or scripts to check the JSON or CSV format before uploading.
-- **Sample Review**: Manually review a sample of your dataset entries to catch any errors early.
+Extract typed entity mentions from each input.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `prompt` | `string` | required | The input text to extract entities from. |
+| `completion` | `string (JSON)` | required | A **JSON-encoded string** mapping entity type → list of mentions. |
+
+The `completion` is a serialized JSON string, not a nested object — use an empty array for entity
+types with no mentions, and keep entity-type names consistent across the file.
+
+```json
+{
+  "prompt": "This is a sample text for an NER task.",
+  "completion": "{\"Entity_Type_A\": [\"sample\"], \"Entity_Type_B\": [\"NER task\"], \"Entity_Type_C\": []}"
+}
+```
+
+### CLIP Classification
+
+Classify a pair of images as a policy violation or not.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `prompt.content` | `array<ImageItem>` | required | Two image items to compare. |
+| `completion.violation` | `0 \| 1` | required | `1` if the pair is a violation, else `0`. |
+
+```json
+{
+  "prompt": { "content": [
+    {"type": "image", "image": "data:image/jpeg;base64,/9j/..."},
+    {"type": "image", "image": "data:image/jpeg;base64,/9j/..."}
+  ]},
+  "completion": { "violation": 1 }
+}
+```
+
+Images may be base64 data URLs or S3/GCS URLs, and are auto-resized to 1024px on the long edge.
+
+### CLIP Embedding
+
+Train a joint image/text embedder on paired images, with optional captions.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `itemA.image` | `url \| base64` | required | First image. |
+| `itemB.image` | `url \| base64` | required | Second image. |
+| `itemA.text` | `string` | optional | Caption for image A. |
+| `itemB.text` | `string` | optional | Caption for image B. |
+| `similarity` | `0 \| 1` | required | `1` if the images are similar, else `0`. |
+
+```json
+{
+  "itemA": { "image": "data:image/jpeg;base64,/9j/...", "text": "OPTIONAL_TEXT" },
+  "itemB": { "image": "data:image/jpeg;base64,/9j/...", "text": "OPTIONAL_TEXT" },
+  "similarity": 1
+}
+```
+
+Captions are optional; PNG, JPEG, and WebP are supported.
+
+### VLM Generation
+
+Fine-tune a vision-language model on multi-turn messages that mix images and text.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `messages` | `array<Message>` | required | Ordered turns. |
+| `messages[].role` | `"user" \| "assistant"` | required | Who is speaking. |
+| `messages[].content` | `array<ContentBlock>` | required | Ordered blocks of `{type:"image", image}` or `{type:"text", text}`. |
+
+```json
+{
+  "messages": [
+    {"role": "user", "content": [
+      {"type": "image", "image": "data:image/jpeg;base64,/9j/..."},
+      {"type": "text",  "text":  "Your input text"}
+    ]},
+    {"role": "assistant", "content": [
+      {"type": "text", "text": "Your output text"}
+    ]}
+  ]
+}
+```
+
+Image and text blocks may appear in any order within a turn; images are auto-resized to 1024px on
+the long edge.
+
+### VLM Classification
+
+Assign multiple labels to an input that can include images and text.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `prompt.content` | `array<ContentBlock>` | required | Input blocks — images and/or text. |
+| `completion` | `object<string, 0 \| 1>` | required | Map of label → binary relevance. |
+
+```json
+{
+  "prompt": { "content": [
+    {"type": "image", "image": "data:image/jpeg;base64,/9j/..."},
+    {"type": "text",  "text":  "Your input text"}
+  ]},
+  "completion": { "Label_1": 1, "Label_2": 0, "Label_3": 0 }
+}
+```
+
+At least one image block is expected per sample; the label set is auto-detected across the file.
+
+---
+
+## Data formatting guidelines
+
+- **Consistent structure** — every row must follow its task's schema exactly, with the same keys
+  in the same shape. The first rows define the schema that profiling validates the rest against.
+- **UTF-8 encoding** — encode files as UTF-8 to support the full range of characters and symbols.
+- **No missing fields** — include every required field on every row.
+- **One record per line (JSONL)** — no enclosing array, no trailing commas, no line breaks inside
+  a record.
+
+## Data cleaning and preprocessing
+
+- **Remove noise** — strip irrelevant content, broken samples, and duplicates.
+- **Normalize text** — standardize capitalization, whitespace, and punctuation.
+- **Fix errors** — correct obvious spelling and formatting mistakes that don't reflect real
+  inputs.
+
+## Data quality and diversity
+
+- **Relevance** — include data that closely matches the inputs your deployed model will see.
+- **Diversity** — vary phrasing, length, and edge cases so the model generalizes.
+- **Balanced representation** — for classification, give every class enough examples (profiling
+  flags classes under ~20 samples).
+
+## Privacy and compliance
+
+- **Anonymize** — remove or mask personally identifiable information (PII).
+- **Comply** — ensure your data collection and use meet relevant regulations (GDPR, CCPA, etc.).
+
+## Tips for a successful upload
+
+- **Start small** — upload a small slice first to confirm formatting and see the profiling
+  result before committing the full dataset.
+- **Validate before uploading** — check your JSON/JSONL parses and conforms to the schema.
+- **Use the Schema guide** — copy a sample or download a starter `.jsonl` straight from the
+  upload screen, then replace the placeholder values with your data.
+- **Review a sample** — manually read a handful of rows to catch labeling or formatting mistakes
+  early.
