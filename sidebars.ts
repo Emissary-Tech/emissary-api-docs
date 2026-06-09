@@ -29,6 +29,7 @@ const sidebars: SidebarsConfig = {
         label: 'Post Training',
         items: [
             'fine-tuning/quickstart',
+            'fine-tuning/concept',
             'fine-tuning/datasets',
             'fine-tuning/parameters'
         ],
