@@ -1,0 +1,163 @@
+---
+title: 'Concepts'
+description: 'The core concepts behind post-training on Emissary — projects, datasets, base models, techniques, training jobs, checkpoints, and evaluation.'
+---
+
+## Concepts
+
+**Post-training** is how you adapt a base model to your specific task on Emissary. Prompting only
+changes what you put *into* a model; post-training changes the model's weights themselves,
+unlocking more stable, precise, and differentiated behavior than prompt engineering can reach.
+
+You start from a base model, train it on examples of your task (or, with GRPO, against a reward),
+and get back **checkpoints** — versions of the adapted model — that you evaluate and then
+[deploy for inference](../inference/deployments). This page defines the concepts and entities
+you'll work with along the way. For a hands-on walkthrough, see the
+[Quickstart](./quickstart); for the knobs you can tune, see [Hyperparameters](./parameters).
+
+The lifecycle, end to end:
+
+```
+project → dataset → training job → checkpoints → evaluation → deployment
+```
+
+---
+
+## Post-training techniques
+
+Emissary supports two techniques, which differ in *how* the model learns:
+
+- **SFT (Supervised Fine-Tuning)** — trains the model to reproduce the input→output pairs in your
+  dataset. This is the default and works for every fine-tunable task type.
+- **GRPO (Group Relative Policy Optimization)** — a reinforcement-learning technique that improves
+  the model against a reward signal by comparing several sampled completions per prompt. GRPO is
+  available for the `text-generation` task type only.
+
+Both techniques train with **LoRA adapters** — small, efficient weight layers added on top of the
+frozen base model rather than rewriting all of its weights. That keeps training fast and makes the
+resulting checkpoints cheap to serve (many can share one base model on an engine). The
+hyperparameters each technique exposes are documented in [Hyperparameters](./parameters).
+
+---
+
+## Task types
+
+A **task type** defines what your model does — and it shapes everything downstream: the structure
+of the model's output, the schema your dataset must follow, and the API you call once it's
+deployed. Supported task types include text `completion` and `chat` (`text-generation`), `classification`,
+`regression`, `embedding`, `ner` (named-entity recognition), and the vision tasks `clip-*` and
+`vlm-*`.
+
+You choose the task type when you prepare your dataset and again when you start a training job,
+and it must be consistent across the dataset, the base model, and the eventual inference engine.
+Each task type has its own dataset schema — see [Datasets](./datasets) for the exact shape of
+each.
+
+:::note
+A base model only supports certain task types. When you pick a base model, Emissary shows which
+tasks it can be fine-tuned for; choose one that matches your goal.
+:::
+
+---
+
+## Training projects
+
+A **training project** is a workspace that groups the training jobs you run toward a single goal.
+If you're building a model to classify support tickets, you might create a `support-triage`
+project and run and compare all related jobs inside it. Projects keep your experiments organized
+as you iterate toward a model that's good enough to deploy.
+
+---
+
+## Base models
+
+A **base model** is the foundation you fine-tune from. When you start a job you choose between:
+
+- **Pre-trained** — start from a published foundation model's weights. This is where you begin
+  when you have no checkpoints yet.
+- **Fine-tuned** — continue training from one of your own existing checkpoints, to refine a model
+  further or adapt it to new data.
+
+The available base models are listed when you create a job, each annotated with the task types it
+supports.
+
+---
+
+## Datasets
+
+Your **dataset** is the set of examples the model learns from — input→output pairs whose exact
+shape depends on your task type. Dataset quality is the single biggest lever on the quality of the
+fine-tuned model.
+
+When you upload a dataset, Emissary runs a **profiling** pass that validates it against the task's
+schema and surfaces metadata — row counts, class balance, token-length distributions, and outlier
+samples — so you can catch problems before training. We recommend uploading **JSONL** for the most
+reliable profiling. See [Datasets](./datasets) for supported formats and per-task schemas.
+
+### Evaluation strategy
+
+To measure how well a model generalizes, you train on one split and evaluate on another. When you
+configure a job's data, you set an **evaluation strategy** by either:
+
+- **splitting** a test set out of your training data by a ratio, or
+- providing a **dedicated test dataset** you've uploaded separately.
+
+The held-out set is what's used to score each checkpoint and to detect overfitting.
+
+---
+
+## Training jobs
+
+A **training job** is one fine-tuning run. It ties together a base model, a technique and task
+type, your training and evaluation data, and a set of hyperparameters — then trains and emits
+checkpoints. A job is defined across a few sections (identity, base model, technique & task, data,
+[hyperparameters](./parameters), and optional test functions), most prefilled with sensible
+defaults so you can start quickly and adjust as you experiment.
+
+While a job runs and after it finishes, its details page shows:
+
+- a **training loss** curve that populates as the job emits data points,
+- the **checkpoints** it has produced (with evaluation results, if you provided a test set),
+- real-time **logs**, and
+- the **configuration** (the hyperparameters used for the run).
+
+---
+
+## Checkpoints
+
+A **checkpoint** is a snapshot of the model captured during training — typically one per epoch.
+Each checkpoint is an independently evaluable and deployable version of your fine-tuned model.
+
+Because the model evolves over the run, checkpoints let you pick the *best* version rather than
+just the last one: a later checkpoint isn't always better, since training too long can overfit.
+You compare checkpoints using their evaluation scores and deploy the one that performs best on
+your held-out data. Deploying a checkpoint hands it off to inference as a
+[deployment](../inference/deployments) on an engine.
+
+---
+
+## Evaluation
+
+**Evaluation** tells you whether a checkpoint is actually good. When you provide a test dataset,
+Emissary runs the model against it **at every checkpoint** and reports the results, so you can
+watch performance improve (or degrade) over the course of training.
+
+You control *what* is measured with **test functions** — metric functions that take the input, the
+expected output, and the model's predicted output, and return a numeric score. You can use the
+shared functions or write your own, and register several to track multiple metrics per checkpoint.
+Aligning these metrics with your real objective — and watching the held-out scores for signs of
+overfitting — is how you decide which checkpoint to ship.
+{/* See [Testing and Evaluation](./testing) for how to write and register metric functions. */}
+
+---
+
+## From training to deployment
+
+A trained checkpoint isn't serving anything until you deploy it. Deploying a checkpoint creates a
+**deployment** on an **inference engine** — the GPU-backed service that actually runs your model
+and exposes an API. Because fine-tunes are LoRA adapters, many checkpoints can be served from one
+engine at once, and you address each by name in your requests.
+
+The inference side has its own concepts — engines, deployments, server types, and autoscaling.
+Start with [Inference concepts](../inference/concept) and [Deployments](../inference/deployments)
+to take a checkpoint live.
