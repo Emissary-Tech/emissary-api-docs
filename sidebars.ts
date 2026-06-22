@@ -18,6 +18,7 @@ const sidebars: SidebarsConfig = {
       {
           type: 'category',
           label: 'Quickstart',
+          collapsed: false,
           items: [
               'quickstart/llm-as-judge',
               'quickstart/router',
@@ -25,14 +26,29 @@ const sidebars: SidebarsConfig = {
       },
       {
         type: 'category',
-        label: 'Fine-Tuning',
+        label: 'Post Training',
         items: [
             'fine-tuning/quickstart',
+            'fine-tuning/concept',
             'fine-tuning/datasets',
-            'fine-tuning/parameters',
-            'fine-tuning/testing',
-            'fine-tuning/deployment',
+            'fine-tuning/parameters'
         ],
+      },
+      {
+        type: 'category',
+        label: 'Inference',
+        items: [
+            'inference/concept',
+            'inference/deployments',
+            'inference/autoscaling'
+            // {
+            //   type: 'category',
+            //   label: 'Integration',
+            //   items: [
+            //       'inference/integration/classification'
+            //   ]
+            // }
+        ]
       },
       {
         type: 'category',
@@ -41,18 +57,18 @@ const sidebars: SidebarsConfig = {
             'playground/experiments'
         ]
       },
-      {
-        type: 'category',
-        label: 'Guides',
-        items: [
-            'guides/emissary-classification',
-            'guides/emissary-regression',
-            'guides/text-generation',
-            'guides/ner',
-            'guides/clip-classification',
-            'guides/clip-embedding',
-        ]
-      }
+      // {
+      //   type: 'category',
+      //   label: 'Guides',
+      //   items: [
+      //       'guides/emissary-classification',
+      //       'guides/emissary-regression',
+      //       'guides/text-generation',
+      //       'guides/ner',
+      //       'guides/clip-classification',
+      //       'guides/clip-embedding',
+      //   ]
+      // }
   ],
   openApiSidebar: [
     {
