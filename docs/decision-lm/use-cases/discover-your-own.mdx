@@ -1,0 +1,116 @@
+---
+id: discover-your-own
+title: 'Discover Your Own'
+description: 'A prompt for Claude Code that finds where Emissary Decision LMs fit in your AI agent and implements them.'
+---
+
+Every agent has decisions buried in it: which tool to call, whether an answer is good enough, which model to use. Many of them are being made by a full generative call that could be a single fast classification.
+
+The prompt below turns Claude Code into a guide for finding those spots in **your** codebase and replacing them with Emissary Decision LMs. It:
+
+1. Maps your agent's LLM calls.
+2. Finds **replacement tasks**: existing calls that are really a decision followed by generation.
+3. Finds **net new tasks**: verifiers and routers that would make the agent better.
+4. Implements the changes using **only Emissary** for the decision layer.
+
+## Before you start
+
+- Create an Emissary API key under **Settings → Credentials** and export it as `EMISSARY_API_KEY`.
+- Open Claude Code in the root of the repository that contains your agent.
+- Skim the [overview](../overview) and the [Experiments reference](/experiment) so you know what the result should look like.
+
+## The prompt
+
+Paste this into Claude Code.
+
+````text
+You are helping me add Emissary Decision LMs to this AI agent. A Decision LM is an LLM with
+a classification head that makes one decision in a single forward pass: binary
+classification, multi-class classification, or regression. It returns probabilities or a
+number in tens of milliseconds, at a small fraction of the cost of a generative call.
+
+Docs: https://docs2.withemissary.com  (see "Experiments" and the Decision LM section)
+API:  POST https://api.withemissary.com/v1/experiments       (create a decision model)
+      POST https://api.withemissary.com/v1/classification    (binary / multi-class)
+      POST https://api.withemissary.com/v1/regression        (numeric score)
+Auth: header X-API-Key, read from the EMISSARY_API_KEY environment variable.
+Experiment modes: judge (binary yes/no), decision (multi-class), routing (multi-class
+destinations), regression (numeric scale).
+
+Work in four phases. Do not skip ahead, and stop for my approval at the end of phase 3.
+
+## Phase 1 - Map the agent
+Read the codebase and list every place it calls an LLM or makes a branching decision.
+For each, record: file and line, what the call does, what the input is, what the output
+is, and whether the output is free-form text or a choice among known options.
+
+## Phase 2 - Find candidates
+
+A) REPLACEMENT TASKS - existing LLM calls that are really a decision.
+Look for calls where the model's job is to pick, label, grade, or gate, even if it
+currently returns prose or JSON. Typical examples:
+  - intent or topic classification before choosing a prompt or tool
+  - "which tool/agent should handle this?" selection
+  - choosing between a small and a large model
+  - yes/no checks ("is this on topic?", "is this safe?", "did the user ask for X?")
+  - sentiment, urgency, priority, or severity scoring
+  - extracting a category from a ticket, email, or document
+For each one, split it into two steps:
+  1. DECISION - what exactly is being decided, and what are the classes (or the scale)?
+  2. GENERATION - what text still needs to be written once the decision is made?
+The decision moves to an Emissary Decision LM. The generation stays with the existing
+model, but now it can use a decision-specific prompt, or be skipped entirely.
+
+B) NET NEW TASKS - decisions the agent does not make today but should.
+Include where sensible:
+  - VERIFIERS: judge checks on the agent's outputs before they are returned or acted on
+    (groundedness, policy compliance, tone, completeness, hallucination risk, tool-call
+    arguments that look wrong)
+  - DECISION ROUTERS: routing between models, agents, or workflows by query difficulty or
+    type, with a confidence-based fallback to the strongest option
+  - GATES: input filtering (off-topic, prompt injection, PII) and escalation to a human
+    when confidence is low
+Only propose a net new task if there is a concrete place in the code where its output
+would change behavior.
+
+## Phase 3 - Present a plan
+Show me a table with one row per candidate:
+  | # | Type (replace / new) | Location | Mode (judge / decision / routing / regression) |
+  | Classes or scale | Replaces or adds | Expected benefit | Risk |
+Rank by impact. For each, define the classes with precise, mutually exclusive
+descriptions (include an "other" class where inputs may not fit), or for a judge, a
+single yes/no question. Recommend a confidence threshold and say what happens below it.
+Then STOP and wait for my approval of which items to implement.
+
+## Phase 4 - Implement (after approval)
+Use ONLY Emissary for the decision layer. Do not add any other classifier, embedding
+model, keyword heuristic, or third-party moderation or routing service in its place.
+For each approved item:
+  1. Add a small module that creates the experiment with POST /v1/experiments (idempotent:
+     reuse the experiment id if it already exists; store ids in config, not in code).
+  2. Add a typed client function that calls /v1/classification or /v1/regression with
+     data_format "probs" where applicable, and returns the probabilities.
+  3. Replace the existing decision call, or insert the new verifier / router, at the
+     location from the plan. Keep the generation step with the existing model.
+  4. Apply the confidence threshold. Below it, fall back to the previous behavior or the
+     strongest route. Never fail silently.
+  5. Log the input, the probabilities, and the chosen branch, so decisions can be
+     reviewed later and used as training data.
+  6. Add tests that mock the Emissary API for each branch, plus one test for the
+     low-confidence fallback.
+Read the API key from EMISSARY_API_KEY and never hard-code it. Make timeouts and retries
+explicit. Keep each change small and reviewable.
+
+When done, summarize what changed, how to run the tests, and which decisions I should
+review first with real traffic before trusting the thresholds.
+````
+
+## What to expect
+
+Claude Code will walk the repository, then come back with a ranked plan before it changes anything. A typical agent turns up a handful of candidates, such as an intent classifier, a model-selection step, and a missing output verifier.
+
+After you approve, it creates the experiments, wires them in with a fallback path, and logs every decision. Those logs are your future training data. Once you have enough, [post-train](/fine-tuning/concept) the models to raise accuracy on your real traffic.
+
+:::tip
+Start with one or two high-traffic items. Verify the thresholds against real inputs before adding more.
+:::

@@ -1,0 +1,83 @@
+---
+id: compare
+title: 'Comparing Decision LMs'
+description: 'How to evaluate Decision LMs on cost, latency, security, modality, calibration, and more, and how Emissary compares with Jev and the Luna Decisions API.'
+---
+
+{/*
+  Competitor figures are vendor-reported and drawn from third-party coverage, not from
+  first-party docs. Re-verify every "Jev" and "Luna" cell before publishing:
+  - Jev (TypeSafe): mastra.ai/articles/jev, arize.com (TypeSafe's Jev), innfactory.ai
+  - Luna Decisions API (OpenAI): orcarouter.ai/blog/openai-decisions-api-gpt-6-luna
+*/}
+
+# Comparing Decision LMs
+
+Decision LMs look similar from the outside: you send an input and a set of options, and you get back a decision with a confidence. The differences that matter show up in production. This page lists the dimensions worth evaluating and compares Emissary with two other Decision LM offerings, **Jev** and the **Luna Decisions API**.
+
+For background on how these models work, read the [technical deep dive](./deep-dive) first.
+
+:::caution
+Figures for Jev and the Luna Decisions API are vendor-reported and may have changed. Treat them as a starting point and benchmark on your own data. Cells marked *Not published* mean we couldn't find a public figure.
+:::
+
+---
+
+## What to compare
+
+| Dimension | Why it matters |
+|---|---|
+| **Cost** | Decisions run on every request, so price per million tokens (or per call) dominates at scale. |
+| **Latency** | A decision on the hot path adds directly to user-facing latency. Look at p95 and p99, not only the median. |
+| **Security and deployment** | Can you self-host, run on dedicated capacity, or keep data in your own cloud? Required for regulated data. |
+| **Multi-modality** | Can the model decide over images as well as text? |
+| **Calibratability** | Can you improve the confidence scores with your own data, or are you stuck with what the vendor ships? |
+| **Customization** | Zero-shot only, or can you post-train on your labels to raise accuracy? |
+| **Output types** | Binary, multi-class, and regression, and whether one call can answer several questions. |
+| **Input format** | Plain text only, or structured state such as JSON, logs, and conversation history. |
+| **Accuracy on your task** | Public benchmarks rarely match your data. Always measure on a labeled sample. |
+| **Ownership and portability** | Do you own the trained weights? Can you move providers without redoing your data pipeline? |
+| **Scale and limits** | Maximum number of classes, input length, throughput, and rate limits. |
+| **Availability** | General availability vs. preview or waitlist, and what SLA backs it. |
+
+---
+
+## Side by side
+
+| | **Emissary** | **Jev** (TypeSafe) | **Luna Decisions API** (OpenAI) |
+|---|---|---|---|
+| **Cost** | $0.05 per 1M tokens | Vendor claims 40–400x cheaper than LLM alternatives; price not published | Not published |
+| **Latency** | ~56 ms per decision | 70–500 ms reported | ~150 ms vendor-stated (preview) |
+| **Security / deployment** | Managed endpoints, plus [dedicated inference engines](/inference/concept) on GPU capacity for your organization | Hosted API; reported as early access with no published weights or on-prem option | Hosted by OpenAI |
+| **Multi-modality** | Not yet for Decision LMs; Emissary supports CLIP and VLM task types for [post-training](/fine-tuning/concept) | Not stated | Reported to accept image inputs |
+| **Calibratability** | Post-train to improve confidence scores on your own data | Calibrated by design through the vendor's own training (RLCD); no customer-side recalibration documented | Not published |
+| **Customization** | Zero-shot from class descriptions, then [post-train](/fine-tuning/concept) with SFT | Zero-shot via typed questions | Not published |
+| **Output types** | Binary (`judge`), multi-class (`decision`, `routing`), `regression` | Choice, score, and boolean questions, with several questions per call | Constrained choice among candidate answers |
+| **Input** | Text | Text or structured JSON state | Text, reportedly images |
+| **Ownership** | You post-train your own checkpoints on Emissary | Vendor-owned model | Vendor-owned model |
+| **Availability** | Generally available | Early access / waitlist reported | Preview reported |
+
+### Reading the table
+
+**Cost and latency.** Both are close to the floor for all three, and well below a frontier model. At these levels, cost is more likely to be decided by your token volume than by the headline rate, and latency by your network path than by the model. Compare using your own input lengths and measure p95.
+
+**Security.** If you handle regulated or sensitive data, check whether the provider offers dedicated capacity or self-hosting. Emissary's [inference engines](/inference/concept) give you GPU-backed serving scoped to your organization, with [autoscaling](/inference/autoscaling) and scheduling. Confirm current options with each vendor, since hosted-only previews often add private deployment later.
+
+**Multi-modality.** If your decisions depend on images (for example, content moderation on uploads), this is the dimension most likely to rule a vendor out. Verify it end to end, not just on a landing page.
+
+**Calibration.** A model that is calibrated out of the box can still be wrong for your data. The more useful property is being able to *improve* calibration on your own labels. On Emissary, post-training on your data adjusts the confidence scores as well as the accuracy. See [Common challenges](./deep-dive#common-challenges) for why this matters.
+
+---
+
+## Run your own comparison
+
+The most reliable comparison is a small, honest benchmark.
+
+1. **Label a sample.** 200–500 real inputs with a ground-truth label each, including hard and ambiguous cases.
+2. **Run every candidate** on the same inputs with equivalent class definitions.
+3. **Measure accuracy and calibration.** Compare accuracy, plus how often high-confidence answers are right. A reliability table by confidence bucket is enough.
+4. **Measure latency under load**, including network time and retries, as median, p95, and p99.
+5. **Price it at your volume**, using your real input lengths.
+6. **Check the fit.** Confirm data handling, deployment options, and modalities against your requirements.
+
+To set up the Emissary side, start from the [Experiments reference](/experiment).

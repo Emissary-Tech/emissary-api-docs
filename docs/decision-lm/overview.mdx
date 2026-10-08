@@ -1,0 +1,58 @@
+---
+id: overview
+title: 'Overview'
+description: 'What a Decision Language Model is, what it is used for, and where to go next.'
+---
+
+# Decision LM
+
+A **Decision Language Model (Decision LM)** is an AI model built to *decide* and *predict* rather than *write*. Instead of generating text token by token, it reads an input, runs a **single pass** through the model, and returns a discriminative value: a yes or no label, a set of probabilities across classes, or a number in a range.
+
+It is effectively a large language model with a classification head that keeps the language understanding of an LLM, but it never produces a free-form answer, only a single output over a constrained vocabulary. That makes it exponentially faster (~50-500 ms E2E latency), cheaper  (<$0.10/M tokens), and predictable enough to sit in pipeline relying on well-formatted outputs - making them incredibly valuable for real time or high volume use-cases.
+
+You may also see them called  **System One models** (popularized by Daniel Kahneman's Thinking Fast and Slow), *LLM classifiers*, or *Decisions API*. They all mean the same thing.
+
+---
+
+## What Decision LMs are used for
+
+A Decision LM handles three kinds of task.
+
+| Task | Output | Example |
+|---|---|---|
+| **Binary classification** | One probability that a statement is true | *Does this response answer the user's question?* |
+| **Multi-class classification** | A probability for each class, summing to 1 | *Which model should handle this query?* |
+| **Regression** | A single number on a scale you define | *How urgent is this ticket, from 0 to 1?* |
+
+In practice these show up in a few recurring places:
+
+- **[Model routing](./use-cases/model-routing):** send each query to the right-sized model or agent.
+- **[LLM judges](./use-cases/llm-judges):** score outputs against criteria such as helpfulness, safety, or factuality.
+- **[Content classification](./use-cases/content-classification):** moderation, intent detection, sentiment, and ticket triage.
+- **Guardrails and verifiers:** check an agent's input or output before the next step runs.
+
+Not sure where a Decision LM fits in your own agent? Use the [Discover your own](./use-cases/discover-your-own) prompt to have Claude Code find the spots for you.
+
+---
+
+## Why use one
+
+If the answer to a question is a choice among known options, a frontier model is overkill. A Decision LM gives you:
+
+- **Low latency.** One forward pass, typically 50-500ms, with no generation loop.
+- **Low cost.** Orders of magnitude cheaper per request than prompting a frontier model for the same call (~$0.04-$0.10/M tokens --> 2% of Opus)
+- **Confidence scores.** Every decision comes with probabilities you can threshold, log, and route on.
+
+For example, an Emissary judge returns in about **56 ms** at **$0.29 per 10k requests**, where a frontier model takes 1.6–2.6 seconds and $10–15 per 10k. See the [LLM judge](/quickstart/llm-as-judge) and [router](/quickstart/router) quickstarts for the side-by-side numbers.
+
+The tradeoffs, including calibration and input brittleness, are covered in [Advantages and challenges](./deep-dive#advantages). To see how Emissary stacks up against other Decision LMs on cost, latency, security, modality, and calibration, read [Comparing Decision LMs](./compare).
+
+---
+
+## Where to go next
+
+- **Want to see one work?** Start with the [LLM judge quickstart](/quickstart/llm-as-judge) or the [router quickstart](/quickstart/router).
+- **Want to know how they work?** Read the [technical deep dive](./deep-dive).
+- **Choosing a provider?** See [Comparing Decision LMs](./compare).
+- **Want to see where they fit?** Browse the [use cases](./use-cases/model-routing).
+- **Want to call the API directly?** See [Experiments](/experiment) for binary, multi-class, and regression snippets.

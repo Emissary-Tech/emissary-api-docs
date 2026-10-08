@@ -1,0 +1,147 @@
+---
+id: deep-dive
+title: 'Technical Deep Dive'
+description: 'How Decision LMs work: the classification head, three ways to build it, how classes become prompts, and the tradeoffs.'
+---
+
+# Technical deep dive
+
+A Decision LM is an LLM with a classification head, run for a single forward pass, and built for decision-making, classification, and regression. There is no sampling loop and no generated text. The model reads the input once and the output is a distribution (or a number) read straight off the final hidden state.
+
+This page covers how the head is built, how your classes reach the model, and what to expect in production. For a high-level introduction, see the [overview](./overview).
+
+---
+
+## The basic mechanism
+
+A standard LLM ends in a language-modeling head: a linear layer that maps the last hidden state to a score for every token in the vocabulary. Generation repeats that step, sampling a token and feeding it back in.
+
+A Decision LM replaces that loop with one step.
+
+```
+input + class definitions
+        │
+        ▼
+  transformer layers      (one forward pass)
+        │
+        ▼
+ last-token hidden state
+        │
+        ▼
+ classification head      (one row per class)
+        │
+        ▼
+ softmax / sigmoid / scalar  →  probabilities or a number
+```
+
+The head has one output per class for multi-class tasks, a single logit for binary tasks, and a single scalar for regression. Because the output is read from one position, latency is roughly that of the prompt's prefill, with no decoding at all.
+
+---
+
+## Three ways to build the head
+
+The interesting design question is how the head's weights get their initial meaning. There are three common approaches.
+
+### 1. Constrained decoding
+
+Keep the original language-modeling head and restrict it. The class labels are written into the prompt, and decoding is constrained to the label tokens with a maximum of one generated token. The model's probabilities over those tokens become the class probabilities.
+
+- **Pros:** no training and no new weights. It works with any instruction-following model.
+- **Cons:** the model is still reasoning in a generative format. It is sensitive to label wording and token choice, and you pay for the full vocabulary projection.
+
+### 2. Semantic initialization
+
+Build a dedicated classification head whose weights are *initialized from the language-modeling head itself*. For each class, take the output-head weights for the tokens that best represent it, so that the new head starts out behaving like the model's own next-token probabilities for those labels. This is the same vocabulary distribution the constrained approach reads, but now it lives in a small head you can train.
+
+- **Pros:** works zero-shot from class names and descriptions, produces a real head that is cheap to run, and can be fine-tuned further.
+- **Cons:** zero-shot quality depends on how well the class descriptions line up with what the base model already knows.
+
+**This is how Emissary [experiments](/experiment) start.** You provide class names and descriptions, and you get a working zero-shot endpoint in under a minute. You can then improve it with [post-training](/fine-tuning/concept).
+
+### 3. Post-training with mapped choices
+
+Skip clever initialization and teach the model the task directly. Classes are mapped to simple answer tokens, such as `A`, `B`, `C`, `D`, or dedicated special tokens, and the input prompt is rewritten so each token corresponds to a choice:
+
+```
+Which route should handle this query?
+
+A: simple_task    – short factual or lookup questions
+B: complex_task   – multi-step reasoning or code
+C: creative_task  – writing and brainstorming
+
+Query: Design and implement an infrastructure platform
+Answer:
+```
+
+Then you generate a large amount of synthetic data and train with ordinary **cross-entropy** loss. The task has an obvious right answer, so no reward modeling or preference data is needed.
+
+- **Pros:** the strongest accuracy ceiling. The model is trained for exactly this task, and the label tokens are unambiguous.
+- **Cons:** it needs a data-generation pipeline and a training run per task, so it is slower to start than the first two approaches.
+
+:::note
+The labels don't have to be letters. Special tokens work well because they carry no prior meaning, so the model learns the mapping from scratch rather than fighting what `A` usually means.
+:::
+
+### Which should I use?
+
+| | Constrained decoding | Semantic initialization | Post-trained mappings |
+|---|---|---|---|
+| Training needed | None | None to start, optional later | Required |
+| Time to first result | Minutes | Minutes | Hours to days |
+| Accuracy ceiling | Lowest | Medium, rises with fine-tuning | Highest |
+| Good for | Quick prototypes | Zero-shot, then iterate | Stable, high-volume tasks |
+
+These are not exclusive. A common path is to start zero-shot, collect real traffic, and post-train once the task is well defined.
+
+---
+
+## How inference works
+
+Your classes are not passed to the model as structured data. They are rendered into the **prompt template** that matches the technique used to build the model, and the model reads them as text.
+
+- With **constrained decoding**, the template lists the labels and the instruction, and the allowed output tokens are restricted to those labels.
+- With **semantic initialization**, the template contains each class's name and description, and the head's rows are tied to those classes.
+- With **post-trained mappings**, the template assigns each class to its answer token (`A: class 1`, `B: class 2`, and so on), exactly as it did during training. The model's probability over those tokens is the decision.
+
+Two consequences follow:
+
+1. **The template is part of the model.** A model trained with one template should be served with that template. Changing it at inference time is a distribution shift.
+2. **Class order and wording matter.** Where a class appears in the prompt, and how it is described, can move the probabilities. Keep descriptions specific and mutually exclusive, and test reorderings.
+
+On Emissary the template is applied for you. You supply `classes` when you create an experiment and an `input` when you call the model, and the platform builds the prompt. See [Inference](/inference/concept) for how requests are served.
+
+---
+
+## Advantages
+
+- **Low latency.** One forward pass with no decoding loop. Emissary returns judgments in tens of milliseconds, against seconds for a frontier model.
+- **Low cost.** Small models, a single pass, and shared GPU serving make each call a fraction of the price of a generative call.
+- **Confidence scores.** You get probabilities, not just a label. Threshold them, escalate low-confidence cases to a bigger model, and log them for monitoring.
+- **Deterministic output shape.** The result is always a valid label or number, so there is no output parsing and no malformed JSON.
+- **Easy to improve.** Because the output is a clean label, training data is cheap to create and evaluation is simple accuracy or error.
+
+---
+
+## Common challenges
+
+Decision LMs are not free of failure modes. Plan for these.
+
+- **Miscalibrated confidence.** A probability of 0.9 doesn't always mean 90% of such cases are correct. Models are often overconfident, especially on out-of-distribution inputs. Measure calibration on your own data and pick thresholds empirically rather than assuming 0.5 is right.
+- **Brittleness to input.** Small changes in phrasing, formatting, or length can shift the output. Test with paraphrases, typos, and different input lengths.
+- **Sensitivity to class definitions.** Vague or overlapping classes produce unstable results. Write each description as a precise criterion.
+- **Position and label bias.** The order of choices, or the identity of the answer token, can bias the output. Randomize order during training and evaluate with shuffled orderings.
+- **No reasoning.** A single pass can't work through a multi-step problem. If the decision needs real deliberation, route that case to a generative model.
+- **Closed label set.** The model must pick from the classes you defined. Inputs that fit none of them still get a label, so include an `other` or `none` class when that is possible.
+- **Distribution drift.** Inputs change over time. Monitor confidence and class frequency, and re-train when they move.
+- **Long inputs.** Very long inputs can dilute the signal or exceed the context window. Truncate or chunk deliberately.
+- **Threshold maintenance.** Thresholds tuned on one model version may not transfer to the next, so re-check them after every re-train.
+
+A good pattern is to use the confidence score as a gate: act on high-confidence decisions directly, and send the uncertain middle to a stronger model or a human.
+
+---
+
+## Next steps
+
+- Try it: [LLM judge](/quickstart/llm-as-judge) or [router](/quickstart/router) quickstart.
+- Improve it: [post-training concepts](/fine-tuning/concept) and [datasets](/fine-tuning/datasets).
+- Apply it: [use cases](./use-cases/model-routing).

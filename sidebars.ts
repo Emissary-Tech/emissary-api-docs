@@ -26,6 +26,25 @@ const sidebars: SidebarsConfig = {
       },
       {
         type: 'category',
+        label: 'Decision LM',
+        items: [
+            'decision-lm/overview',
+            'decision-lm/deep-dive',
+            'decision-lm/compare',
+            {
+              type: 'category',
+              label: 'Use Cases',
+              items: [
+                  'decision-lm/use-cases/model-routing',
+                  'decision-lm/use-cases/llm-judges',
+                  'decision-lm/use-cases/content-classification',
+                  'decision-lm/use-cases/discover-your-own',
+              ],
+            },
+        ],
+      },
+      {
+        type: 'category',
         label: 'Post Training',
         items: [
             'fine-tuning/quickstart',

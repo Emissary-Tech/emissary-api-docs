@@ -1,0 +1,86 @@
+---
+id: llm-judges
+title: 'LLM Judges'
+description: 'Use a Decision LM to score outputs against criteria you define, at a fraction of the cost of a frontier model.'
+---
+
+An LLM judge scores a piece of text, such as a model's answer, a support reply, or a user message, against a criterion. Frontier models can do this, but at 1.6–2.6 seconds and $10–15 per 10k requests, running a judge on every request is rarely affordable. A Decision LM runs the same judgment in about 56 ms for $0.29 per 10k.
+
+This is a **binary** decision. You phrase the criterion as a yes/no question, and the model returns the probability that the answer is yes.
+
+**Typical uses**
+
+- Online evals: score every production response for helpfulness, tone, or factuality
+- Guardrails: block or flag responses that fail a check
+- Reward signals and filtering: label large datasets cheaply
+
+For the full walkthrough, see [Create Your First Judge](/quickstart/llm-as-judge).
+
+---
+
+## Create the judge
+
+A judge has a `name` (the metric) and a `description` (the criterion, phrased as a yes/no question).
+
+```python
+import json
+import requests
+
+response = requests.post(
+    "https://api.withemissary.com/v1/experiments",
+    headers={
+        "Content-Type": "application/json",
+        "X-API-Key": YOUR_API_KEY,
+    },
+    data=json.dumps({
+        "name": "AngerJudge",
+        "mode": "judge",
+        "classes": [
+            {"name": "anger", "description": "Does this text express anger?"}
+        ],
+    }),
+)
+print(response.json())
+```
+
+```json
+{ "id": "ex-ahejacuehandheha", "latest_version": "0.0.0" }
+```
+
+## Call the judge
+
+```python
+response = requests.post(
+    "https://api.withemissary.com/v1/classification",
+    headers={
+        "Content-Type": "application/json",
+        "X-API-Key": YOUR_API_KEY,
+    },
+    data=json.dumps({
+        "model": "ex-ahejacuehandheha/0.0.0",  # <experiment_id>/<version>
+        "input": "I'm so mad!",
+        "data_format": "probs",
+    }),
+)
+print(response.json())
+```
+
+```json
+{
+    "id": "classify-3c52592c7a404f97aa494861a79db220",
+    "model": "ex-ahejacuehandheha/0.0.0",
+    "data": [{ "index": 0, "probs": { "anger": 0.96 } }],
+    "created": 1779906329
+}
+```
+
+A high `anger` probability means the judge flagged the message. For a calm input, expect a value near 0.
+
+---
+
+## Tips
+
+- **Be specific about what "yes" looks like.** A one-line question works, but a short rubric stabilizes the score.
+- **Choose thresholds on your own data.** Don't assume 0.5. Label a small sample and pick the cut-off that matches the precision and recall you need.
+- **One criterion per judge.** Create several judges rather than packing multiple criteria into one question.
+- **Need a numeric score instead?** Use a `regression` experiment. See [Experiments](/experiment#regression).

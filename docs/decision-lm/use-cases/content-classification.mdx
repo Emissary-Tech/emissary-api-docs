@@ -1,0 +1,95 @@
+---
+id: content-classification
+title: 'Content Classification'
+description: 'Use a Decision LM for moderation, intent detection, sentiment, and triage.'
+---
+
+Content classification assigns an input to exactly one of several categories. Because each call is a single fast forward pass, you can classify every message, ticket, or document as it arrives.
+
+This is a **multi-class** decision. The model returns a probability for each class, and the probabilities sum to 1.
+
+**Typical uses**
+
+- Content moderation and safety triage
+- Intent detection in chat or voice agents
+- Sentiment analysis
+- Support ticket triage and tagging
+
+:::note
+The snippets below come from the [Experiments reference](/experiment#decision), which covers the `decision` mode in full.
+:::
+
+---
+
+## Create the classifier
+
+Each class has a `name` and a `description`. Write descriptions so the classes are mutually exclusive.
+
+```python
+import json
+import requests
+
+response = requests.post(
+    'https://api.withemissary.com/v1/experiments',
+    headers={
+        'Content-Type': 'application/json',
+        'X-API-Key': YOUR_API_KEY
+    },
+    data=json.dumps({
+        'name': 'MyDecision',
+        'mode': 'decision',
+        'classes': [
+            {'name': 'positive', 'description': 'The text expresses a positive sentiment, satisfaction, or approval.'},
+            {'name': 'negative', 'description': 'The text expresses a negative sentiment, dissatisfaction, or complaint.'},
+            {'name': 'neutral',  'description': 'The text is factual or does not express a strong opinion.'}
+        ]
+    })
+)
+print(response.json())
+```
+
+```json
+{"id": "ex-ahejacuehandhehe", "latest_version": "0.0.0"}
+```
+
+## Call the classifier
+
+```python
+response = requests.post(
+    'https://api.withemissary.com/v1/classification',
+    headers={
+        'Content-Type': 'application/json',
+        'X-API-Key': YOUR_API_KEY
+    },
+    data=json.dumps({
+        'model': 'ex-ahejacuehandhehe/0.0.0',
+        'input': 'This product is absolutely wonderful!',
+        'data_format': 'probs'
+    })
+)
+print(response.json())
+```
+
+```json
+{
+    "id": "classify-eac7451c54174ebc8da47be77dfe9581",
+    "model": "ex-ahejacuehandhehe/0.0.0",
+    "data": [{
+        "index": 0,
+        "probs": {
+            "negative": 0.017637422308325768,
+            "neutral":  0.024233082309365273,
+            "positive": 0.9581295251846313
+        }
+    }],
+    "created": 1779907078
+}
+```
+
+---
+
+## Tips
+
+- **Add an escape class.** Include `other` or `none` so off-topic inputs have somewhere to go instead of being forced into a real category.
+- **Act on confidence.** Auto-handle high-confidence results and send the uncertain middle to review.
+- **Move to post-training for high-stakes tasks.** Moderation and compliance deserve a model trained on your labeled data. See [Datasets](/fine-tuning/datasets).

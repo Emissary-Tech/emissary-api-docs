@@ -1,0 +1,94 @@
+---
+id: model-routing
+title: 'Model Routing'
+description: 'Use a Decision LM to send each query to the right model, agent, or workflow.'
+---
+
+A router decides where a request should go before any expensive work happens. Sending every query to a frontier model wastes money on easy requests, and sending everything to a small model hurts quality on hard ones. A Decision LM makes that call in tens of milliseconds, so routing doesn't add noticeable latency.
+
+This is a **multi-class** decision: each class is a destination, and the model returns a probability for each. The route with the highest probability wins.
+
+**Typical routes**
+
+- Fast, cheap model vs. heavyweight reasoning model
+- Specialist agents (research, coding, creative)
+- Support queues or internal teams
+
+For a full walkthrough, including the playground and dashboard paths, see [Create Your First ModelRouter](/quickstart/router).
+
+---
+
+## Create the router
+
+Each route has a `name` and a `description`. The description is what the router matches queries against, so make it specific.
+
+```python
+import json
+import requests
+
+response = requests.post(
+    "https://api.withemissary.com/v1/experiments",
+    headers={
+        "Content-Type": "application/json",
+        "X-API-Key": YOUR_API_KEY,
+    },
+    data=json.dumps({
+        'name': 'ModelRouter',
+        'mode': 'routing',
+        'classes': [
+            {'name': 'Claude Haiku',   'description': 'Simple, straightforward queries that can be handled by a small, fast model.'},
+            {'name': 'Claude Opus',  'description': 'Complex queries requiring reasoning, code generation, or multi-step analysis.'},
+            {'name': 'GPT 5', 'description': 'Creative writing, brainstorming, or content generation tasks.'}
+        ]
+    })
+)
+print(response.json())
+```
+
+```json
+{ "id": "ex-ahejacuehandheha", "latest_version": "0.0.0" }
+```
+
+## Call the router
+
+```python
+response = requests.post(
+    "https://api.withemissary.com/v1/classification",
+    headers={
+        "Content-Type": "application/json",
+        "X-API-Key": YOUR_API_KEY,
+    },
+    data=json.dumps({
+        "model": "ex-ahejacuehandheha/0.0.0",  # <experiment_id>/<version>
+        "input": "Design and implement a infrastructure platform",
+        "data_format": "probs",
+    }),
+)
+print(response.json())
+```
+
+```json
+{
+    "id": "classify-fec5cbf726b44af2ade51065232ad182",
+    "model": "ex-ahejacuehandheha/0.0.0",
+    "data": [{
+            "index": 0,
+            "probs": {
+                    "Claude Haiku": 0.09003042429685593,
+                    "Claude Opus": 0.8626418709754944,
+                    "GPT 5": 0.047327760607004166
+            }
+    }],
+    "created": 1780085360
+}
+```
+
+`Claude Opus` has the highest probability (~0.86), so this query goes to Claude Opus.
+
+---
+
+## Tips
+
+- **Use the confidence.** If the top probability is low, fall back to your most capable route rather than guessing.
+- **Describe routes by the work, not the model.** "Multi-step analysis" ages better than "the big model," and lets you swap the destination later.
+- **Improve it with your own traffic.** Once you have logged decisions, [post-train](/fine-tuning/concept) the router so it learns your actual distribution.
