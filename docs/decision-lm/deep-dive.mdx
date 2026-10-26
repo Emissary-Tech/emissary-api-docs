@@ -1,14 +1,14 @@
 ---
 id: deep-dive
 title: 'Technical Deep Dive'
-description: 'How Decision LMs work: the classification head, three ways to build it, how classes become prompts, and the tradeoffs.'
+description: 'How Decision LMs work: the classification head, ways to build it, how classes become prompts, and the tradeoffs.'
 ---
 
 # Technical deep dive
 
-A Decision LM is an LLM with a classification head, run for a single forward pass, and built for decision-making, classification, and regression. There is no sampling loop and no generated text. The model reads the input once and the output is a distribution (or a number) read straight off the final hidden state.
+A Decision LM uses a language model to produce a decision in a single forward pass, without autoregressive text generation. Depending on the implementation, the decision comes from a constrained language-modeling head or a dedicated classification or regression head. There is no sampling loop and no generated text. The model reads the input once and the output is a distribution (or a number) read straight off the final hidden state.
 
-This page covers how the head is built, how your classes reach the model, and what to expect in production. For a high-level introduction, see the [overview](./overview).
+This deep-dive is designed for those hoping to understand how the model is built, how your classes reach the model, and what to expect in production. For a high-level introduction, see the [overview](./overview).
 
 ---
 
@@ -28,35 +28,37 @@ input + class definitions
  last-token hidden state
         │
         ▼
- classification head      (one row per class)
+ classification head  / constrained LM head    
         │
         ▼
  softmax / sigmoid / scalar  →  probabilities or a number
 ```
 
-The head has one output per class for multi-class tasks, a single logit for binary tasks, and a single scalar for regression. Because the output is read from one position, latency is roughly that of the prompt's prefill, with no decoding at all.
+The head has one output per class for multi-class tasks, a single logit for binary tasks, and a single scalar for regression. Because the output is read from one position, latency is roughly that of the prompt's prefill, with no decoding at all - your entire latency is roughly equal to TTFT. 
 
 ---
 
 ## Three ways to build the head
 
-The interesting design question is how the head's weights get their initial meaning. There are three common approaches.
+The interesting design question is how to create this new constrained output space for every request - that is, how do the head's weights get their initial meaning while keeping it a single pass. There are three common approaches.
 
 ### 1. Constrained decoding
 
 Keep the original language-modeling head and restrict it. The class labels are written into the prompt, and decoding is constrained to the label tokens with a maximum of one generated token. The model's probabilities over those tokens become the class probabilities.
 
-- **Pros:** no training and no new weights. It works with any instruction-following model.
-- **Cons:** the model is still reasoning in a generative format. It is sensitive to label wording and token choice, and you pay for the full vocabulary projection.
+- **Pros:** no training and no new weights. It works with any instruction-following model and requires no additional work for any number of classifications.
+- **Cons:** the model is still reasoning in a generative format. It is sensitive to label wording and token choice, and you pay for the full vocabulary projection. Constrained decoding 
+
+This is very likely how Luna's decision API works. 
 
 ### 2. Semantic initialization
 
-Build a dedicated classification head whose weights are *initialized from the language-modeling head itself*. For each class, take the output-head weights for the tokens that best represent it, so that the new head starts out behaving like the model's own next-token probabilities for those labels. This is the same vocabulary distribution the constrained approach reads, but now it lives in a small head you can train.
+Build a dedicated classification head whose weights are *initialized from the language-modeling head itself*. For each class, we take the output-head weights for the tokens that best represent it, so that the new head starts out behaving like the model's own next-token probabilities for those labels. This is the same vocabulary distribution the constrained approach reads, but now it lives in a small head you can train.
 
 - **Pros:** works zero-shot from class names and descriptions, produces a real head that is cheap to run, and can be fine-tuned further.
-- **Cons:** zero-shot quality depends on how well the class descriptions line up with what the base model already knows.
+- **Cons:** zero-shot quality depends on how well the class descriptions line up with what the base model already knows. There is also a small but existent memory and latency overhead in generating the new head. 
 
-**This is how Emissary [experiments](/experiment) start.** You provide class names and descriptions, and you get a working zero-shot endpoint in under a minute. You can then improve it with [post-training](/fine-tuning/concept).
+**This is how Emissary [experiments](/experiment) start.** You provide class names and descriptions, and you get a working zero-shot endpoint in under a second. You can then improve it with [post-training](/fine-tuning/concept).
 
 ### 3. Post-training with mapped choices
 
@@ -128,7 +130,7 @@ Decision LMs are not free of failure modes. Plan for these.
 
 - **Miscalibrated confidence.** A probability of 0.9 doesn't always mean 90% of such cases are correct. Models are often overconfident, especially on out-of-distribution inputs. Measure calibration on your own data and pick thresholds empirically rather than assuming 0.5 is right.
 - **Brittleness to input.** Small changes in phrasing, formatting, or length can shift the output. Test with paraphrases, typos, and different input lengths.
-- **Sensitivity to class definitions.** Vague or overlapping classes produce unstable results. Write each description as a precise criterion.
+- **Sensitivity to class definitions.** Vague or overlapping classes produce unstable results. Write each description as a precise criterion. Class definitions / descriptions are your new prompt templates.
 - **Position and label bias.** The order of choices, or the identity of the answer token, can bias the output. Randomize order during training and evaluate with shuffled orderings.
 - **No reasoning.** A single pass can't work through a multi-step problem. If the decision needs real deliberation, route that case to a generative model.
 - **Closed label set.** The model must pick from the classes you defined. Inputs that fit none of them still get a label, so include an `other` or `none` class when that is possible.

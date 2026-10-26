@@ -31,6 +31,7 @@ const sidebars: SidebarsConfig = {
             'decision-lm/overview',
             'decision-lm/deep-dive',
             'decision-lm/compare',
+            'decision-lm/build-your-own',
             {
               type: 'category',
               label: 'Use Cases',

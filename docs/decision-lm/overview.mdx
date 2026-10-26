@@ -8,7 +8,7 @@ description: 'What a Decision Language Model is, what it is used for, and where 
 
 A **Decision Language Model (Decision LM)** is an AI model built to *decide* and *predict* rather than *write*. Instead of generating text token by token, it reads an input, runs a **single pass** through the model, and returns a discriminative value: a yes or no label, a set of probabilities across classes, or a number in a range.
 
-It is effectively a large language model with a classification head that keeps the language understanding of an LLM, but it never produces a free-form answer, only a single output over a constrained vocabulary. That makes it exponentially faster (~50-500 ms E2E latency), cheaper  (<$0.10/M tokens), and predictable enough to sit in pipeline relying on well-formatted outputs - making them incredibly valuable for real time or high volume use-cases.
+It is effectively a large language model with a classification head that keeps the language understanding of an LLM, but it never produces a free-form answer, only a single output over a constrained vocabulary. That makes it exponentially faster (~50-500 ms E2E latency), cheaper (under $0.10/M tokens), and predictable enough to sit in pipeline relying on well-formatted outputs - making them incredibly valuable for real time or high volume use-cases.
 
 You may also see them called  **System One models** (popularized by Daniel Kahneman's Thinking Fast and Slow), *LLM classifiers*, or *Decisions API*. They all mean the same thing.
 
@@ -45,7 +45,7 @@ If the answer to a question is a choice among known options, a frontier model is
 
 For example, an Emissary judge returns in about **56 ms** at **$0.29 per 10k requests**, where a frontier model takes 1.6–2.6 seconds and $10–15 per 10k. See the [LLM judge](/quickstart/llm-as-judge) and [router](/quickstart/router) quickstarts for the side-by-side numbers.
 
-The tradeoffs, including calibration and input brittleness, are covered in [Advantages and challenges](./deep-dive#advantages). To see how Emissary stacks up against other Decision LMs on cost, latency, security, modality, and calibration, read [Comparing Decision LMs](./compare).
+The tradeoffs, including calibration and input brittleness, are covered in [Advantages and challenges](./deep-dive#advantages). To see how Emissary stacks up against other Decision LMs on cost, latency, security, and calibration, read [Comparing Decision LMs](./compare).
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 id: compare
 title: 'Comparing Decision LMs'
-description: 'How to evaluate Decision LMs on cost, latency, security, modality, calibration, and more, and how Emissary compares with Jev and the Luna Decisions API.'
+description: 'How to evaluate Decision LMs on cost, latency, security, calibration, and more, and how Emissary compares with Jev and the Luna Decisions API.'
 ---
 
 {/*
@@ -25,20 +25,11 @@ Figures for Jev and the Luna Decisions API are vendor-reported and may have chan
 
 ## What to compare
 
-| Dimension | Why it matters |
-|---|---|
-| **Cost** | Decisions run on every request, so price per million tokens (or per call) dominates at scale. |
-| **Latency** | A decision on the hot path adds directly to user-facing latency. Look at p95 and p99, not only the median. |
-| **Security and deployment** | Can you self-host, run on dedicated capacity, or keep data in your own cloud? Required for regulated data. |
-| **Multi-modality** | Can the model decide over images as well as text? |
-| **Calibratability** | Can you improve the confidence scores with your own data, or are you stuck with what the vendor ships? |
-| **Customization** | Zero-shot only, or can you post-train on your labels to raise accuracy? |
-| **Output types** | Binary, multi-class, and regression, and whether one call can answer several questions. |
-| **Input format** | Plain text only, or structured state such as JSON, logs, and conversation history. |
-| **Accuracy on your task** | Public benchmarks rarely match your data. Always measure on a labeled sample. |
-| **Ownership and portability** | Do you own the trained weights? Can you move providers without redoing your data pipeline? |
-| **Scale and limits** | Maximum number of classes, input length, throughput, and rate limits. |
-| **Availability** | General availability vs. preview or waitlist, and what SLA backs it. |
+**Cost and latency.** A Decision LM sits on the hot path and runs on every request, so both numbers compound quickly. Cost is usually quoted per million tokens, but what you pay depends on your real input lengths and call volume, so price it at your own scale. Latency matters because the decision usually happens before the user sees anything. Look at p95 and p99 including network time, not just the median, since tail latency is what users notice.
+
+**Security and deployment.** Decisions often run over sensitive inputs such as customer messages, internal documents, or agent traces. Check where the model runs and who else shares that capacity. The key question is whether you can use dedicated capacity, self-host, or keep data inside your own cloud. For regulated workloads this decides whether a provider is usable at all, so ask early rather than after you have built on it.
+
+**Calibratability.** A confidence score is only useful if it means what it says: when the model reports 0.9, it should be right about 90% of the time. Models are rarely perfectly calibrated on your data out of the box, so the more important question is whether you can *improve* calibration with your own labels, for example by post-training, or whether you are stuck with what the vendor ships. If you plan to threshold, escalate, or route on confidence, this matters more than raw accuracy.
 
 ---
 
@@ -46,14 +37,13 @@ Figures for Jev and the Luna Decisions API are vendor-reported and may have chan
 
 | | **Emissary** | **Jev** (TypeSafe) | **Luna Decisions API** (OpenAI) |
 |---|---|---|---|
-| **Cost** | $0.05 per 1M tokens | Vendor claims 40–400x cheaper than LLM alternatives; price not published | Not published |
+| **Cost** | $0.05 per 1M tokens | $0.042 per 1M input tokens | $0.10 per 1M input tokens |
 | **Latency** | ~56 ms per decision | 70–500 ms reported | ~150 ms vendor-stated (preview) |
 | **Security / deployment** | Managed endpoints, plus [dedicated inference engines](/inference/concept) on GPU capacity for your organization | Hosted API; reported as early access with no published weights or on-prem option | Hosted by OpenAI |
-| **Multi-modality** | Not yet for Decision LMs; Emissary supports CLIP and VLM task types for [post-training](/fine-tuning/concept) | Not stated | Reported to accept image inputs |
 | **Calibratability** | Post-train to improve confidence scores on your own data | Calibrated by design through the vendor's own training (RLCD); no customer-side recalibration documented | Not published |
 | **Customization** | Zero-shot from class descriptions, then [post-train](/fine-tuning/concept) with SFT | Zero-shot via typed questions | Not published |
-| **Output types** | Binary (`judge`), multi-class (`decision`, `routing`), `regression` | Choice, score, and boolean questions, with several questions per call | Constrained choice among candidate answers |
-| **Input** | Text | Text or structured JSON state | Text, reportedly images |
+| **Output types** | Zero-shot: binary, multi-class, and score. Post-trained: also multi-label | Binary and multi-class | Binary and multi-class |
+| **Input** | Text and images | Text and images | Text and images |
 | **Ownership** | You post-train your own checkpoints on Emissary | Vendor-owned model | Vendor-owned model |
 | **Availability** | Generally available | Early access / waitlist reported | Preview reported |
 
@@ -62,8 +52,6 @@ Figures for Jev and the Luna Decisions API are vendor-reported and may have chan
 **Cost and latency.** Both are close to the floor for all three, and well below a frontier model. At these levels, cost is more likely to be decided by your token volume than by the headline rate, and latency by your network path than by the model. Compare using your own input lengths and measure p95.
 
 **Security.** If you handle regulated or sensitive data, check whether the provider offers dedicated capacity or self-hosting. Emissary's [inference engines](/inference/concept) give you GPU-backed serving scoped to your organization, with [autoscaling](/inference/autoscaling) and scheduling. Confirm current options with each vendor, since hosted-only previews often add private deployment later.
-
-**Multi-modality.** If your decisions depend on images (for example, content moderation on uploads), this is the dimension most likely to rule a vendor out. Verify it end to end, not just on a landing page.
 
 **Calibration.** A model that is calibrated out of the box can still be wrong for your data. The more useful property is being able to *improve* calibration on your own labels. On Emissary, post-training on your data adjusts the confidence scores as well as the accuracy. See [Common challenges](./deep-dive#common-challenges) for why this matters.
 
@@ -78,6 +66,6 @@ The most reliable comparison is a small, honest benchmark.
 3. **Measure accuracy and calibration.** Compare accuracy, plus how often high-confidence answers are right. A reliability table by confidence bucket is enough.
 4. **Measure latency under load**, including network time and retries, as median, p95, and p99.
 5. **Price it at your volume**, using your real input lengths.
-6. **Check the fit.** Confirm data handling, deployment options, and modalities against your requirements.
+6. **Check the fit.** Confirm data handling, and deployment options against your requirements.
 
 To set up the Emissary side, start from the [Experiments reference](/experiment).

@@ -1,0 +1,303 @@
+---
+id: build-your-own
+title: 'Build your own'
+description: 'When and why to train your own classifier or regressor on Emissary, and how to format data, train, evaluate, and deploy it.'
+---
+
+# Build your own
+
+Zero-shot Decision LMs are the fastest way to get started, but once your task is well defined and you have labeled data, you can **post-train your own classifier or regressor** on Emissary. This page covers whether you should, and walks through how.
+
+---
+
+## Why?
+
+A model trained on your data usually beats a zero-shot one on the things that matter in production:
+
+- **Calibrated probabilities.** A trained model's scores line up with how often it is actually right, so a threshold of 0.9 means roughly 90% precision. That makes thresholds, escalation rules, and human-in-the-loop routing reliable.
+- **Greater precision and recall.** The model learns your label boundaries, edge cases, and vocabulary instead of inferring them from a class description.
+- **Consistency.** The same input gets the same decision, run after run. There is no prompt drift and no dependence on prompt wording.  Encode your policy, your tone, and your edge cases, including ones that are hard to put in a prompt.
+- **Lower cost and latency.** No longer need to put a description of each class in your input, because the model learns what each class means from your examples. Requests are shorter, so you pay for fewer tokens per request and each one processes faster.
+- **Ownership.** The checkpoint is yours. You can version it, A/B test it, and retrain it as your data grows.
+
+## When?
+
+Build your own once you have **at least 100 labeled samples per class**. For a regressor, aim for a comparable total number of examples that cover the full range of the target.
+
+With fewer examples, start from a zero-shot [Decision LM](./overview), collect real traffic, label it, and come back here. Balanced classes help. Profiling warns if any class has fewer than about 20 examples.
+
+## Validation
+
+Third parties have benchmarked trained LLM classifiers against prompted LLMs and published the results. See the [llm-classifier-bench](https://github.com/lucasbiagettia/llm-classifier-bench) repository for the methodology, datasets, and numbers.
+
+---
+
+## How?
+
+The lifecycle is: **format dataset → train → measure → deploy**. This page uses the API. Every step can also be done in the dashboard, as described in the [post-training quickstart](/fine-tuning/quickstart).
+
+Set these up once:
+
+```python
+import json
+import requests
+
+BASE = 'https://api.withemissary.com'
+HEADERS = {'X-API-Key': YOUR_API_KEY}
+```
+
+### 1. Format your dataset
+
+Datasets are JSONL, one example per line. Each example has a `prompt` (the input text) and a `completion` (the target). For the full schema reference, see [Datasets](/fine-tuning/datasets).
+
+**Multi-class classification.** `completion` maps every label to `1` or `0`, and exactly one label is `1`:
+
+```jsonl
+{"prompt": "My card was charged twice this month.", "completion": {"billing": 1, "bug": 0, "feature_request": 0}}
+{"prompt": "The export button does nothing when I click it.", "completion": {"billing": 0, "bug": 1, "feature_request": 0}}
+{"prompt": "Please add dark mode to the dashboard.", "completion": {"billing": 0, "bug": 0, "feature_request": 1}}
+```
+
+**Binary classification.** Use a single label key:
+
+```jsonl
+{"prompt": "Does this response answer the question? ...", "completion": {"is_helpful": 1}}
+```
+
+**Multi-label classification.** Use the same label map, but more than one label can be `1` on a single example:
+
+```jsonl
+{"prompt": "I was charged twice and the export button is also broken.", "completion": {"billing": 1, "bug": 1, "feature_request": 0}}
+{"prompt": "Please add dark mode, and fix the typo on the pricing page.", "completion": {"billing": 0, "bug": 1, "feature_request": 1}}
+```
+
+:::note
+Multi-label classification is only available in **post-trained** Decision LMs. It is not supported by zero-shot Decision LMs, so you need to train your own model to use it. Multi-label datasets also don't support rebalancing.
+:::
+
+**Regression.** `completion` is a single number:
+
+```jsonl
+{"prompt": "Our site has been down for an hour and customers are calling.", "completion": 0.92}
+```
+
+:::tip
+- Keep the same label keys on every row.
+- Normalize wide-ranging regression targets (for example to 0-1) before training.
+- Hold back a test set now, **before** training, if you plan to run your own evaluation. See [step 3](#3-measure-performance).
+:::
+
+### 2. Kick off training
+
+Create a project, upload the dataset, then start a training job. See [Concepts](/fine-tuning/concept) for what each entity is and [Hyperparameters](/fine-tuning/parameters) for the knobs.
+
+```python
+# Create a project
+project = requests.post(
+    f'{BASE}/v1/projects',
+    headers=HEADERS,
+    json={'name': 'ticket-triage'}
+).json()
+project_id = project['id']
+
+# Upload the training dataset
+with open('train.jsonl', 'rb') as f:
+    train_ds = requests.post(
+        f'{BASE}/v1/projects/{project_id}/datasets',
+        headers=HEADERS,
+        files={'file': ('train.jsonl', f, 'application/json')},
+        data={'name': 'train'}
+    ).json()
+```
+
+Now start the job. **Pick `Qwen3-8B` as the base model if you want to deploy serverless.** Do not pick `Qwen3-8B-Base`, which cannot be served serverless. See [Which base model should I pick?](#faq).
+
+```python
+job = requests.post(
+    f'{BASE}/v1/projects/{project_id}/training-jobs',
+    headers=HEADERS,
+    json={
+        'name': 'ticket-triage-v1',
+        'base_model': 'Qwen3-8B',
+        'task_type': 'classification',   # or 'regression'. Only the training loss differs.
+        'train_dataset_id': train_ds['id'],
+        'train_test_split_ratio': 20     # hold out 20% for evaluation
+    }
+).json()
+```
+
+Training emits a **checkpoint** (typically one per epoch). Watch progress with [Retrieve training job](/api/retrieve-training-job-by-id), and list checkpoints with [List checkpoints](/api/list-checkpoints). Hyperparameters have good defaults, so you can start without setting any.
+
+### 3. Measure performance
+
+You have two options. Use either, or both.
+
+#### Option A: Integrated testing
+
+Give the training job a test set and Emissary evaluates **every checkpoint** against it as training finishes. Either split one off your training data, as above with `train_test_split_ratio`, or upload a dedicated test dataset and pass `test_dataset_id`.
+
+You can also attach test functions to aggregate metrics per checkpoint. For classification we recommend starting with the shared `sample match combined metric shared` function. List what is available with [List test functions](/api/list-test-functions):
+
+```python
+json={
+    ...,
+    'test_dataset_id': test_ds['id'],
+    'test_functions': ['sample match combined metric shared']
+}
+```
+
+Results appear on the job's **Checkpoints** tab, so you can compare checkpoints and pick the best one rather than defaulting to the last. See [Testing and evaluation](/fine-tuning/testing) to write custom metric functions.
+
+#### Option B: Your own hold-out set
+
+If you want full control, for example to compute precision and recall at your production threshold, keep a hold-out set that never touched training and score it against the deployed model:
+
+```python
+from sklearn.metrics import classification_report
+
+y_true, y_pred = [], []
+for row in holdout:   # [{'prompt': ..., 'label': ...}, ...]
+    r = requests.post(
+        f'{BASE}/v1/classification',
+        headers=HEADERS,
+        json={'model': 'ticket-triage-v1', 'input': row['prompt'], 'data_format': 'probs'}
+    ).json()
+    probs = r['data'][0]['probs']
+    y_pred.append(max(probs, key=probs.get))
+    y_true.append(row['label'])
+
+print(classification_report(y_true, y_pred))
+```
+
+To check calibration, bucket predictions by their top probability and compare each bucket's average confidence to its actual accuracy. For regression, compare predictions to targets with MAE, RMSE, or Spearman correlation.
+
+:::note
+A later checkpoint is not always better. Training too long can overfit, so choose the checkpoint with the best held-out score.
+:::
+
+### 4. Deploy
+
+Deploy the best checkpoint, then call it by its deployment name. You can deploy in one of two ways.
+
+:::note Regressors deploy to a classification engine
+Both classification and regression models deploy to a **classification** inference engine. The only difference between them is the **loss function** used during training. Inference is identical, so you create the same kind of engine and call the same endpoint either way.
+:::
+
+:::tip Many models, one engine
+You can deploy multiple classifiers and regressors onto the same engine, as long as they share a model backbone (the same base model). Each one is a lightweight LoRA adapter on the shared base model, and you pick which to call with the `model` field. See [Multiple deployments on one engine](/inference/deployments#multiple-deployments-on-one-engine).
+:::
+
+#### Serverless
+
+Pay per token with no infrastructure to manage. **Serverless requires the `Qwen3-8B` backbone.** Deploy your checkpoint, then call it:
+
+```python
+requests.post(
+    f'{BASE}/v1/projects/{project_id}/deployments',
+    headers=HEADERS,
+    json={
+        'name': 'ticket-triage-v1',
+        'training_job_id': job['id'],
+        'checkpoint': 3     # the best checkpoint from step 3
+    }
+)
+```
+
+#### Dedicated
+
+A GPU engine reserved for your workload. **Any backbone works.** Create an engine for the base model and task type, then deploy your checkpoint onto it:
+
+```python
+engine = requests.post(
+    f'{BASE}/v1/engines',
+    headers=HEADERS,
+    json={
+        'name': 'ticket-triage-engine',
+        'base_model': 'Qwen3-8B',          # any supported backbone
+        'task_type': 'classification',     # also use this for regression models
+        'resource_management_config': {
+            'management_type': 'inactive_timeout',
+            'management_config': {'inactive_duration': 3600}
+        }
+    }
+).json()
+
+requests.post(
+    f'{BASE}/v1/engines/{engine["id"]}/deploy',
+    headers=HEADERS,
+    json={
+        'name': 'ticket-triage-v1',
+        'project_id': project_id,
+        'training_id': job['id'],
+        'checkpoint': 3
+    }
+)
+```
+
+You can also set a schedule, or enable autoscaling. See [Inference concepts](/inference/concept), [Deployments](/inference/deployments), and [Autoscaling](/inference/autoscaling).
+
+#### Call it
+
+Once the deployment shows **Deployed**, call it by name. The request is the same for serverless and dedicated.
+
+```python
+response = requests.post(
+    f'{BASE}/v1/classification',
+    headers=HEADERS,
+    json={
+        'model': 'ticket-triage-v1',
+        'input': 'My card was charged twice this month.',
+        'data_format': 'probs'
+    }
+)
+print(response.json())
+```
+
+Classifiers and regressors are called the same way, through `POST /v1/classification`. See the [API reference](/api/get-classification-from-deployment) for the full request and response shapes.
+
+---
+
+## FAQ
+
+<a id="faq"></a>
+
+### Classification vs. regression: how do I choose?
+
+Choose by the shape of your answer.
+
+- Use **classification** when the answer is a choice among known options, such as route A or B, safe or unsafe, or which of five intents. You get a probability per class.
+- Use **regression** when the answer is a point on a scale, such as urgency from 0 to 1, a quality score, or a sentiment intensity. You get a single number.
+
+Both train and deploy the same way. The only difference is the loss function used in training, so a regressor is served from a classification inference engine just like a classifier.
+
+If your labels are really ordered buckets (low, medium, high) and you have enough examples at a finer grain, regression often uses your data more efficiently. If you only ever act on a few discrete outcomes, classification is simpler to threshold and evaluate.
+
+### How can this be deployed?
+
+- **Serverless on `Qwen3-8B`.** Pay per token with no engine to manage.
+- **Dedicated for everything else.** Any other backbone runs on a dedicated engine.
+
+Use **dedicated** when you have high throughput or a predefined time window, such as scheduled workflows. Use **serverless** when your workload is spiky, low-volume, or unpredictable. Autoscaling is also available on dedicated engines, so [reach out](mailto:support@withemissary.com) if you want it set up for your workload.
+
+### Which base model should I pick?
+
+Choose **Qwen3-8B** (not Qwen3-8B-Base) because it is the one you can deploy serverless.
+
+- Go **bigger** if you need a smarter model, for example when the task is subtle and the smaller model's held-out score is still improving.
+- Go **smaller** if your eval is already maxed out. A simpler task doesn't need a bigger model, and a smaller one is cheaper and faster.
+
+Bigger and smaller backbones run on dedicated engines.
+
+### What does it cost to build your own?
+
+Training a classifier or regressor is cheap, and you can start small.
+
+- **Typical:** for 3-5 classes with about 100 samples each, training usually costs **under $15**.
+- **Larger datasets:** training on up to about 5,000 samples costs **under $50 at most**.
+
+Start with the smaller dataset to confirm your labels and setup work, then scale up to more data if your held-out score is still improving.
+
+### What does it cost to run?
+
+- **Serverless:** **$0.05 per million tokens.**
+- **Dedicated:** **$3/hr for models under 30B parameters.** Contact us for larger models. Bigger models are slower, so the effective cost on a 27B model is roughly **$0.15 per million tokens**, depending on your workload pattern. Steady, high-volume traffic that keeps the GPU busy lands at the low end.
