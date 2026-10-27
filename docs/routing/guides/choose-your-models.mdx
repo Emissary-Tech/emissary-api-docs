@@ -1,0 +1,74 @@
+---
+title: 'Choose your models'
+description: 'How to build your router''s model catalog and pick its default model, with three starting points: open-source only, closed-source only, and a mixed catalog.'
+---
+
+Your router's **catalog** is the set of models it can route across. A wider catalog gives the
+router more strengths to route along, which is where
+[best-of-all-worlds performance](../why-route#best-of-all-worlds-performance) comes from.
+A narrower one is simpler to reason about and needs fewer provider keys.
+
+Pick models in the **Models** section of the New router form. Model names are fixed because they
+double as the router's classifier labels, so the only required choice per model is the provider.
+Pricing and limits are prefilled, and you can [adjust them](./pricing).
+
+## Power packages
+
+Three starting points. Toggle on the models in the form, using the names below. Prices are the
+prefilled list prices per million input / output tokens.
+
+### Open-source only
+
+For teams that want open-weights models only.
+
+| Model | Price per Mtok (in / out) |
+| --- | --- |
+| `kimi-k3` | $3 / $15 |
+| `glm-5.3` | $1.4 / $4.4 |
+| `deepseek-v4.1-flash` | $0.15 / $0.6 |
+
+### Closed-source only
+
+For teams that want proprietary frontier models only.
+
+| Model | Price per Mtok (in / out) |
+| --- | --- |
+| `claude-opus-5` | $5 / $25 |
+| `claude-sonnet-5.5` | $2 / $10 |
+| `gpt-5.6-luna` | $0.2 / $1.2 |
+
+### Open and closed
+
+The widest catalog, for the best mix of capability and cost.
+
+| Model | Price per Mtok (in / out) |
+| --- | --- |
+| `claude-opus-5.5` | $4 / $20 |
+| `claude-sonnet-5.5` | $2 / $10 |
+| `gpt-6.1-sol` | $2 / $10 |
+| `glm-5.3` | $1.4 / $4.4 |
+| `gpt-6-luna` | $0.1 / $0.5 |
+| `deepseek-v4.1-flash` | $0.15 / $0.6 |
+
+You'll need a provider key for each provider the selected models use. Model availability and prices
+change, so check the form for the current list.
+
+## Choose a default model
+
+The **default model** is the anchor of the routing policy. It's required, and it serves any request
+that no model is confident about, recorded as `default_no_confident`. Pricier confident models can
+also take a request from it by escalation. See
+[how a routing decision is made](../how-routing-works/decision#4-fall-back-or-escalate-when-needed).
+
+That makes it your safety net, so pick a model you'd trust with *any* request in your workload, not
+the cheapest one. In the packages above, that usually means one of the larger models.
+
+## Tips
+
+- **Start with a package, then adjust.** You can change the catalog later with **Edit
+  configuration**.
+- **Mix price points.** A catalog of only expensive models leaves little room to save, and one of
+  only cheap models leaves the router nothing to escalate to.
+- **Cover your modalities.** If you send images, make sure the catalog has models that support
+  vision. The Configuration tab's **Vision** column shows which do.
+- **Add models as they ship.** See [migrate to new models](./migrate-to-new-models).

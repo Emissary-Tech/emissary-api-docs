@@ -1,0 +1,43 @@
+---
+title: 'Emissary vs Router.com'
+description: 'How Emissary compares with Ramp Router (router.com): capability-aware, cache-aware routing vs. a cost-and-quality-bar router with spend controls.'
+---
+
+[Router.com](https://router.com) is Ramp's LLM routing layer. It gives you one OpenAI-compatible
+endpoint across providers, sends each request to the cheapest approved model that meets a quality
+bar, falls back to another provider on failure, and ties inference spend into Ramp's financial
+reporting.
+
+*Based on public information as of October 2026. Check each vendor's site for current details.*
+
+## At a glance
+
+| | **Emissary** | **Router.com** |
+| --- | --- | --- |
+| **Core idea** | Predict whether each model can complete the task, then rank the capable models by expected cost | Pick the cheapest approved model that meets a quality bar |
+| **How the decision is made** | Router post-trained on rollouts of the models in your pool, with one confidence estimate per model | Quality bar plus an approved-model list |
+| **Endpoint** | One gateway URL, compatible with the OpenAI and Anthropic APIs | One OpenAI-compatible endpoint |
+| **Cache awareness** | Cache state is part of the ranking | Not described publicly |
+| **Output-length awareness** | Expected output tokens per model are priced in | Not described publicly |
+| **Effort routing** | Routes across models and effort | Not described publicly |
+| **Custom pricing** | Yes, used in ranking | Not described publicly |
+| **Strength** | Routing quality for agentic and multi-step workloads, and insight into your traffic | Spend controls and finance reporting built in |
+
+## When Router.com is a good fit
+
+- You want a single endpoint with an approved-model list, with spend feeding directly into finance
+  tooling.
+- Your main goal is cost control and provider failover, rather than per-request capability
+  prediction.
+
+## When Emissary is a better fit
+
+- Your requests vary a lot in difficulty, and you need the routing decision grounded in how each
+  model actually performs, not a static quality bar.
+- You run long conversations or agent loops where **cache state**, **effort**, and **output length**
+  change which option is actually cheapest.
+- You want routing trained on your own task distribution, priced with your own contract rates, and
+  an auditable record of why each request went where it did.
+
+See [how a routing decision is made](../how-routing-works/decision), and the
+[selection checklist](./selection-checklist) to evaluate any router against your needs.

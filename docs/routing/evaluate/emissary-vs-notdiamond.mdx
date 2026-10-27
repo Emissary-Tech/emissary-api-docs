@@ -1,0 +1,57 @@
+---
+title: 'Emissary vs Not Diamond'
+description: 'How Emissary compares with Not Diamond: both are learned routers; they differ in model awareness, statefulness, how cost is ranked, and who executes the call.'
+---
+
+[Not Diamond](https://docs.notdiamond.ai) is a model router. For a given input and a set of
+candidate models, it returns a recommendation of which model to use, and your application then
+executes the request through its own gateway. Custom routers can be trained on your own evaluation
+data.
+
+Of the products on this list, Not Diamond is the closest to Emissary in category: both are learned
+routers rather than rule-based gateways. The differences are in what the router knows when it
+decides, and in what happens after.
+
+*Based on public information as of October 2026. Check each vendor's site for current details.*
+
+## At a glance
+
+| | **Emissary** | **Not Diamond** |
+| --- | --- | --- |
+| **Category** | Learned router, with a gateway | Learned router |
+| **Training signal** | Post-trained on thousands of rollouts of the models in your pool | Evaluation data, for custom routers |
+| **Decision** | Estimates whether each model can complete the task; ranks the confident ones by cost | Predicts which model should answer |
+| **State** | Stateful: cache state is part of the ranking | Per-request recommendation |
+| **Intelligence density** | Expected output length per model is priced in | Not described publicly |
+| **Effort routing** | Routes across models and effort | Not described publicly |
+| **Custom pricing** | Used in ranking | Not described publicly |
+| **Execution** | The gateway calls the chosen model, on your provider keys | Returns a recommendation; you call the model |
+
+## Where the approaches differ
+
+**Model awareness.** A router trained on labeled queries learns "what does this query look like?" A
+router trained on rollouts of each model learns "will *this model* succeed here?" Emissary uses one
+confidence estimate per model, trained on trajectories. See
+[the design space](../how-routing-works/design-space#model-aware-one-head-per-model).
+
+**Cost as a second step.** Emissary separates capability from cost. Models above your threshold
+form the confident pool, and only then are they ranked on price, expected output length, and cache
+state. That keeps cost from overriding quality.
+
+**Agentic workloads.** For multi-step agents, the cheapest option at step *n* depends on what's
+already cached from earlier steps. A stateful router can account for that, and a stateless one
+can't.
+
+**Execution.** Not Diamond hands back a recommendation, and you wire it into a gateway you already
+run. An Emissary router is also the gateway: call it, and the routed model's answer comes back.
+
+## When Not Diamond is a good fit
+
+- You want a recommendation endpoint that fits into a gateway you already run.
+- Your routing is per-request, with little conversational or cache state to take advantage of.
+
+## When Emissary is a better fit
+
+- You run long conversations or agent loops where cache state matters.
+- You need output length, effort, and your own contract pricing in the cost decision.
+- You'd rather have one endpoint that both decides and executes.

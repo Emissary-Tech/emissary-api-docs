@@ -1,0 +1,134 @@
+---
+title: 'FAQ'
+description: 'Short answers to common questions about model routing, with links to the full explanations.'
+---
+
+## Concepts
+
+<details>
+<summary>What's the difference between a router and a gateway?</summary>
+
+A gateway handles *how* requests reach models, and a router decides *which model* serves each one.
+Emissary is both: one gateway URL, with a router behind it. See
+[routers and gateways](./how-routing-works/routers-and-gateways).
+
+</details>
+
+<details>
+<summary>What's the difference between complexity-based and performance-based routing?</summary>
+
+Complexity-based routing guesses how hard a task is from its input and picks a cheap or expensive
+model, and that's hard to do reliably. Performance-based routing, which is what Emissary does, asks
+which models can actually do the task, based on how they've performed. See
+[the router design space](./how-routing-works/design-space#what-the-router-optimizes-for).
+
+</details>
+
+<details>
+<summary>Does the router choose effort, or only the model?</summary>
+
+Both. Changing a model's effort keeps you on the same model, so the prompt cache is preserved,
+while switching models loses it. See
+[what the router sees](./how-routing-works/what-the-router-sees#effort).
+
+</details>
+
+<details>
+<summary>Can the router handle images?</summary>
+
+The router knows which models accept images and won't send an image request to a text-only model.
+It doesn't interpret the image content itself. See
+[what the router sees](./how-routing-works/what-the-router-sees#modality).
+
+</details>
+
+<details>
+<summary>What's the relationship to the older router quickstart?</summary>
+
+The earlier [router quickstart](../quickstart/router) describes the stateless router. The routers
+documented in this section are stateful, model-aware, and rank on cache state, output length and
+effort.
+
+</details>
+
+## Quality, cost and latency
+
+<details>
+<summary>Does routing reduce quality?</summary>
+
+It shouldn't, and it can improve it. Models are strong at different things, so routing each request
+to the model that handles it best can outperform any single model on your workload as a whole. The
+router first keeps models it's confident can do the task, and only then ranks them by cost. See
+[how a routing decision is made](./how-routing-works/decision).
+
+</details>
+
+<details>
+<summary>How much will I save?</summary>
+
+It depends on your traffic. A workload where most requests need a frontier model saves less than
+one with many routine requests. Cache and effort decisions add savings for agentic workloads.
+Measure on a sample of your own traffic. See [run a trial](./evaluate/run-a-trial).
+
+</details>
+
+<details>
+<summary>Does the router add latency?</summary>
+
+A routing decision takes some time, so a router adds a small amount to each request. Requests that
+go to a faster model finish sooner. Measure end-to-end latency on your workload rather than the
+routing step alone.
+
+</details>
+
+## Using Emissary
+
+<details>
+<summary>Which models can I route between?</summary>
+
+The models in your router's catalog, which you choose when you create it. See
+[choose your models](./guides/choose-your-models).
+
+</details>
+
+<details>
+<summary>Can I create a router through the API?</summary>
+
+Not yet. Routers are created and configured in the dashboard. Once created, you call a router
+through the gateway API. See [get started](./get-started).
+
+</details>
+
+<details>
+<summary>How do I know why a request went to a particular model?</summary>
+
+Click into the request in Activity. You'll see each model's confidence and the routing reason. See
+[monitor and debug](./guides/monitor-and-debug).
+
+</details>
+
+<details>
+<summary>What happens when a new model is released?</summary>
+
+The router already scores models you haven't enabled, so you can see whether it could take a
+meaningful share of your traffic. Enabling it needs no application changes. See
+[migrate to new models](./guides/migrate-to-new-models).
+
+</details>
+
+## Choosing
+
+<details>
+<summary>When shouldn't I use a router?</summary>
+
+When you can select models offline, for example a workflow with fixed steps. See
+[when to route, and when not to](./why-route#when-to-route-and-when-not-to).
+
+</details>
+
+<details>
+<summary>How do I choose a router?</summary>
+
+Use the [router selection checklist](./evaluate/selection-checklist).
+
+</details>

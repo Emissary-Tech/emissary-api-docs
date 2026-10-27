@@ -1,0 +1,49 @@
+---
+title: 'Emissary vs OpenRouter'
+description: 'How Emissary compares with OpenRouter: a trained, capability-aware router and gateway vs. a unified marketplace API with provider routing and an auto-router.'
+---
+
+[OpenRouter](https://openrouter.ai) is a unified API over many models and providers. Its routing
+features are mostly **provider routing**: for a model you choose, it load balances across the
+providers serving it, with options to sort by price, throughput, or latency, to allow or ignore
+specific providers, and to fall back to another. It also offers an auto-router model
+(`openrouter/auto`) that picks among a set of models for a prompt, powered by Not Diamond.
+
+OpenRouter is best thought of as a **marketplace and gateway**, with a routing option on top.
+
+*Based on public information as of October 2026. Check each vendor's site for current details.*
+
+## At a glance
+
+| | **Emissary** | **OpenRouter** |
+| --- | --- | --- |
+| **Category** | Router and gateway | Unified API / marketplace with provider routing |
+| **Main routing axis** | *Which model* can do this task, at what expected cost | *Which provider* serves a model you picked, plus an auto-router option |
+| **Per-request model choice** | A router trained on rollouts of your pool | Auto-router option; otherwise you choose the model |
+| **Cache, output-length and effort awareness** | Part of the ranking | Not part of provider routing by default |
+| **Billing** | Your own provider keys | Credits, with a fee on credit purchases |
+| **Strength** | Routing decisions grounded in model capability and cost | Breadth of models behind a single key and bill |
+
+## Two meanings of "routing"
+
+**Provider routing** answers: "I want model X. Which of the providers hosting X should serve it?"
+That's about price, throughput, latency, and availability for a fixed model.
+
+**Model routing** answers: "Which model should handle this request at all?" That's a question
+about capability and cost across *different* models, and it's what Emissary does.
+
+They can work together. OpenRouter is one of the providers you can use inside an Emissary router:
+add OpenRouter's key, and models served through it can be part of your catalog.
+
+## When OpenRouter is a good fit
+
+- You want access to a wide catalog of models through one API key and one bill.
+- Your main need is availability and price across providers for models you've already chosen.
+
+## When Emissary is a better fit
+
+- You want the model itself chosen per request, with quality protected by a confidence threshold.
+- Your workloads are agentic or conversational, where cache state, effort, and output length drive
+  cost.
+- You want to use your own provider keys and contract pricing, and to see why each request was
+  routed as it was.

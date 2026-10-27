@@ -1,0 +1,46 @@
+---
+title: 'Migrate to new models'
+description: 'How to adopt new models without guesswork: the router scores models you haven''t enabled, so you can see when one could take a meaningful share of your traffic.'
+---
+
+New models ship constantly, and the usual way to adopt one is slow and uncertain: swap it in
+somewhere, hand-test a few prompts, and hope. Routing gives you a better way.
+
+## The router scores models you haven't enabled
+
+Emissary's router predicts confidence across **all** models, including ones you haven't added to
+your catalog. Over time that tells you something you'd otherwise have to find out by experiment:
+when there's a model you aren't using that the router believes could handle a large share of your
+requests.
+
+So migration isn't a leap. You see the evidence first, then decide.
+
+## A migration workflow
+
+1. **Notice the opportunity.** Open a request in Activity and look at **Classifier probabilities**.
+   It lists every model the router scores, including ones outside your catalog. Look for a model
+   you haven't enabled that is confident for a meaningful share of your traffic. See
+   [what emerges from routing](../insights).
+2. **Enable it.** Open the router's **Configuration** tab, click **Edit configuration**, add the
+   model, and add a key for its provider if you don't have one yet.
+3. **Check pricing.** Confirm the model's [pricing](./pricing) reflects your rates, since the router
+   ranks on it.
+4. **Watch what changes.** The router starts sending the new model the requests it's confident
+   about. Check [Activity](./monitor-and-debug) for where it's serving, and for any change in
+   routing reasons.
+5. **Compare.** Check cost, latency, and quality against before. See
+   [run a trial on your traffic](../evaluate/run-a-trial).
+
+You don't need to change application code. Your requests still go to the same gateway URL with the
+same router name, and the router decides what serves them.
+
+## Retiring a model
+
+The same applies in reverse. If a model is deprecated or you want to drop a provider, remove it
+from the catalog and the router stops sending it traffic. Nothing in your application refers to it.
+
+## Why this works
+
+Every request is already being classified for every model, so the router accumulates evidence on
+how each one would have done on *your* traffic. A new model benchmark on someone else's tasks says
+little about yours. Confidence on your own requests does.

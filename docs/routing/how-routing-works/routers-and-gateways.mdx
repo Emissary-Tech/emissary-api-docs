@@ -1,0 +1,52 @@
+---
+title: 'Routers and gateways'
+description: 'The difference between a model router and a gateway, and why Emissary is both: one endpoint for your calls, and a router that decides which model serves each one.'
+---
+
+## Two different jobs
+
+A **gateway** is infrastructure for *how* requests reach models. It gives you one interface over
+many providers and typically handles credentials, retries, timeouts, rate limits, load balancing,
+logging, and failover. It sends each request to the model *you*, or your rules, specified.
+
+A **router** decides *which model* should handle each request. It makes a per-request decision
+based on what the request needs, and optimizes for cost, latency, or quality.
+
+| | Gateway | Router |
+| --- | --- | --- |
+| **Question it answers** | How do I reach and manage models? | Which model should answer this request? |
+| **Typical features** | Keys, retries, fallbacks, load balancing, observability | Capability prediction, cost ranking |
+| **Decision basis** | Config and rules | The request itself, and for stateful routers, the current state |
+
+Many products do one of these. A pure gateway has no opinion about which model is right, and a
+pure router returns a recommendation and leaves execution to you.
+
+## Emissary is both
+
+An Emissary router ships with a gateway:
+
+- **One gateway URL** for all your agents and applications.
+- **Wire-compatible with the OpenAI and Anthropic APIs**, so you use the official SDKs, any
+  compatible library, or plain HTTP.
+- **Your own provider keys.** Calls to model providers use keys you've stored, encrypted, in the
+  router's configuration.
+- **A router behind the URL.** Each router is a model catalog and a routing policy of its own, and
+  you address it by sending its name as the request's `model`.
+
+So the same call that reaches your models also makes the routing decision. There's no separate
+service to call for a recommendation and then execute yourself.
+
+```
+your app ──▶ one gateway URL ──▶ router "production-agents" ──▶ chosen model ──▶ provider
+              model: "production-agents"   (decide)                (call, on your keys)
+```
+
+## Where this matters in practice
+
+- **Switching from a single model:** change the base URL and the `model` string. See
+  [connect an app or agent](../guides/connect).
+- **Comparing products:** some gateways have routing features, but those are usually rules and
+  fallbacks rather than per-request capability prediction. See the
+  [comparisons](../evaluate/emissary-vs-litellm).
+- **Routing across providers you already use:** a router's catalog can span providers, for example
+  Anthropic, OpenAI, and OpenRouter, using a key for each.

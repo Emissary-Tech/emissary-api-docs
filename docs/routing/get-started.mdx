@@ -1,0 +1,84 @@
+---
+title: 'Get started'
+description: 'Create your first Emissary router in the dashboard, send a request to the gateway, and see how it was routed.'
+---
+
+This takes about ten minutes. You'll create a router, send it a request, and check how that
+request was routed. Anything that needs a decision links to a guide, so you can follow the short
+path now and come back to tune later.
+
+:::note
+Routers are created and configured in the Emissary dashboard. For now, the initial setup can't be
+done through the API. Once a router exists, you call it through the gateway API.
+:::
+
+## Before you begin
+
+- An Emissary account. Sign in at [withemissary.com](https://www.withemissary.com).
+- An API key for each provider whose models you want in the router, for example Anthropic,
+  OpenAI, or OpenRouter. Keys are stored encrypted and never returned to the browser.
+- An **Emissary platform API key**, found under **Settings → Credentials**. You'll use it to call
+  the gateway.
+
+## 1. Create a router
+
+In the dashboard, open **Router** and click **New router**.
+
+1. **Name it.** Clients select a router by sending its name as the request's `model`, so it must
+   be unique across your routers, for example `production-agents`.
+2. **Choose data retention.** *Zero data retention* is on by default: Emissary does not retain
+   input, output, or session replay data from gateway traffic, only routing decisions, token
+   counts, and cost telemetry.
+3. **Pick the models to route across.** Toggle on each model you want and choose its provider.
+   Not sure which? Start from a [power package](./guides/choose-your-models).
+4. **Add provider credentials.** A key field appears for each provider your selected models use.
+5. **Set the routing policy.** Choose a **default model** and leave the **confidence threshold**
+   at its default of 0.80 for now. See [choose your models](./guides/choose-your-models) and
+   [set the confidence threshold](./guides/confidence-threshold).
+6. Click **Create configuration**.
+
+![New router form: router name, zero data retention toggle, and model list](/img/routing/new-router-general-models.png)
+
+![New router form: provider credentials, default model, confidence threshold, and router model](/img/routing/new-router-policy.png)
+
+## 2. Send a request
+
+Send your router's name as the `model`, with your Emissary platform API key. The gateway is
+compatible with the OpenAI and Anthropic APIs, so you can use either SDK.
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.withemissary.com/gateway/v1",
+    api_key="YOUR_EMISSARY_API_KEY",
+)
+
+response = client.chat.completions.create(
+    model="production-agents",  # your router's name
+    messages=[{"role": "user", "content": "Hello!"}],
+)
+print(response.choices[0].message.content)
+```
+
+For the Anthropic SDK, curl, Go, Node.js, and coding agents such as Claude Code, see
+[connect an app or agent](./guides/connect).
+
+## 3. See how it was routed
+
+Open your router in the dashboard and go to **Activity**. Click into a request to see each model's
+confidence and the reason the router chose the model it did. See
+[monitor and debug](./guides/monitor-and-debug).
+
+The router's **Configuration** tab shows what you set up, including each target model's pricing and
+which provider keys are stored.
+
+![Router configuration tab showing default model, confidence, target models with pricing, and stored provider credentials](/img/routing/router-configuration.png)
+
+## Next steps
+
+- [How a routing decision is made](./how-routing-works/decision) explains what you just saw in
+  Activity.
+- [Run a trial on your traffic](./evaluate/run-a-trial) before moving production traffic.
+- [When to route, and when not to](./why-route#when-to-route-and-when-not-to) if you're not sure routing fits a
+  given part of your system.

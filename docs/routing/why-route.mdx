@@ -1,0 +1,130 @@
+---
+title: 'Why route'
+description: 'Why route across models instead of picking one: best-of-all-worlds performance, lower cost and latency, seamless migration, and insight into your workload, plus when not to route.'
+---
+
+Most teams pick one model and send everything to it. That choice is a compromise in both
+directions: easy requests overpay for intelligence they don't need, and hard requests are limited
+by whatever that one model happens to be bad at.
+
+**Model routing** replaces that single choice with a decision made per request. A **model router**
+sits in front of a pool of models, looks at each request, and sends it to the model best suited to
+handle it.
+
+```
+            ┌──────────────────────────┐
+request ───▶│       model router       │
+            └─────────────┬────────────┘
+                          │ one model per request
+        ┌─────────────────┼─────────────────┐
+        ▼                 ▼                 ▼
+  small / fast       mid-size model    frontier model
+     model
+```
+
+## What you get
+
+### Best-of-all-worlds performance
+
+Model strengths are uneven. Each model is better at some kinds of tasks and worse at others, and
+that doesn't follow a neat easy-to-hard scale. A router that understands those strengths can send
+each request to the model that does it best, so the combined result can beat *any single frontier
+model* on its own. A good router only sends a request to a model that is likely to complete it, so
+the savings below never come from accepting worse answers.
+
+### Lower cost
+
+Requests that a less expensive model can handle go to a less expensive model. The savings come from
+not over-provisioning intelligence on easy requests. For long conversations and agent loops, they
+also come from cache-aware and effort-aware decisions, covered in
+[what the router sees](./how-routing-works/what-the-router-sees).
+
+### Lower latency
+
+Smaller models respond sooner, so routing easy requests to them cuts latency for those requests.
+For agents, it cuts latency for every step that doesn't need a large model.
+
+### Seamless migration
+
+New models ship constantly. With a router, adding one to the pool, or retiring an old one, doesn't
+mean rewriting application code or re-testing every prompt by hand. The router also scores models
+you haven't enabled, so you can see when a new model could take a meaningful share of your traffic.
+See [migrate to new models](./guides/migrate-to-new-models).
+
+### Insight into your own workload
+
+Every routing decision records how confident each model was and why the request went where it did.
+That's a view of your workload that a single-model setup can't give you: which requests are easy,
+which ones nothing can handle, and which models you're missing.
+See [what emerges from routing](./insights).
+
+### A path to your own models
+
+Every routed request leaves a trajectory. Over time, routing lets you serve the open models you rely
+on from dedicated capacity tuned to your traffic, and post-train models of your own on that
+traffic. The router sends work to them when they're the better call, so routing feeds your training
+data and training makes routing cheaper. See
+[from routing to your own models](./insights#from-routing-to-your-own-models).
+
+## What it depends on
+
+The value depends on the quality of the routing decision. A router that is wrong too often either
+sends hard requests to weak models, and quality drops, or plays it safe and sends everything to the
+largest model, and there are no savings. How Emissary's router avoids both is covered in
+[how a routing decision is made](./how-routing-works/decision).
+
+Routing isn't right for every workload. The last section of this page covers when not to use it.
+
+## When to route, and when not to
+
+Routing is **online model selection**: the model is chosen at request time, per request. The
+alternative is **offline model selection**: you choose the model ahead of time and pin it. The rule
+of thumb is that **if you can select the model offline, do.** Routing exists for the cases where you
+can't know in advance what a request will need.
+
+### Why offline selection wins when it's possible
+
+A router makes its decision at request time, under uncertainty, and it has to handle whatever
+arrives. If you already know what each step of your system does, you can do that work ahead of
+time: evaluate candidate models on that step, pick one, and pin it. There's no runtime decision to
+get wrong, and no routing step to pay for.
+
+You can select offline when your steps are **predefined**. That's a **workflow** rather than an
+**agent**: the sequence of steps is fixed, and each step has little flexibility in what it receives.
+For a step like that, you don't need a broad open front door. You need the one model that does that
+one job well.
+
+### Workflow or agent?
+
+| Your system | What the input looks like | Model selection |
+| --- | --- | --- |
+| **Workflow** with fixed steps, such as extract fields, classify, summarize | Narrow and predictable at each step | **Offline**: pick a model per step and pin it |
+| **Agent or open-ended product** | Anything a user or a loop might send | **Online**: route |
+| **Mixed**: a workflow with a few open-ended steps | Predictable in most places, open in a few | Pin the predictable steps, route the open ones |
+
+### Where routing wins
+
+Online selection is the right tool when:
+
+- **Inputs are open-ended.** Users, agents, and tool outputs can send anything, and you can't
+  classify the traffic ahead of time.
+- **Difficulty varies a lot** within the same entry point, so some requests need a frontier model
+  and many don't.
+- **Models change often**, and you don't want to re-run model selection every time one ships.
+- **You want to learn what your traffic looks like.** Routing decisions show you which requests
+  are easy, which are hard, and which none of your models handle with confidence. See
+  [what emerges from routing](./insights).
+
+### Quick check
+
+Before you set up a router, ask:
+
+1. Can I list every kind of request this system will receive? If yes, select offline.
+2. Is each step's input narrow and predictable? If yes, pin a model for that step.
+3. Does anything open-ended sit in front of the system, such as chat, an agent, or search over
+   arbitrary data? If yes, route that part.
+
+## Where to go next
+
+- [Get started](./get-started): create a router and send your first request.
+- [How a routing decision is made](./how-routing-works/decision): what happens to each request.
