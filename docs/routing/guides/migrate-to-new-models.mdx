@@ -17,22 +17,32 @@ So migration isn't a leap. You see the evidence first, then decide.
 
 ## A migration workflow
 
+The safest way to adopt a new model is as an A/B experiment. Create a second router with the same
+setup plus the new model, send it a share of your traffic, and compare it with your current router
+before you commit.
+
 1. **Notice the opportunity.** Open a request in Activity and look at **Classifier probabilities**.
    It lists every model the router scores, including ones outside your catalog. Look for a model
    you haven't enabled that is confident for a meaningful share of your traffic. See
    [what emerges from routing](../insights).
-2. **Enable it.** Open the router's **Configuration** tab, click **Edit configuration**, add the
-   model, and add a key for its provider if you don't have one yet.
-3. **Check pricing.** Confirm the model's [pricing](./pricing) reflects your rates, since the router
-   ranks on it.
-4. **Watch what changes.** The router starts sending the new model the requests it's confident
-   about. Check [Activity](./monitor-and-debug) for where it's serving, and for any change in
-   routing reasons.
-5. **Compare.** Check cost, latency, and quality against before. See
-   [run a trial on your traffic](../evaluate/run-a-trial).
+2. **Create a second router.** Create a new router with the **same models, default model, and
+   confidence threshold** as your current one, **plus the new model**. Add a key for the new
+   model's provider if you don't have one yet. Keeping everything else identical means any
+   difference you see comes from the new model. See [get started](../get-started).
+3. **Check pricing.** Confirm the new model's [pricing](./pricing) reflects your rates, since the
+   router ranks on it.
+4. **Send it some traffic.** Use the second router's name as the `model` for a portion of your
+   requests, for example a small percentage, and keep the rest on your current router. Your
+   application changes only in which router name it sends.
+5. **Compare.** Put the two routers side by side in [Activity and Metrics](./monitor-and-debug):
+   spend, savings against baseline, latency, model mix, and routing reasons. Then check quality
+   against your own measures. See [run a trial on your traffic](../evaluate/run-a-trial).
+6. **Promote it.** If the new router does better, move all your traffic to it. Or add the new model
+   to your original router with **Edit configuration**, so your application keeps using the same
+   router name.
 
-You don't need to change application code. Your requests still go to the same gateway URL with the
-same router name, and the router decides what serves them.
+Once the new model is in your main router, your application needs no changes. Requests still go to
+the same gateway URL with the same router name, and the router decides what serves them.
 
 ## Retiring a model
 

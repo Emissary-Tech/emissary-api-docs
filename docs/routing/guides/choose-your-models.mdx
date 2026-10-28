@@ -5,7 +5,7 @@ description: 'How to build your router''s model catalog and pick its default mod
 
 Your router's **catalog** is the set of models it can route across. A wider catalog gives the
 router more strengths to route along, which is where
-[best-of-all-worlds performance](../why-route#best-of-all-worlds-performance) comes from.
+[best-of-all-worlds performance](../why-route#what-you-get) comes from.
 A narrower one is simpler to reason about and needs fewer provider keys.
 
 Pick models in the **Models** section of the New router form. Model names are fixed because they
@@ -50,8 +50,11 @@ The widest catalog, for the best mix of capability and cost.
 | `gpt-6-luna` | $0.1 / $0.5 |
 | `deepseek-v4.1-flash` | $0.15 / $0.6 |
 
-You'll need a provider key for each provider the selected models use. Model availability and prices
-change, so check the form for the current list.
+You'll need a provider key for each provider the selected models use. For open-source models,
+Emissary currently invokes them through OpenRouter. Select OpenRouter as the provider, and if you'd
+rather use a different gateway, change the base URL to point to any other one.
+
+Model availability and prices change, so check the form for the current list.
 
 ## Choose a default model
 

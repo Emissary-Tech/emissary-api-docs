@@ -34,10 +34,10 @@ const sidebars: SidebarsConfig = {
               type: 'category',
               label: 'How routing works',
               items: [
-                  'routing/how-routing-works/routers-and-gateways',
                   'routing/how-routing-works/decision',
                   'routing/how-routing-works/what-the-router-sees',
                   'routing/how-routing-works/design-space',
+                  'routing/how-routing-works/routers-and-gateways',
               ],
             },
             {

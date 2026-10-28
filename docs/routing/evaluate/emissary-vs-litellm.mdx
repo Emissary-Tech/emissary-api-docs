@@ -1,6 +1,6 @@
 ---
 title: 'Emissary vs LiteLLM'
-description: 'How Emissary compares with LiteLLM: a router with a gateway, trained to choose the model per request, vs. an open-source gateway with config-driven load balancing and fallbacks.'
+description: 'How Emissary compares with LiteLLM: automated, trained model routing with tracked savings vs. a self-hosted gateway with near-complete model coverage and self-managed routing.'
 ---
 
 [LiteLLM](https://docs.litellm.ai) is an open-source SDK and proxy server that exposes many model
@@ -8,10 +8,11 @@ providers behind one OpenAI-compatible interface. Its routing features are about
 traffic management**: load balancing across deployments of the same model, retries, cooldowns, and
 fallbacks to another model group when a call fails.
 
-Emissary is also a gateway: one URL, compatible with the OpenAI and Anthropic APIs, calling
+Emissary can also be your gateway: one URL, compatible with the OpenAI and Anthropic APIs, calling
 providers with your own keys. The difference is what decides *which model* serves a request. With
-LiteLLM, that's rules and configuration you write. With Emissary, it's a router trained to predict
-which models can do the task. See [routers and gateways](../how-routing-works/routers-and-gateways).
+LiteLLM, you manage that yourself, with rules and configuration you write. With Emissary, it's
+automated, by a router trained to predict which models can do the task. See
+[routers and gateways](../how-routing-works/routers-and-gateways).
 
 *Based on public information as of October 2026. Check each vendor's site for current details.*
 
@@ -19,25 +20,27 @@ which models can do the task. See [routers and gateways](../how-routing-works/ro
 
 | | **Emissary** | **LiteLLM** |
 | --- | --- | --- |
-| **Category** | Router and gateway | Gateway / proxy, with a routing layer |
-| **What decides the model** | A router trained on rollouts that estimates, per model, whether it can complete the task | Rules and config you write: model groups, weights, fallbacks |
-| **Per-request intelligence** | Predicts task capability from the request | Doesn't predict task difficulty on its own |
-| **Cache, output-length and effort awareness** | Part of the ranking | Not part of its default routing |
-| **Observability of decisions** | Per-request confidence and routing reason | Logging and cost tracking |
-| **Failover, retries, load balancing** | Not covered in these docs | Core features |
+| **Category** | Router, with a gateway | Gateway / proxy, with a routing layer |
+| **Model routing** | Automated: a router trained on rollouts predicts, per model, whether it can complete the task | Self-managed: rules and config you write, such as model groups, weights, and fallbacks |
+| **Model coverage** | The models in Emissary's catalog | Almost all models |
+| **Savings** | Tracked per request and in aggregate against a baseline | Cost tracking, with routing savings up to your rules |
+| **Model migration** | The router scores models you haven't enabled, and you can A/B a new model | You update your config and rules |
 | **Hosting** | Managed gateway at `api.withemissary.com` | Open source, self-hosted |
 
 ## When LiteLLM is a good fit
 
-- You need a self-hosted gateway you control, with keys, retries, timeouts, and fallbacks under
-  your own infrastructure.
-- Your routing is simple enough to express as rules, or you only need reliability across
+- You need the broadest **model coverage** in a gateway. LiteLLM supports almost every model.
+- You want to **self-host** the gateway, with keys, retries, timeouts, and fallbacks under your own
+  infrastructure.
+- Your routing is simple enough to manage yourself as rules, or you only need reliability across
   deployments of the same model.
 
 ## When Emissary is a better fit
 
-- You want the **choice of model** made per request from evidence about what each model can do,
-  rather than hand-written rules.
-- You want savings from sending easy requests to cheaper models, without maintaining routing rules
-  as models and prices change.
-- You want to see, per request, how confident each model was and why the router chose what it did.
+- You want **automated model routing** rather than self-managed routing: the choice of model made
+  per request from evidence about what each model can do, with no rules to maintain as models and
+  prices change.
+- You want **actual, tracked, meaningful savings**: Activity and Metrics show spend against a
+  baseline, and each request records why it went where it did.
+- You want **easy model migrations**: the router tells you which new models fit your traffic, and
+  you can test one on a second router before you commit.

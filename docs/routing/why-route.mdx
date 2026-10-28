@@ -3,9 +3,11 @@ title: 'Why route'
 description: 'Why route across models instead of picking one: best-of-all-worlds performance, lower cost and latency, seamless migration, and insight into your workload, plus when not to route.'
 ---
 
-Most teams pick one model and send everything to it. That choice is a compromise in both
-directions: easy requests overpay for intelligence they don't need, and hard requests are limited
-by whatever that one model happens to be bad at.
+Most teams pick one model and send everything to it. Because they have to pick just one, they
+**peak provision**: they choose the model that can handle *any* request, and use it for *every*
+request, even though they know there is no such thing as one best model. That choice is a
+compromise in both directions: easy requests overpay for intelligence they don't need, and hard
+requests are limited by whatever that one model happens to be bad at.
 
 **Model routing** replaces that single choice with a decision made per request. A **model router**
 sits in front of a pool of models, looks at each request, and sends it to the model best suited to
@@ -24,47 +26,55 @@ request ───▶│       model router       │
 
 ## What you get
 
-### Best-of-all-worlds performance
+- **Best-of-all-worlds performance.** *There is no one best model.* Every model is better at some
+  kinds of tasks and worse at others, and those strengths don't line up on a neat scale from easy to
+  hard. A router that understands them sends each request to the model that does that kind of work
+  best, so the combined result can beat *any single frontier model* on its own. It only sends a
+  request to a model that is likely to complete it, so the savings below never come from accepting
+  worse answers.
 
-Model strengths are uneven. Each model is better at some kinds of tasks and worse at others, and
-that doesn't follow a neat easy-to-hard scale. A router that understands those strengths can send
-each request to the model that does it best, so the combined result can beat *any single frontier
-model* on its own. A good router only sends a request to a model that is likely to complete it, so
-the savings below never come from accepting worse answers.
+- **Lower cost.** Requests that a cheaper model can handle go to a cheaper model, so you stop paying
+  for intelligence an easy request doesn't need. For long conversations and agent loops, the router
+  saves more by taking the prompt cache and reasoning effort into account, so it doesn't throw away
+  context it has already paid for. See
+  [what the router sees](./how-routing-works/what-the-router-sees).
 
-### Lower cost
+- **Lower latency.** Smaller models respond sooner, so routing an easy request to one finishes it
+  faster. For agents, that speed-up applies to every step that doesn't need a large model. Routing
+  adds some overhead of its own (~100ms), but a single deflection in a 10-step process can make up
+  the difference, and average deflection rates approach 60%.
 
-Requests that a less expensive model can handle go to a less expensive model. The savings come from
-not over-provisioning intelligence on easy requests. For long conversations and agent loops, they
-also come from cache-aware and effort-aware decisions, covered in
-[what the router sees](./how-routing-works/what-the-router-sees).
+- **Seamless migration.** New models ship constantly. With a router, adding one to the pool, or
+  retiring an old one, doesn't mean rewriting application code or re-testing every prompt by hand.
+  The router also scores models you haven't enabled, so you can see when a new model could take a
+  meaningful share of your traffic. See [migrate to new models](./guides/migrate-to-new-models).
 
-### Lower latency
+- **Insight into your workload.** Every routing decision records how confident each model was and
+  why the request went where it did. That gives you a view of your workload that a single-model setup
+  can't: which requests are easy, which ones nothing can handle, and which models you're missing. See
+  [what emerges from routing](./insights).
 
-Smaller models respond sooner, so routing easy requests to them cuts latency for those requests.
-For agents, it cuts latency for every step that doesn't need a large model.
+- **A path to your own models.** Every routed request leaves a trajectory. Over time, you can serve
+  the open models you rely on from dedicated capacity tuned to your traffic, and post-train models of
+  your own on that traffic. The router sends work to them when they're the better call, so routing
+  feeds your training data and training makes routing cheaper. See
+  [from routing to your own models](./insights#from-routing-to-your-own-models).
 
-### Seamless migration
+## Expected outcomes
 
-New models ship constantly. With a router, adding one to the pool, or retiring an old one, doesn't
-mean rewriting application code or re-testing every prompt by hand. The router also scores models
-you haven't enabled, so you can see when a new model could take a meaningful share of your traffic.
-See [migrate to new models](./guides/migrate-to-new-models).
+- **30–50% cost reduction** is typical. The more options you give the router, the more it saves,
+  and where you land in that range depends on what's in your catalog:
+  - **Bottom of the range** when routing *within a family of models*, for example across the sizes
+    of one provider's lineup.
+  - **Top of the range** when routing *across open-source and closed-source models*, since open
+    models widen the gap between the cheapest capable model and the default.
+- **~60% deflection from the default model**, meaning about 60% of requests are served by a model
+  other than the default. This is usually measured against a default of Opus 5.x-grade models.
 
-### Insight into your own workload
-
-Every routing decision records how confident each model was and why the request went where it did.
-That's a view of your workload that a single-model setup can't give you: which requests are easy,
-which ones nothing can handle, and which models you're missing.
-See [what emerges from routing](./insights).
-
-### A path to your own models
-
-Every routed request leaves a trajectory. Over time, routing lets you serve the open models you rely
-on from dedicated capacity tuned to your traffic, and post-train models of your own on that
-traffic. The router sends work to them when they're the better call, so routing feeds your training
-data and training makes routing cheaper. See
-[from routing to your own models](./insights#from-routing-to-your-own-models).
+These are typical figures, not guarantees. They depend on your traffic, catalog and default model,
+so measure on your own requests. See [run a trial](./evaluate/run-a-trial). Once a router has
+traffic, the **Saved** figure in Activity shows spend against a baseline of the default model. See
+[monitor and debug](./guides/monitor-and-debug#activity).
 
 ## What it depends on
 
@@ -77,22 +87,21 @@ Routing isn't right for every workload. The last section of this page covers whe
 
 ## When to route, and when not to
 
-Routing is **online model selection**: the model is chosen at request time, per request. The
+Routing is **online model selection**: the model is chosen at request time, per step. The
 alternative is **offline model selection**: you choose the model ahead of time and pin it. The rule
 of thumb is that **if you can select the model offline, do.** Routing exists for the cases where you
-can't know in advance what a request will need.
+can't know in advance what a request will need. Its worth keeping in mind that the same aspect of AI that makes it so accessible - a unified front door, makes it harder to pin models.
 
-### Why offline selection wins when it's possible
+### Why offline selection is valuable when it's possible
 
 A router makes its decision at request time, under uncertainty, and it has to handle whatever
 arrives. If you already know what each step of your system does, you can do that work ahead of
-time: evaluate candidate models on that step, pick one, and pin it. There's no runtime decision to
-get wrong, and no routing step to pay for.
+time: evaluate candidate models on that step, pick one, and pin it. There's no runtime decision to get wrong, and no routing step to pay for.
 
-You can select offline when your steps are **predefined**. That's a **workflow** rather than an
+You can select offline when your steps are **predefined**. That's more akin to a **workflow** rather than an
 **agent**: the sequence of steps is fixed, and each step has little flexibility in what it receives.
 For a step like that, you don't need a broad open front door. You need the one model that does that
-one job well.
+one job well over and over again. 
 
 ### Workflow or agent?
 
