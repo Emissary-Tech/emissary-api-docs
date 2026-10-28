@@ -1,0 +1,57 @@
+---
+title: 'Run a trial on your traffic'
+description: 'How to test a router on your own requests before moving production traffic: build a sample, set a baseline, compare cost, latency and quality, and read the routing decisions.'
+---
+
+A router's value depends on your traffic, so the only trustworthy test is on your traffic. Treat any
+vendor's savings figure, including ours, as a claim until you've measured it on your own requests.
+
+## 1. Build a representative sample
+
+Collect a set of real requests that reflects your workload. Include the easy ones, the hard ones,
+and the odd ones, because the mix is what determines routing. For agents, use whole
+multi-step runs rather than isolated calls, since cache and effort effects only show up across
+steps.
+
+## 2. Set a baseline
+
+Run the sample through your **current** setup, typically a single model, and record:
+
+- **Cost**: total spend for the sample.
+- **Latency**: end-to-end, per request or per step.
+- **Quality**: however you measure it today, whether evals, graded outputs, or task success.
+
+## 3. Create a router and run the same sample
+
+Create a router with a [catalog](../guides/choose-your-models) and the default
+[threshold](../guides/confidence-threshold), and send the sample through it. See
+[get started](../get-started) and [connect an app or agent](../guides/connect).
+
+## 4. Compare
+
+Compare against the baseline on all three: cost, latency, and quality. Look at quality first.
+Savings that come with a quality drop aren't savings.
+
+## 5. Read the routing decisions
+
+In **Activity**, click into requests and read the confidence and routing reason. See
+[monitor and debug](../guides/monitor-and-debug).
+
+- Where did requests go, and does it match your intuition about what's easy?
+- How much landed on the default model with `default_no_confident`?
+- Were there escalations?
+
+## 6. Adjust and repeat
+
+Tune the [threshold](../guides/confidence-threshold), the catalog, and
+[pricing](../guides/pricing), and run again. Change one thing at a time so you know what moved the
+numbers.
+
+## What a good result looks like
+
+- Quality holds, or improves, compared with the baseline.
+- Cost and latency fall, with more of the savings on the requests that were easy.
+- The requests the router considered unhandled are ones you'd have expected to be hard.
+
+If routing doesn't help, that's a useful answer too. See
+[when to route, and when not to](../why-route#when-to-route-and-when-not-to).

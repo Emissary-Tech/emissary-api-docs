@@ -1,0 +1,64 @@
+---
+title: 'Router selection checklist'
+description: 'A checklist for evaluating model routers: what to ask about fit, decision quality, state, cost, modality, integration, and evidence.'
+---
+
+Use this checklist to evaluate any model router, including Emissary. Not every item will matter for
+every workload. The point is to know which ones do before you commit. The terms are explained in
+[the router design space](../how-routing-works/design-space).
+
+## 1. Fit with your workload
+
+- [ ] **Do you need a router, a gateway, or both?** Be clear whether you need a decision about
+      *which model*, a way to *reach and manage* models, or both. See
+      [routers and gateways](../how-routing-works/routers-and-gateways).
+- [ ] **Does your traffic vary in difficulty?** If almost every request needs the same model,
+      routing won't help much.
+- [ ] **Is the front door open-ended?** If your steps are fixed, select models offline instead. See
+      [when to route, and when not to](../why-route#when-to-route-and-when-not-to).
+- [ ] **Are your workloads agentic or conversational?** If so, state and cache matter (see 3).
+
+## 2. Decision quality
+
+- [ ] **Is the router performance-based or complexity-based?** Does it estimate which models can do
+      the task, or guess how hard the task is from the input?
+- [ ] **Is it model-aware?** Was it trained on how the models in *your* pool actually perform, or
+      does it only map query text to a label?
+- [ ] **How is quality protected?** Is there a confidence threshold you control, so cost savings
+      can't override quality?
+- [ ] **Can you see why it routed a request?** You need that to trust and tune it.
+- [ ] **How does it adapt when models change?** Adding or updating a model shouldn't mean starting
+      over, and ideally it tells you which new models fit your traffic.
+
+## 3. State and cost
+
+- [ ] **Is it stateful?** Does it know what each model has cached, and use it?
+- [ ] **Does it route across effort as well as models?** Changing effort on the same model keeps the
+      cache.
+- [ ] **Is it intelligence-density aware?** Does it price in expected output tokens, not just
+      per-token price?
+- [ ] **Does it support custom pricing?** Contract rates and discounts should be reflected in the
+      ranking.
+
+## 4. Modality
+
+- [ ] **Is it modality-aware?** It must not route images to text-only models.
+- [ ] **Do you need it to be multimodal?** Only if image content should influence the decision.
+
+## 5. Integration and operations
+
+- [ ] **Does it return a recommendation, or execute the call?** Which fits your stack?
+- [ ] **Does it work with your SDKs and agents?** For example, OpenAI- or Anthropic-compatible APIs,
+      and coding agents.
+- [ ] **Whose provider keys does it use?** Yours, or credits you buy from the router.
+- [ ] **What does the routing step cost in latency and money?** Measure on your own workload.
+- [ ] **What happens when the router is unavailable?** Is there a safe default?
+
+## 6. Evidence
+
+- [ ] **Run a trial on your own traffic.** See [run a trial](./run-a-trial).
+- [ ] **Treat vendor savings figures as claims**, not predictions, until you've measured them.
+
+Ready to try Emissary? Start with [get started](../get-started), and see how it compares in
+[Emissary vs Router.com](./emissary-vs-router-com), [vs LiteLLM](./emissary-vs-litellm),
+[vs Not Diamond](./emissary-vs-notdiamond), and [vs OpenRouter](./emissary-vs-openrouter).
