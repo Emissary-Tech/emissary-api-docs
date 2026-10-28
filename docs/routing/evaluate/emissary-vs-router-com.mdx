@@ -1,0 +1,42 @@
+---
+title: 'Emissary vs Router.com'
+description: 'How Emissary compares with Ramp Router (router.com): an automated, capability-aware router vs. a gateway with pluggable routing policies and finance integration.'
+---
+
+[Router.com](https://router.com) is Ramp's LLM routing layer, and it's closer to a gateway than a
+router. It gives you one endpoint across providers, with fallbacks, spend tracking, and per-request
+inspection, and it ties inference spend into Ramp's financial reporting. Its own strategy sends each
+request to the cheapest approved model that meets a quality bar, and it supports other routing
+policies too, such as Jev and NemoSwitchyard.
+
+*Based on public information as of October 2026. Check each vendor's site for current details.*
+
+## At a glance
+
+| | **Emissary** | **Router.com** |
+| --- | --- | --- |
+| **Category** | Router, with a gateway | Gateway with pluggable routing policies |
+| **How the decision is made** | A router post-trained on rollouts of the models in your pool, with one confidence estimate per model and effort | Its own cheapest-approved-model-above-a-quality-bar strategy, or another routing policy you plug in |
+| **Endpoint** | One gateway URL, compatible with the OpenAI and Anthropic APIs | One endpoint across providers |
+| **Cache, output-length and effort awareness** | Part of the ranking | Depends on the policy |
+| **Custom pricing** | Used in ranking | Not described publicly |
+| **Strength** | Automated routing quality for agentic and multi-step workloads, with tracked savings | Finance integration and spend controls, and a choice of routing policies |
+
+## When Router.com is a good fit
+
+- Finance integration is the priority, with inference spend flowing into Ramp's reporting.
+- You want a gateway that can run different routing policies, and you'd rather pick or build the
+  policy yourself.
+- Your main goals are cost control and provider fallbacks.
+
+## When Emissary is a better fit
+
+- You want **automated routing** grounded in how each model actually performs, not a static quality
+  bar or a policy you have to choose and maintain.
+- You run long conversations or agent loops where **cache state**, **effort**, and **output length**
+  change which option is actually cheapest.
+- You want routing trained on your own task distribution, priced with your own contract rates, and
+  an auditable record of why each request went where it did.
+
+See [how a routing decision is made](../how-routing-works/decision), and the
+[selection checklist](./selection-checklist) to evaluate any router against your needs.

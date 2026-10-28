@@ -1,0 +1,39 @@
+---
+title: 'Set the confidence threshold'
+description: 'The confidence threshold is the main quality-versus-cost dial on a router: how sure the router must be that a model can handle a request before it can serve it.'
+---
+
+The **confidence threshold** is the setting that most affects the quality and cost of your router.
+It's how confident the router must be that a model can complete a request before that model is
+allowed to serve it. The default is **0.80**.
+
+## What it does
+
+For each request the router gives every model a confidence. Models at or above the threshold are in
+the confident pool, and the cheapest of them serves the request. See
+[how a routing decision is made](../how-routing-works/decision).
+
+- **A higher threshold is more conservative.** Fewer models clear the bar, so fewer requests go to
+  cheaper models and more fall back to the default model or escalate. Quality risk drops, and so do
+  the savings.
+- **A lower threshold saves more.** More models clear the bar, so more requests go to cheaper
+  models, with more risk that a cheaper model isn't up to the task.
+
+## How to tune it
+
+1. **Start at the default (0.80)** and send representative traffic.
+2. **Look at the routing reasons** in [Activity](./monitor-and-debug). A large share of
+   `default_no_confident` means the threshold is high for your catalog, or that your catalog
+   doesn't cover this traffic. Lowering the threshold helps in the first case, and adding models in
+   the second.
+3. **Check quality, not just cost.** Compare outputs against your current setup on a sample of
+   your own requests. See [run a trial on your traffic](../evaluate/run-a-trial).
+4. **Change it in small steps** and re-check. In the router's **Configuration** tab, use **Edit
+   configuration**.
+
+## What the threshold doesn't do
+
+It doesn't change how models are ranked once they're in the confident pool. That's decided by price,
+expected output length, cache state and effort. See
+[what the router sees](../how-routing-works/what-the-router-sees). It only decides who gets into the
+pool.

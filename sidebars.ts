@@ -26,6 +26,50 @@ const sidebars: SidebarsConfig = {
       },
       {
         type: 'category',
+        label: 'Model Routing',
+        items: [
+            'routing/why-route',
+            'routing/get-started',
+            {
+              type: 'category',
+              label: 'How routing works',
+              items: [
+                  'routing/how-routing-works/decision',
+                  'routing/how-routing-works/what-the-router-sees',
+                  'routing/how-routing-works/design-space',
+                  'routing/how-routing-works/routers-and-gateways',
+              ],
+            },
+            {
+              type: 'category',
+              label: 'Guides',
+              items: [
+                  'routing/guides/choose-your-models',
+                  'routing/guides/confidence-threshold',
+                  'routing/guides/pricing',
+                  'routing/guides/migrate-to-new-models',
+                  'routing/guides/connect',
+                  'routing/guides/monitor-and-debug',
+              ],
+            },
+            'routing/insights',
+            {
+              type: 'category',
+              label: 'Evaluate Emissary',
+              items: [
+                  'routing/evaluate/emissary-vs-router-com',
+                  'routing/evaluate/emissary-vs-litellm',
+                  'routing/evaluate/emissary-vs-notdiamond',
+                  'routing/evaluate/emissary-vs-openrouter',
+                  'routing/evaluate/run-a-trial',
+                  'routing/evaluate/selection-checklist',
+              ],
+            },
+            'routing/faq',
+        ],
+      },
+      {
+        type: 'category',
         label: 'Post Training',
         items: [
             'fine-tuning/quickstart',
