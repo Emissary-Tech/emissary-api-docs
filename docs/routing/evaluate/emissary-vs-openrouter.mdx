@@ -1,8 +1,7 @@
 ---
-title: 'Emissary vs OpenRouter'
-description: 'How Emissary compares with OpenRouter: a trained, capability-aware router and gateway vs. a unified marketplace API with provider routing and an auto-router.'
+title: 'Emissary vs OpenRouter: model vs provider routing'
+description: 'Emissary vs OpenRouter: a trained, capability-aware router and gateway versus a unified marketplace API with provider routing and an auto-router.'
 ---
-
 [OpenRouter](https://openrouter.ai) is a unified API over many models and providers. Its routing
 features are mostly **provider routing**: for a model you choose, it load balances across the
 providers serving it, with options to sort by price, throughput, or latency, to allow or ignore
@@ -13,7 +12,7 @@ OpenRouter is best thought of as a **marketplace and gateway**, with a routing o
 
 *Based on public information as of October 2026. Check each vendor's site for current details.*
 
-## At a glance
+## How does Emissary compare with OpenRouter? {#at-a-glance}
 
 | | **Emissary** | **OpenRouter** |
 | --- | --- | --- |
@@ -47,3 +46,9 @@ add OpenRouter's key, and models served through it can be part of your catalog.
   cost.
 - You want to use your own provider keys and contract pricing, and to see why each request was
   routed as it was.
+
+## See also
+
+- [Compare LLM routers](./llm-router-comparison): Emissary next to OpenRouter, LiteLLM, Not Diamond
+  and Router.com.
+- [What is model routing?](../what-is-model-routing)

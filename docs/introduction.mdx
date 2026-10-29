@@ -1,19 +1,101 @@
 ---
+title: 'Emissary docs: LLM routing, post-training, inference'
+sidebar_label: 'Introduction'
+description: 'Emissary is a platform for LLM model routing, post-training and inference. Route requests to the right model, train your own, and serve it on managed GPUs.'
 id: home-doc
-title: 'Introduction'
 sidebar_position: 1
 slug: /
 ---
+import FaqSchema from '@site/src/components/FaqSchema';
 
-# Introduction
+<FaqSchema items={[
+  {
+    question: 'What is Emissary?',
+    answer: 'Emissary is a platform for LLM model routing, post-training and inference. You can route each request to the model best suited to handle it, post-train your own models on your data, and serve base and fine-tuned models on managed GPU infrastructure.',
+  },
+  {
+    question: 'What does Emissary model routing do?',
+    answer: 'An Emissary router sits behind one gateway URL that is compatible with the OpenAI and Anthropic APIs. For each request it estimates which models in your catalog can complete the task, then sends the request to the cheapest of them.',
+  },
+  {
+    question: 'Can I use my own provider keys with Emissary?',
+    answer: 'Yes. Calls to model providers use keys you store, encrypted, in the router configuration.',
+  },
+]} />
 
-Emissary lets you replace slow, expensive frontier-model calls with small, purpose-built classifiers that return the same decision in milliseconds for a fraction of the cost. Define what you want to measure or route on, and Emissary handles the rest — no prompt engineering, no full-size model in the loop.
+# Emissary documentation
+
+**Emissary** is a platform for **LLM model routing, post-training and inference**. Route each request
+to the model best suited to handle it, post-train models of your own on your data, and serve base and
+fine-tuned models on managed GPU infrastructure. Emissary replaces slow, expensive frontier-model
+calls with small, purpose-built classifiers that return the same decision in milliseconds for a
+fraction of the cost, with no prompt engineering and no full-size model in the loop.
+
+## What can I do with Emissary?
+
+<div className="row">
+  <div className="col col--4">
+
+### Model routing
+
+Send each request to the cheapest model that can do the job, behind one OpenAI- and
+Anthropic-compatible gateway URL. Typical savings are 30–50%.
+
+[What is model routing?](./routing/what-is-model-routing) · [Get started](./routing/get-started) ·
+[Reduce LLM costs](./routing/reduce-llm-costs)
+
+  </div>
+  <div className="col col--4">
+
+### Post-training
+
+Adapt a base model to your task with supervised fine-tuning (SFT) or reinforcement learning
+(GRPO), then compare checkpoints and deploy the best one.
+
+[What is post-training?](./fine-tuning/what-is-post-training) ·
+[Quickstart](./fine-tuning/quickstart) · [Datasets](./fine-tuning/datasets)
+
+  </div>
+  <div className="col col--4">
+
+### Inference
+
+Serve base models and fine-tuned LoRA adapters on managed GPUs, with autoscaling from a single
+instance to a cluster of replicas.
+
+[What is LLM inference?](./inference/what-is-llm-inference) ·
+[Deployments](./inference/deployments) · [Autoscaling](./inference/autoscaling)
+
+  </div>
+</div>
 
 ## Quickstart
 
-The fastest way to get started is one of our quick start guides. Each walks you through building your first model three ways — the public playground (no signup), the dashboard UI, and the API:
+The fastest way to get started is one of our quick start guides. Each walks you through building
+your first model three ways: the public playground (no signup), the dashboard UI, and the API.
 
-- **[Create Your First Judge](/quickstart/llm-as-judge)** — score any text against criteria you define (e.g. *helpfulness*, *factual accuracy*) and get back a calibrated probability instead of a vague verdict.
-- **[Create Your First ModelRouter](/quickstart/router)** — automatically send each query to the model best suited to handle it, so you stop hard-coding one model for every request.
+- **[Create Your First Judge](./quickstart/llm-as-judge)**: score any text against criteria you
+  define (for example *helpfulness* or *factual accuracy*) and get back a calibrated probability
+  instead of a vague verdict.
+- **[Create Your First ModelRouter](./quickstart/router)**: automatically send each query to the
+  model best suited to handle it, so you stop hard-coding one model for every request.
 
-Want to train your own models? See the **[Fine-Tuning Quickstart](/fine-tuning/quickstart)** to fine-tune and deploy a model on your own data.
+Want a router that also accounts for cache state, effort and output length? Start with
+[model routing: get started](./routing/get-started). Want to train your own models? See the
+[post-training quickstart](./fine-tuning/quickstart).
+
+## How do the pieces fit together?
+
+Routing, post-training and inference form a loop. Every routed request leaves a trajectory, so you
+learn which requests are easy and which no model can handle. You serve the open models you rely on
+from dedicated capacity, and you post-train models of your own on that traffic. The router sends work
+to them when they're the better call, which makes routing cheaper again. See
+[what emerges from routing](./routing/insights).
+
+## Reference
+
+- [API reference](/api): REST endpoints for projects, datasets, training jobs, engines and
+  deployments.
+- [Glossary](./glossary): definitions of the terms used across these docs.
+- [llms.txt](https://docs.withemissary.com/llms.txt): a plain-text index of these docs for LLMs and
+  AI assistants.

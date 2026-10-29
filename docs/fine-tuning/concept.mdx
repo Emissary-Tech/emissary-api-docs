@@ -1,8 +1,8 @@
 ---
-title: 'Concepts'
-description: 'The core concepts behind post-training on Emissary — projects, datasets, base models, techniques, training jobs, checkpoints, and evaluation.'
+title: 'Post-training concepts: SFT, GRPO, checkpoints'
+sidebar_label: 'Concepts'
+description: 'Core concepts behind post-training on Emissary: projects, datasets, base models, SFT and GRPO, training jobs, checkpoints, evaluation and deployment.'
 ---
-
 ## Concepts
 
 **Post-training** is how you adapt a base model to your specific task on Emissary. Prompting only
@@ -161,3 +161,14 @@ engine at once, and you address each by name in your requests.
 The inference side has its own concepts — engines, deployments, server types, and autoscaling.
 Start with [Inference concepts](../inference/concept) and [Deployments](../inference/deployments)
 to take a checkpoint live.
+
+---
+
+## How does post-training relate to routing and inference?
+
+Post-training sits between the other two parts of Emissary. Requests that a
+[router](../routing/what-is-model-routing) can't handle with confidence show where you have a
+capability gap, and routed traffic is raw material for training a model of your own. See
+[from routing to your own models](../routing/insights#from-routing-to-your-own-models). Once
+trained, a checkpoint is served on an [inference engine](../inference/what-is-llm-inference). For the
+overview of post-training itself, see [what is post-training?](./what-is-post-training).

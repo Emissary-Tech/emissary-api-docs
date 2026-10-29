@@ -1,8 +1,8 @@
 ---
-title: 'What emerges from routing'
-description: 'Routing does more than pick a model. It produces audit-level intelligence about your workload, and it sets up dedicated inference and post-training, so routing compounds over time.'
+title: 'What emerges from LLM routing'
+sidebar_label: 'What emerges from routing'
+description: 'Routing records each model''s confidence on every request, giving you workload insight and a path to dedicated inference and post-training on your own traffic.'
 ---
-
 The obvious reasons to route are cost, performance, and latency. The less obvious ones emerge from
 routing itself. A router classifies every request against every model and keeps the result. That
 gives you two things a single-model setup can't:
@@ -11,7 +11,7 @@ gives you two things a single-model setup can't:
 2. **A path to your own models**: dedicated inference for the open models you route to, and
    post-training on the trajectories your traffic leaves behind.
 
-## What you learn
+## What does routing tell you about your workload? {#what-you-learn}
 
 ### What's recorded for every request
 
@@ -55,7 +55,7 @@ covering enough, or that the default is carrying work a cheaper model could do. 
 Spread across models, with confidence, shows what share of your workload is easy and what share
 needs a frontier model. Teams often guess at this, and the routing record measures it.
 
-## From routing to your own models
+## How does routing lead to your own models? {#from-routing-to-your-own-models}
 
 Routing is the first step of a loop: **route, serve, post-train.** Each step makes the next one
 possible, and the last makes routing cheaper again.
@@ -108,7 +108,7 @@ more trajectories you have to learn from. The routing record shows which request
 confidently, which are the best candidates for a model of your own. And the router decides, request
 by request, when that model is the better call.
 
-## Why it's useful
+## Why is this useful? {#why-its-useful}
 
 Most model decisions are made on public benchmarks and intuition. Routing data comes from *your*
 requests, so it answers questions specific to your workload: which model should I add, where is my

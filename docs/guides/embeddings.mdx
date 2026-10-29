@@ -2,6 +2,12 @@
 title: Embeddings
 ---
 
+import Head from '@docusaurus/Head';
+
+<Head>
+  <meta name="robots" content="noindex" />
+</Head>
+
 ## 1. Objective
 Text similarity tasks involve calculating semantic similarity between pairs of sentences. For this task, the **All-Mpnet-Base-V2-Embedding** model is recommended, which is optimized for generating embeddings that can be used for computing similarity between texts.
 
@@ -82,7 +88,7 @@ Including a test dataset allows you to evaluate the model's performance during t
 - **Custom Metrics:** Define custom metrics in the testing script to suit your evaluation needs.
 
 ## 5. Deployment
-Refer to the in-depth walkthrough on deploying a model on Emissary here - [Deployment Guide](../fine-tuning/deployment).
+Refer to the in-depth walkthrough on deploying a model on Emissary here - [Deployment Guide](../inference/deployments).
 Deploying your models allows you to serve them and integrate them into your applications.
 
 ### Finetuned Model Deployment

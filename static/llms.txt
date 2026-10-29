@@ -1,0 +1,125 @@
+# Emissary Docs
+
+> Emissary is a platform for LLM model routing, post-training and inference. Route each request to the model best suited to handle it, post-train models of your own, and serve base and fine-tuned models on managed GPU infrastructure.
+
+Emissary's model router is reached through one gateway URL that is compatible with the OpenAI and Anthropic APIs. Pages are plain prose with short answers first. A single-file version of every page below is at https://docs.withemissary.com/llms-full.txt.
+
+## Overview
+
+- [Emissary docs: LLM routing, post-training, inference](https://docs.withemissary.com): Emissary is a platform for LLM model routing, post-training and inference. Route requests to the right model, train your own, and serve it on managed GPUs.
+- [LLM routing, post-training and inference glossary](https://docs.withemissary.com/glossary): Definitions of the terms used across the Emissary docs: model router, gateway, confidence threshold, effort, SFT, GRPO, LoRA, checkpoint, engine and more.
+
+## Quickstarts
+
+- [ModelRouter quickstart: your first LLM router](https://docs.withemissary.com/quickstart/router): Create a router that sends each query to the best-suited model in about 56 ms for $0.23 per 10k requests. Use the public playground, the dashboard or the API.
+- [LLM-as-a-judge quickstart: create your first judge](https://docs.withemissary.com/quickstart/llm-as-judge): Create an LLM judge that scores any text against criteria you define and returns a calibrated probability in about 56 ms. Use the playground, dashboard or API.
+- [Experiments: zero-shot LLM deployments in minutes](https://docs.withemissary.com/experiment): Spin up a zero-shot model in under a minute and call it through a ready-made API: judge, decision, routing, tool calling, regression and NER modes.
+
+## Model routing
+
+- [What is model routing? LLM routers explained](https://docs.withemissary.com/routing/what-is-model-routing): Model routing sends each LLM request to the model best suited to handle it. Learn how an LLM router works, the types of routers, and when to use one.
+- [Why use model routing? Benefits and trade-offs](https://docs.withemissary.com/routing/why-route): Why route across LLMs instead of picking one model: better performance, typically 30-50% lower cost, lower latency, easier migration, and when not to route.
+- [How to reduce LLM costs with model routing](https://docs.withemissary.com/routing/reduce-llm-costs): Cut LLM API spend by routing each request to the cheapest model that can do the job. Where the savings come from, typical results, and how to measure them.
+- [Get started: create your first LLM router](https://docs.withemissary.com/routing/get-started): Create an Emissary router in the dashboard, send a request through the OpenAI- and Anthropic-compatible gateway, and see how it was routed. About ten minutes.
+- [How an LLM router decides which model to use](https://docs.withemissary.com/routing/how-routing-works/decision): How Emissary decides which LLM serves a request: estimate each model's confidence, keep the confident ones, then pick the cheapest. Includes a worked example.
+- [What an LLM router sees: cache, effort and cost](https://docs.withemissary.com/routing/how-routing-works/what-the-router-sees): The signals Emissary's router uses beyond the request: prompt cache state, expected output length, reasoning effort, modality, context limits and your pricing.
+- [Types of LLM routers: the router design space](https://docs.withemissary.com/routing/how-routing-works/design-space): How LLM routers differ: complexity-based vs performance-based, blind vs model-aware, stateless vs stateful. A neutral map for evaluating any router.
+- [LLM router vs LLM gateway: the difference](https://docs.withemissary.com/routing/how-routing-works/routers-and-gateways): A router decides which model serves a request, and a gateway handles how requests reach models. See the difference and how Emissary can be both.
+- [Choose models for your LLM router catalog](https://docs.withemissary.com/routing/guides/choose-your-models): Build your router's model catalog and pick a default model, with three starting points: open-source only, closed-source only, and a mixed catalog.
+- [Confidence threshold: quality vs cost in routing](https://docs.withemissary.com/routing/guides/confidence-threshold): The confidence threshold is the main quality-versus-cost dial on a router: how sure it must be that a model can handle a request. Learn how to tune it.
+- [Use your own LLM pricing in a router](https://docs.withemissary.com/routing/guides/pricing): Router pricing is prefilled with list prices. Adjust it to your contract rates so the router's idea of cheapest is your cheapest.
+- [Migrate to new LLMs with model routing](https://docs.withemissary.com/routing/guides/migrate-to-new-models): Adopt new LLMs without guesswork: the router scores models you haven't enabled, so you can see when one could take a meaningful share of your traffic.
+- [Connect an app or agent to an LLM router](https://docs.withemissary.com/routing/guides/connect): Call an Emissary router from the OpenAI or Anthropic SDK, curl or plain HTTP, or point a coding agent such as Claude Code at the gateway.
+- [Monitor and debug LLM routing decisions](https://docs.withemissary.com/routing/guides/monitor-and-debug): Use the Activity, Metrics, Sessions and Configuration tabs to see how a router behaves, read a routing decision in detail, and diagnose unexpected routing.
+- [What emerges from LLM routing](https://docs.withemissary.com/routing/insights): Routing records each model's confidence on every request, giving you workload insight and a path to dedicated inference and post-training on your own traffic.
+- [Model routing FAQ: LLM router questions](https://docs.withemissary.com/routing/faq): Short answers to common questions about LLM model routing: routers versus gateways, quality, cost, latency, supported models and when not to route.
+
+## Comparing and evaluating LLM routers
+
+- [LLM router comparison: OpenRouter, LiteLLM and more](https://docs.withemissary.com/routing/evaluate/llm-router-comparison): Compare LLM routers and gateways: Emissary, OpenRouter, LiteLLM, Not Diamond and Router.com. How each chooses a model and where each fits best.
+- [Emissary vs OpenRouter: model vs provider routing](https://docs.withemissary.com/routing/evaluate/emissary-vs-openrouter): Emissary vs OpenRouter: a trained, capability-aware router and gateway versus a unified marketplace API with provider routing and an auto-router.
+- [Emissary vs LiteLLM: router vs gateway](https://docs.withemissary.com/routing/evaluate/emissary-vs-litellm): Emissary vs LiteLLM: automated, trained model routing with tracked savings versus a self-hosted gateway with broad model coverage and self-managed rules.
+- [Emissary vs Not Diamond: routing compared](https://docs.withemissary.com/routing/evaluate/emissary-vs-notdiamond): Emissary vs Not Diamond: per-request, per-model success prediction versus Not Diamond Code's routing from metadata such as a complexity classification.
+- [Emissary vs Router.com: routing compared](https://docs.withemissary.com/routing/evaluate/emissary-vs-router-com): Emissary vs Router.com (Ramp): an automated, capability-aware router versus a gateway with pluggable routing policies and finance integration.
+- [How to test an LLM router on your traffic](https://docs.withemissary.com/routing/evaluate/run-a-trial): Test a router on your own requests before moving production traffic: build a sample, set a baseline, compare cost, latency and quality, and read the decisions.
+- [LLM router selection checklist](https://docs.withemissary.com/routing/evaluate/selection-checklist): A checklist for evaluating model routers: fit, decision quality, state and cost, modality, integration and evidence. Use it on any router, including Emissary.
+
+## Post-training
+
+- [What is post-training? SFT, GRPO and fine-tuning](https://docs.withemissary.com/fine-tuning/what-is-post-training): Post-training adapts a base LLM to your task by changing its weights. Learn how SFT and GRPO work, what you need, and how to start post-training on Emissary.
+- [Post-training quickstart: fine-tune a model](https://docs.withemissary.com/fine-tuning/quickstart): Fine-tune your first model on Emissary: create a project, upload a dataset, run a training job, compare checkpoints, and deploy the best one.
+- [Post-training concepts: SFT, GRPO, checkpoints](https://docs.withemissary.com/fine-tuning/concept): Core concepts behind post-training on Emissary: projects, datasets, base models, SFT and GRPO, training jobs, checkpoints, evaluation and deployment.
+- [Post-training datasets: formats and schemas](https://docs.withemissary.com/fine-tuning/datasets): How to format and upload datasets for post-training on Emissary: supported formats, per-task schemas, profiling and best practices.
+- [Post-training hyperparameters for SFT and GRPO](https://docs.withemissary.com/fine-tuning/parameters): The hyperparameters you can tune when post-training on Emissary with SFT and GRPO, what each one does, and how to adjust them.
+
+## Inference
+
+- [What is LLM inference? Engines and autoscaling](https://docs.withemissary.com/inference/what-is-llm-inference): LLM inference is running a trained model to produce outputs. See how Emissary serves base and fine-tuned models on managed GPUs with autoscaling.
+- [Inference concepts: engines and deployments](https://docs.withemissary.com/inference/concept): Inference engines, deployments, server types, autoscaling and lifecycle on Emissary: how base and fine-tuned models are served on managed GPUs.
+- [Deployments: serve base and fine-tuned models](https://docs.withemissary.com/inference/deployments): How deployments serve base and fine-tuned LoRA models on an Emissary inference engine: creating, calling and managing them.
+- [Autoscaling LLM inference: replicas and tuning](https://docs.withemissary.com/inference/autoscaling): How Emissary cluster engines scale GPU replicas up and down with traffic: min and max replicas, scaling metrics, delays and tuning.
+
+## API reference
+
+- [Emissary API reference](https://docs.withemissary.com/api): REST endpoints for projects, datasets, training jobs, inference engines and deployments.
+- [OpenAPI specification](https://raw.githubusercontent.com/Emissary-Tech/emissary-api-docs/refs/heads/main/api/openapi.yaml): machine-readable API definition.
+
+## Optional
+
+- [ApiErrorInvalidInput](https://docs.withemissary.com/api/schemas/apierrorinvalidinput):
+- [ApiErrorNotFound](https://docs.withemissary.com/api/schemas/apierrornotfound):
+- [ApiErrorUnauthorized](https://docs.withemissary.com/api/schemas/apierrorunauthorized):
+- [ApiResponse](https://docs.withemissary.com/api/schemas/apiresponse):
+- [BaseModelDetail](https://docs.withemissary.com/api/schemas/basemodeldetail):
+- [BaseModelSummary](https://docs.withemissary.com/api/schemas/basemodelsummary):
+- [Cancel training job](https://docs.withemissary.com/api/cancel-training-job-by-id): Cancel a training job.
+- [Chat Completions](https://docs.withemissary.com/api/get-chat-completions): Get chat completions from a serverless deployment.
+- [ChatCompletionObject](https://docs.withemissary.com/api/schemas/chatcompletionobject):
+- [Classification](https://docs.withemissary.com/api/get-classification-from-deployment): Get classification from a deployment using the provided input.
+- [CompletionObject](https://docs.withemissary.com/api/schemas/completionobject):
+- [Completions](https://docs.withemissary.com/api/get-completions-from-deployment): Get completions from a deployment using the provided input.
+- [Create deployment](https://docs.withemissary.com/api/create-deployment): Create a new deployment.
+- [Create Deployment on Inference Engine](https://docs.withemissary.com/api/deploy-on-engine): Create deployment on Inference Engine
+- [Create GRPO training job](https://docs.withemissary.com/api/create-grpo-training-job): Initiate GRPO fine-tuning (training job).
+- [Create Inference Engine](https://docs.withemissary.com/api/create-engine): Create a new inference engine.
+- [Create new experiment (zero-shot deployment)](https://docs.withemissary.com/api/create-experiment): Create a new experiment. Same as creating a new zero-shot deployment which you can directly integrate into usage.
+- [Create project](https://docs.withemissary.com/api/create-project): Create a new project. Projects can be created and used to organize datasets, training jobs, and deployments.
+- [Create SFT training job](https://docs.withemissary.com/api/create-training-job): Initiate fine-tuning (training job).
+- [DatasetDetail](https://docs.withemissary.com/api/schemas/datasetdetail): Dataset Object
+- [DatasetSummary](https://docs.withemissary.com/api/schemas/datasetsummary): Dataset Summary Object
+- [Deactivate Inference Engine](https://docs.withemissary.com/api/deactivate-engine-by-id): Deactivate an inference engine.
+- [Delete dataset](https://docs.withemissary.com/api/delete-dataset-by-id): Delete a dataset.
+- [Delete deployment](https://docs.withemissary.com/api/delete-deployment-by-id): Delete a deployment.
+- [Delete Inference Engine](https://docs.withemissary.com/api/delete-engine-by-id): Delete an inference engine.
+- [Delete project](https://docs.withemissary.com/api/delete-project-by-id): Delete a project.
+- [Delete training job](https://docs.withemissary.com/api/delete-training-job-by-id): Delete a training job.
+- [DeploymentDetail](https://docs.withemissary.com/api/schemas/deploymentdetail): Deployment Object
+- [DeploymentSummary](https://docs.withemissary.com/api/schemas/deploymentsummary): Deployment Summary Object
+- [Embeddings](https://docs.withemissary.com/api/get-embeddings-from-deployment): Get embeddings from a deployment using the provided input.
+- [Emissary API](https://docs.withemissary.com/api/emissary-api): v0.1.0
+- [InferenceEngineDetail](https://docs.withemissary.com/api/schemas/inferenceenginedetail): Inference Engine Object
+- [InferenceEngineSummary](https://docs.withemissary.com/api/schemas/inferenceenginesummary): Inference Engine Summary
+- [List base models](https://docs.withemissary.com/api/list-base-models): List and describe the various models available in the API
+- [List checkpoints](https://docs.withemissary.com/api/list-checkpoints): Returns a list of checkpoints for a training job.
+- [List datasets](https://docs.withemissary.com/api/list-datasets): Returns a list of datasets
+- [List deployments](https://docs.withemissary.com/api/list-deployments): Returns a list of deployments
+- [List Inference Engines](https://docs.withemissary.com/api/list-engines): Returns a list of inference engines
+- [List projects](https://docs.withemissary.com/api/list-projects): Returns a list of projects.
+- [List Testing Functions](https://docs.withemissary.com/api/list-test-functions): Returns a list of test functions
+- [List training jobs](https://docs.withemissary.com/api/list-training-jobs): Returns a list of training jobs
+- [ProjectDetail](https://docs.withemissary.com/api/schemas/projectdetail): Project Object
+- [ProjectSummary](https://docs.withemissary.com/api/schemas/projectsummary): Project Summary Object
+- [Reactivate deployment](https://docs.withemissary.com/api/reactivate-deployment-by-id): Reactivate a deactivated deployment.
+- [Reactivate Inference Engine](https://docs.withemissary.com/api/reactivate-engine-by-id): Reactivate a inactive inference engine.
+- [Retrieve base model](https://docs.withemissary.com/api/retrieve-base-model-by-name): Retrieves a model instance, providing basic information about the model such as the hyper parameters that can be adjusted
+- [Retrieve dataset](https://docs.withemissary.com/api/retrieve-dataset-by-id): Retrieve a dataset.
+- [Retrieve deployment](https://docs.withemissary.com/api/retrieve-deployment-by-id): Retrieve a deployment.
+- [Retrieve Inference Engine](https://docs.withemissary.com/api/get-engine): Retrieve Inference Engine's Details
+- [Retrieve project](https://docs.withemissary.com/api/retrieve-project-by-id): Retrieve a project.
+- [Retrieve training job](https://docs.withemissary.com/api/retrieve-training-job-by-id): Retrieve a training job.
+- [TestingFunctionSummary](https://docs.withemissary.com/api/schemas/testingfunctionsummary): Testing Function Summary Object
+- [TrainingJobCheckpoint](https://docs.withemissary.com/api/schemas/trainingjobcheckpoint): Training Job Checkpoint Object
+- [TrainingJobDetail](https://docs.withemissary.com/api/schemas/trainingjobdetail): Training Job Object
+- [TrainingJobSummary](https://docs.withemissary.com/api/schemas/trainingjobsummary): Training Job Summary Object
+- [Undeploy from Inference Engine](https://docs.withemissary.com/api/un-deploy-from-engine): Undeploy the deployment from the Inference Engine
+- [Upload dataset](https://docs.withemissary.com/api/create-dataset): Upload dataset to the project (upto 100MB). Upload through UI if your dataset size is larger than 100MB.

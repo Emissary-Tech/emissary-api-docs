@@ -1,8 +1,8 @@
 ---
-title: 'Deployments'
-description: 'How deployments serve base and fine-tuned models on an inference engine — creating, calling, and managing them.'
+title: 'Deployments: serve base and fine-tuned models'
+sidebar_label: 'Deployments'
+description: 'How deployments serve base and fine-tuned LoRA models on an Emissary inference engine: creating, calling and managing them.'
 ---
-
 ## Deployments
 
 A **deployment** is a served model version running on an [inference engine](./concept). The
@@ -30,7 +30,7 @@ independently; it goes away only when the engine is deleted.
 ### Fine-tuned deployment
 
 A **fine-tuned deployment** serves a specific checkpoint you produced — either from a
-[fine-tuning job](../fine-tuning/quickstart) or a [Playground experiment](../playground/experiments).
+[fine-tuning job](../fine-tuning/quickstart) or a [Playground experiment](/experiment).
 You give it a name, and from then on you address it by that name in your inference requests. A
 fine-tuned deployment's task type must match the engine's task type.
 
@@ -74,7 +74,7 @@ Emissary provisions the engine first; the deployment activates once the engine r
 
 ### Deploy a Playground experiment
 
-You can also deploy a [Playground experiment](../playground/experiments) version instead of a
+You can also deploy a [Playground experiment](/experiment) version instead of a
 training-job checkpoint. The flow is the same — pick the experiment and version, name the
 deployment, and choose an existing engine or create one alongside it.
 

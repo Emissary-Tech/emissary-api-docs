@@ -1,0 +1,199 @@
+---
+title: 'LLM routing, post-training and inference glossary'
+sidebar_label: 'Glossary'
+description: 'Definitions of the terms used across the Emissary docs: model router, gateway, confidence threshold, effort, SFT, GRPO, LoRA, checkpoint, engine and more.'
+keywords: [LLM glossary, model routing glossary, post-training glossary, inference glossary, confidence threshold, LoRA, GRPO, SFT]
+---
+Short definitions of the terms used across the Emissary docs, grouped by topic. Each links to the
+page that explains it in full.
+
+## Model routing
+
+### Model routing
+
+Choosing, for each request, which model should handle it. See [what is model routing?](./routing/what-is-model-routing).
+
+
+### Model router (also LLM router)
+
+Software that sits in front of a pool of models, reads each request, and sends it to the model best suited to it. See [routers and gateways](./routing/how-routing-works/routers-and-gateways).
+
+
+### Gateway (also LLM gateway)
+
+Infrastructure for how requests reach models: one interface over many providers, with credentials, retries, rate limits, load balancing and failover. A gateway doesn't decide which model is right. See [routers and gateways](./routing/how-routing-works/routers-and-gateways).
+
+
+### Catalog
+
+The set of models a router can route across. See [choose your models](./routing/guides/choose-your-models).
+
+
+### Default model
+
+The anchor of a router's policy. It serves any request that no model is confident about, so choose one you'd trust with any request.
+
+
+### Confidence
+
+The router's estimate of the probability that a given model completes a request. There is one estimate per model and effort level. See [how a routing decision is made](./routing/how-routing-works/decision).
+
+
+### Confidence threshold
+
+How confident the router must be that a model can complete a request before that model may serve it. The default is 0.80. A higher threshold is more conservative, and a lower one saves more. See [set the confidence threshold](./routing/guides/confidence-threshold).
+
+
+### Confident pool
+
+The models in your catalog whose confidence clears the threshold for a given request. The cheapest of them serves the request.
+
+
+### Routing reason
+
+The recorded explanation of why a request went to a model, such as `cheapest_confident` or `default_no_confident`. See [monitor and debug](./routing/guides/monitor-and-debug).
+
+
+### Escalation
+
+When the default model isn't confident but a more expensive model is, and the request is sent to the more expensive one.
+
+
+### Deflection
+
+A request served by a model other than the default model.
+
+
+### Performance-based routing
+
+Routing that asks which models can actually do the task, based on how they have performed. Compare **complexity-based routing**, which guesses how hard a task is from its input. See [the router design space](./routing/how-routing-works/design-space).
+
+
+### Stateful routing
+
+Routing that tracks the current situation, most importantly cache state, rather than deciding each request in isolation. See [what the router sees](./routing/how-routing-works/what-the-router-sees#cache-state).
+
+
+### Prompt cache
+
+Context a model has already processed and holds, which makes sending the same conversation back to it cheaper. Switching models forfeits the previous model's cache.
+
+
+### Effort
+
+How much reasoning a model applies to a request, which trades more reasoning for more cost and latency. The router can change effort instead of switching models, which keeps the cache. See [what the router sees](./routing/how-routing-works/what-the-router-sees#effort).
+
+
+### Intelligence density
+
+How many output tokens a model needs to complete a task. A router that is intelligence-density aware prices that in rather than comparing per-token prices alone.
+
+
+### Zero data retention
+
+A router setting, on by default, under which Emissary doesn't retain input, output or session replay data from gateway traffic. See [get started](./routing/get-started).
+
+
+## Post-training
+
+### Post-training
+
+Adapting a base model to your task by changing its weights, rather than only changing its input as prompting does. See [what is post-training?](./fine-tuning/what-is-post-training).
+
+
+### Fine-tuning
+
+Training a model on examples of your task. Often used interchangeably with post-training.
+
+
+### SFT (Supervised Fine-Tuning)
+
+A technique that trains the model to reproduce the input-to-output pairs in your dataset. See [concepts](./fine-tuning/concept#post-training-techniques).
+
+
+### GRPO (Group Relative Policy Optimization)
+
+A reinforcement-learning technique that improves the model against a reward signal by comparing several sampled completions per prompt. Available for the `text-generation` task type.
+
+
+### LoRA (Low-Rank Adaptation) adapter
+
+A small set of weight layers added on top of a frozen base model instead of rewriting all of its weights. Fine-tunes on Emissary are LoRA adapters, so many can share one base model.
+
+
+### Base model
+
+The foundation model you adapt: either a published pre-trained model, or one of your own existing checkpoints.
+
+
+### Task type
+
+What your model does, such as `text-generation`, `classification`, `regression`, `embedding` or `ner`. It determines the dataset schema, the model's output and the API you call.
+
+
+### Training project
+
+A workspace that groups the training jobs you run toward a single goal.
+
+
+### Training job
+
+One post-training run, tying together a base model, a technique, your data and your hyperparameters.
+
+
+### Checkpoint
+
+A snapshot of the model captured during training, typically one per epoch. Each is independently evaluable and deployable.
+
+
+### Hyperparameters
+
+The settings of a training run, such as learning rate and number of epochs. See [hyperparameters](./fine-tuning/parameters).
+
+
+### Test function
+
+A metric function that takes the input, the expected output and the predicted output, and returns a numeric score for a checkpoint.
+
+
+### Overfitting
+
+When a model fits its training data so closely that it performs worse on data it hasn't seen. It's why a later checkpoint isn't always better.
+
+
+## Inference
+
+### Inference
+
+Running a trained model on new input to produce an output. See [what is LLM inference?](./inference/what-is-llm-inference).
+
+
+### Inference engine
+
+A managed, GPU-backed serving unit, bound to one base model and one task type. See [concepts](./inference/concept).
+
+
+### Deployment
+
+A specific model version served on an engine, called by name. Either a **base model deployment** or a **fine-tuned deployment**. See [deployments](./inference/deployments).
+
+
+### Replica
+
+One GPU-backed copy of an engine, handling a share of its traffic. See [autoscaling](./inference/autoscaling).
+
+
+### Autoscaling
+
+Adding replicas when load rises and removing them when it falls, between a minimum and a maximum you set.
+
+
+### On-demand engine
+
+An engine on a single GPU instance with fixed capacity. The default server type.
+
+
+### Cluster engine
+
+A horizontally scalable, multi-replica engine, used automatically when you enable autoscaling.
+

@@ -1,0 +1,166 @@
+---
+title: 'What is model routing? LLM routers explained'
+sidebar_label: 'What is model routing?'
+description: 'Model routing sends each LLM request to the model best suited to handle it. Learn how an LLM router works, the types of routers, and when to use one.'
+keywords: [model routing, LLM router, LLM routing, AI model router, model router, LLM gateway]
+---
+import FaqSchema from '@site/src/components/FaqSchema';
+
+<FaqSchema items={[
+  {
+    question: 'What is model routing?',
+    answer: 'Model routing is the practice of choosing, for each request, which large language model should handle it. A model router sits in front of a pool of models and sends each request to the model best suited to the job.',
+  },
+  {
+    question: 'What is an LLM router?',
+    answer: 'An LLM router is software that decides which large language model should serve each request. It looks at the request, and sometimes at the state around it, and picks a model that can do the task at the lowest cost, latency or risk.',
+  },
+  {
+    question: 'How much can model routing save?',
+    answer: 'A cost reduction of 30 to 50 percent is typical, depending on your traffic, your catalog of models and your default model. These are typical figures, not guarantees, so measure on your own requests.',
+  },
+  {
+    question: 'Does model routing reduce quality?',
+    answer: 'It should not. A performance-based router only sends a request to a model that it is confident can complete it, and ranks by cost only among those models. Routing can also improve quality, because models are strong at different things.',
+  },
+  {
+    question: 'Is a model router the same as an LLM gateway?',
+    answer: 'No. A gateway handles how requests reach models: one interface, credentials, retries and failover. A router decides which model serves each request. Emissary can be both.',
+  },
+  {
+    question: 'When should you not use a model router?',
+    answer: 'When you can select the model ahead of time, for example in a workflow with fixed steps and predictable inputs. In that case, evaluate candidate models for each step and pin one.',
+  },
+]} />
+
+**Model routing** is the practice of choosing, for each request, which large language model (LLM)
+should handle it. A **model router**, also called an **LLM router**, sits in front of a pool of
+models, reads each request, and sends it to the model best suited to the job. Easy requests stop
+paying for a frontier model, and hard requests stop getting stuck on a model that is weak at them.
+
+```
+            ┌──────────────────────────┐
+request ───▶│       model router       │
+            └─────────────┬────────────┘
+                          │ one model per request
+        ┌─────────────────┼─────────────────┐
+        ▼                 ▼                 ▼
+  small / fast       mid-size model    frontier model
+     model
+```
+
+## How does model routing work?
+
+Every routed request goes through the same three steps:
+
+1. **Assess.** The router reads the request and estimates which models in the pool can do the task.
+2. **Filter.** It keeps the models that are likely to succeed, and drops the ones that are not.
+3. **Choose.** It picks one of the remaining models, usually the cheapest, and sends the request
+   there.
+
+On Emissary, the router gives each model a **confidence**: the probability that the model completes
+this request. Models at or above your **confidence threshold** (0.80 by default) are the confident
+pool, and the cheapest model in that pool serves the request. If no model is confident, the request
+goes to your **default model**. Capability comes first and cost second, so savings never come from
+accepting worse answers. See [how a routing decision is made](./how-routing-works/decision) for a
+worked example.
+
+## Why use model routing?
+
+Most teams pick one model and send everything to it. Because that one model has to handle any
+request, they pick a strong, expensive one. Easy requests overpay, and hard requests are limited by
+whatever that single model happens to be bad at. Routing replaces the single choice with a decision
+per request:
+
+- **Better results than any single model.** Every model is better at some tasks and worse at
+  others, and those strengths don't line up on one easy-to-hard scale.
+- **Lower cost.** A cost reduction of **30–50%** is typical, and about **60%** of requests are
+  usually served by a model other than the default. These are typical figures, not guarantees. See
+  [how to reduce LLM costs with model routing](./reduce-llm-costs).
+- **Lower latency.** Smaller models respond sooner, and for agents that speed-up applies to every
+  step that doesn't need a large model.
+- **Easier model migration.** Adding or retiring a model doesn't mean rewriting application code.
+  See [migrate to new models](./guides/migrate-to-new-models).
+- **Insight into your workload.** Every decision records each model's confidence and the routing
+  reason. See [what emerges from routing](./insights).
+
+The full argument is in [why route](./why-route).
+
+## What are the types of model routers?
+
+Routers differ along a few dimensions. The ones that matter most:
+
+| Dimension | One end | Other end |
+| --- | --- | --- |
+| **What it optimizes for** | **Complexity-based:** guesses how hard the task is, then picks a cheap or an expensive model | **Performance-based:** asks which models can actually do the task |
+| **What it knows about the models** | **Blind:** a small decision model trained on labeled queries | **Model-aware:** trained on rollouts of each model, with one head per model |
+| **State** | **Stateless:** each decision is made in isolation | **Stateful:** uses cache state, so long conversations and agent loops don't throw away paid-for context |
+| **Modality** | **Modality-blind:** treats every request as text | **Modality-aware:** knows which models accept images |
+| **Cost** | **Per-token price only** | **Intelligence-density aware:** prices in how many output tokens each model will need |
+
+Emissary's router is performance-based, model-aware, stateful, modality-aware and
+intelligence-density aware. See [the router design space](./how-routing-works/design-space) for
+what each of these means, and [what the router sees](./how-routing-works/what-the-router-sees) for
+the signals it uses.
+
+## What is the difference between a model router and an LLM gateway?
+
+A **gateway** is infrastructure for *how* requests reach models: one interface over many providers,
+credentials, retries, rate limits, load balancing and failover. A **router** decides *which model*
+should handle each request. Many products do only one of the two. Emissary is a router that also
+works as a gateway: one URL, compatible with the OpenAI and Anthropic APIs, with a router behind it.
+You can also use its routing decision alongside a gateway you already run. See
+[routers and gateways](./how-routing-works/routers-and-gateways).
+
+## When should you not use model routing?
+
+Routing is **online model selection**, made at request time. If you can select the model
+**offline**, do. When the steps of your system are fixed and each step's input is narrow and
+predictable, evaluate candidate models for each step and pin one. Routing is for the open-ended
+parts: chat, agents, and anything where you can't list every kind of request ahead of time. See
+[when to route, and when not to](./why-route#when-to-route-and-when-not-to).
+
+## How do you get started with model routing?
+
+1. [Create a router](./get-started) in the Emissary dashboard: choose your models, add your own
+   provider keys, and set a default model and a confidence threshold.
+2. [Connect your app or agent](./guides/connect) by changing two things: the base URL and the
+   `model` string. The gateway works with the OpenAI and Anthropic SDKs, curl, and coding agents
+   such as Claude Code.
+3. [Read the routing decisions](./guides/monitor-and-debug) in Activity to see each model's
+   confidence and why the request went where it did.
+4. [Run a trial on your own traffic](./evaluate/run-a-trial) before moving production traffic.
+
+## How does Emissary compare with other routers?
+
+See [compare LLM routers](./evaluate/llm-router-comparison) for Emissary side by side with
+OpenRouter, LiteLLM, Not Diamond and Router.com, and the
+[router selection checklist](./evaluate/selection-checklist) for questions to ask of any router.
+
+## Frequently asked questions
+
+### Does model routing reduce quality?
+
+It shouldn't, and it can improve it. A performance-based router only sends a request to a model that
+it is confident can complete it, and ranks by cost only among those models. Models are strong at
+different things, so routing each request to the model that handles it best can outperform any
+single model on your workload as a whole.
+
+### How much can model routing save?
+
+A cost reduction of 30–50% is typical. The bottom of that range is typical when routing within one
+provider's model family, and the top when routing across open-source and closed-source models. Your
+result depends on your traffic, catalog and default model, so measure it on your own requests.
+
+### Does a router add latency?
+
+A routing decision takes a little time, around 100 ms, and requests that go to a faster model finish
+sooner. For multi-step agents, one deflection to a smaller model in a ten-step process can make up
+the difference. Measure end-to-end latency on your workload rather than the routing step alone.
+
+### Can I route across providers?
+
+Yes. A router's catalog can span providers, for example Anthropic, OpenAI and OpenRouter, using a
+key you store for each. See [choose your models](./guides/choose-your-models).
+
+More questions are answered in the [model routing FAQ](./faq).

@@ -1,12 +1,12 @@
 ---
-title: 'How a routing decision is made'
-description: 'How Emissary decides which model serves a request: estimate each model''s confidence, keep the confident ones, then pick the cheapest. Includes a worked example.'
+title: 'How an LLM router decides which model to use'
+sidebar_label: 'How a routing decision is made'
+description: 'How Emissary decides which LLM serves a request: estimate each model''s confidence, keep the confident ones, then pick the cheapest. Includes a worked example.'
 ---
-
 Every request to an Emissary router goes through the same decision. In short: **find the models
 that can do the job, then pick the cheapest of them.** Capability first, cost second.
 
-## The decision, step by step
+## How does the router decide, step by step? {#the-decision-step-by-step}
 
 ### 1. Estimate each model's confidence
 
@@ -60,7 +60,7 @@ request ─▶ confidence per model ─▶ ≥ threshold? ─┬─ some models 
 Every decision records the classifier's probability for each model and effort, an estimated cost
 per candidate, and the routing reason, so you can see why any request went where it did. See [monitor and debug](../guides/monitor-and-debug).
 
-## Why capability comes before cost
+## Why does capability come before cost? {#why-capability-comes-before-cost}
 
 Splitting the decision this way keeps quality and cost separate. The first stage protects quality
 by filtering to models that can do the job. The second optimizes cost, only within that set. A

@@ -1,0 +1,73 @@
+---
+title: 'LLM router comparison: OpenRouter, LiteLLM and more'
+sidebar_label: 'Compare LLM routers'
+description: 'Compare LLM routers and gateways: Emissary, OpenRouter, LiteLLM, Not Diamond and Router.com. How each chooses a model and where each fits best.'
+keywords: [LLM router comparison, OpenRouter alternative, LiteLLM alternative, Not Diamond alternative, Router.com alternative, best LLM router, LLM gateway comparison]
+---
+import FaqSchema from '@site/src/components/FaqSchema';
+
+<FaqSchema items={[
+  {
+    question: 'What is the best LLM router?',
+    answer: 'It depends on what you need. Choose a router such as Emissary if you want the model chosen automatically for each request from evidence about what each model can do. Choose a gateway such as LiteLLM or OpenRouter if your main need is model coverage, self-hosting, or one key and one bill across providers.',
+  },
+  {
+    question: 'What is an alternative to OpenRouter that picks the model for each request?',
+    answer: 'Emissary is a router and gateway that predicts, for each request, which models can complete the task and then picks the cheapest of them. OpenRouter is mainly a marketplace with provider routing, plus an auto-router option.',
+  },
+  {
+    question: 'What is the difference between LiteLLM and a model router?',
+    answer: 'LiteLLM is an open-source gateway and proxy whose routing is self-managed: rules and configuration you write, such as model groups, weights and fallbacks. A model router such as Emissary automates the choice of model per request.',
+  },
+]} />
+
+**Short answer:** pick a **router** when you want the model chosen for you, request by request, from
+evidence about what each model can do. Pick a **gateway** when your main need is model coverage,
+self-hosting, or one key and one bill. Emissary is a router that also works as a gateway. This page
+puts it next to four other options. Each has its own detailed page, linked below.
+
+*Based on public information as of October 2026. Check each vendor's site for current details.*
+
+## How do Emissary, OpenRouter, LiteLLM, Not Diamond and Router.com compare?
+
+| | **Emissary** | **OpenRouter** | **LiteLLM** | **Not Diamond** | **Router.com** |
+| --- | --- | --- | --- | --- | --- |
+| **Category** | Router, with a gateway | Unified API and marketplace with provider routing | Open-source gateway and proxy, with a routing layer | Model routing company: an API router, and a local proxy for coding agents | Ramp's LLM routing layer: a gateway with pluggable routing policies |
+| **How the model is chosen** | A router trained on rollouts predicts, per model and effort, whether it can complete the task, then picks the cheapest confident one, taking cache state, output length and effort into account | You choose the model, and it routes across providers. An auto-router option (`openrouter/auto`) picks among models | You write rules and config: model groups, weights, fallbacks | The API router recommends a model. Not Diamond Code routes from derived metadata such as a complexity classification | Its own cheapest-approved-model-above-a-quality-bar strategy, or another policy you plug in |
+| **Who executes the call** | Emissary's gateway, on your provider keys | OpenRouter, billed through credits | The proxy you host | Your application, for the API router. A local proxy, for Not Diamond Code | Router.com, as one endpoint across providers |
+| **Strength** | Routing decisions grounded in model capability and cost, with tracked savings | Breadth of models behind one key and one bill | Near-complete model coverage, and self-hosting | Routing from metadata alone, without request content | Finance integration and spend controls |
+
+## Which LLM router should I choose?
+
+- **You want the model chosen automatically for each request,** with quality protected by a
+  confidence threshold: [Emissary](../how-routing-works/decision).
+- **You want the broadest model coverage in a self-hosted gateway,** and your routing is simple
+  enough to manage as rules: [LiteLLM](./emissary-vs-litellm).
+- **You want a wide catalog behind one API key and one bill,** and your main need is availability
+  and price across providers for models you've already chosen: [OpenRouter](./emissary-vs-openrouter).
+- **You want routing that works only from metadata,** or a local proxy for a coding agent:
+  [Not Diamond](./emissary-vs-notdiamond).
+- **Finance integration is the priority,** with inference spend flowing into Ramp's reporting:
+  [Router.com](./emissary-vs-router-com).
+
+## What does "routing" mean across these products?
+
+The word covers different jobs. **Provider routing** chooses which provider serves a model you
+already picked. **Reliability routing** is load balancing, retries and fallbacks. **Model routing**
+chooses which *model* should serve each request. Most gateways do the first two and some offer a
+version of the third. See [routers and gateways](../how-routing-works/routers-and-gateways) and
+[the router design space](../how-routing-works/design-space).
+
+## How should I evaluate any router?
+
+Whichever products you shortlist, test on your own requests rather than on a vendor's figures. Use
+the [router selection checklist](./selection-checklist) to decide what matters for your workload,
+and [run a trial on your traffic](./run-a-trial) to measure cost, latency and quality against your
+current setup.
+
+## Detailed comparisons
+
+- [Emissary vs OpenRouter](./emissary-vs-openrouter)
+- [Emissary vs LiteLLM](./emissary-vs-litellm)
+- [Emissary vs Not Diamond](./emissary-vs-notdiamond)
+- [Emissary vs Router.com](./emissary-vs-router-com)

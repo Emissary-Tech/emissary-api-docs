@@ -27,8 +27,10 @@ const sidebars: SidebarsConfig = {
       {
         type: 'category',
         label: 'Model Routing',
+        link: { type: 'doc', id: 'routing/what-is-model-routing' },
         items: [
             'routing/why-route',
+            'routing/reduce-llm-costs',
             'routing/get-started',
             {
               type: 'category',
@@ -55,12 +57,13 @@ const sidebars: SidebarsConfig = {
             'routing/insights',
             {
               type: 'category',
-              label: 'Evaluate Emissary',
+              label: 'Compare and evaluate',
               items: [
-                  'routing/evaluate/emissary-vs-router-com',
+                  'routing/evaluate/llm-router-comparison',
+                  'routing/evaluate/emissary-vs-openrouter',
                   'routing/evaluate/emissary-vs-litellm',
                   'routing/evaluate/emissary-vs-notdiamond',
-                  'routing/evaluate/emissary-vs-openrouter',
+                  'routing/evaluate/emissary-vs-router-com',
                   'routing/evaluate/run-a-trial',
                   'routing/evaluate/selection-checklist',
               ],
@@ -70,28 +73,23 @@ const sidebars: SidebarsConfig = {
       },
       {
         type: 'category',
-        label: 'Post Training',
+        label: 'Post-training',
+        link: { type: 'doc', id: 'fine-tuning/what-is-post-training' },
         items: [
             'fine-tuning/quickstart',
             'fine-tuning/concept',
             'fine-tuning/datasets',
-            'fine-tuning/parameters'
+            'fine-tuning/parameters',
         ],
       },
       {
         type: 'category',
         label: 'Inference',
+        link: { type: 'doc', id: 'inference/what-is-llm-inference' },
         items: [
             'inference/concept',
             'inference/deployments',
             'inference/autoscaling'
-            // {
-            //   type: 'category',
-            //   label: 'Integration',
-            //   items: [
-            //       'inference/integration/classification'
-            //   ]
-            // }
         ]
       },
       {
@@ -101,18 +99,11 @@ const sidebars: SidebarsConfig = {
             'playground/experiments'
         ]
       },
-      // {
-      //   type: 'category',
-      //   label: 'Guides',
-      //   items: [
-      //       'guides/emissary-classification',
-      //       'guides/emissary-regression',
-      //       'guides/text-generation',
-      //       'guides/ner',
-      //       'guides/clip-classification',
-      //       'guides/clip-embedding',
-      //   ]
-      // }
+      'glossary',
+      // The task-specific guides under docs/guides and fine-tuning/testing are
+      // intentionally not listed here and are marked noindex until they are
+      // reviewed against the current product. To bring them back, add them to
+      // this sidebar and remove the <head> noindex tag from each page.
   ],
   openApiSidebar: [
     {

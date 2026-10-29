@@ -1,135 +1,232 @@
 ---
-title: 'FAQ'
-description: 'Short answers to common questions about model routing, with links to the full explanations.'
+title: 'Model routing FAQ: LLM router questions'
+sidebar_label: 'FAQ'
+description: 'Short answers to common questions about LLM model routing: routers versus gateways, quality, cost, latency, supported models and when not to route.'
 ---
+import FaqSchema from '@site/src/components/FaqSchema';
+
+<FaqSchema items={[
+  {
+    "question": "What is model routing?",
+    "answer": "Model routing is choosing, for each request, which model should handle it. A model router sits in front of a pool of models, reads each request, and sends it to the model best suited to the job."
+  },
+  {
+    "question": "What is an LLM router?",
+    "answer": "An LLM router is another name for a model router: software that decides which large language model serves each request, so easy requests stop paying for a frontier model."
+  },
+  {
+    "question": "How does Emissary's router decide which model to use?",
+    "answer": "It estimates each model's confidence that it can complete the request, keeps the models at or above your confidence threshold, and picks the cheapest of them. If none is confident, the request goes to your default model."
+  },
+  {
+    "question": "Does Emissary work with the OpenAI and Anthropic SDKs?",
+    "answer": "Yes. Every router is reached through one gateway URL that is compatible with the OpenAI and Anthropic APIs. To switch an existing integration, change the base URL and the model string."
+  },
+  {
+    "question": "Can I route Claude Code or other coding agents?",
+    "answer": "Yes. Point the agent at the gateway and every request it makes is routed."
+  },
+  {
+    "question": "Does Emissary retain my prompts and responses?",
+    "answer": "Not by default. Zero data retention is on by default, so Emissary doesn't retain input, output or session replay data from gateway traffic, only routing decisions, token counts and cost telemetry. Turning it off lets you replay sessions and is the raw material for what emerges from routing."
+  },
+  {
+    "question": "What's the difference between a router and a gateway?",
+    "answer": "A gateway handles how requests reach models, and a router decides which model serves each one. Emissary can be both: one gateway URL with a router behind it, which we recommend, or the routing policy alongside a gateway you already run."
+  },
+  {
+    "question": "What's the difference between complexity-based and performance-based routing?",
+    "answer": "Complexity-based routing guesses how hard a task is from its input and picks a cheap or expensive model, and that's hard to do reliably. Performance-based routing, which is what Emissary does, asks which models can actually do the task, based on how they've performed."
+  },
+  {
+    "question": "Does the router choose effort, or only the model?",
+    "answer": "Both. Changing a model's effort keeps you on the same model, so the prompt cache is preserved, while switching models loses it."
+  },
+  {
+    "question": "Can the router handle images?",
+    "answer": "The router knows which models accept images and won't send an image request to a text-only model. It doesn't interpret the image content itself."
+  },
+  {
+    "question": "What's the relationship to the older router quickstart?",
+    "answer": "The earlier router quickstart describes the stateless router. The routers documented in this section are stateful, model-aware, and rank on cache state, output length and effort."
+  },
+  {
+    "question": "Does routing reduce quality?",
+    "answer": "It shouldn't, and it can improve it. Models are strong at different things, so routing each request to the model that handles it best can outperform any single model on your workload as a whole. The router first keeps models it's confident can do the task, and only then ranks them by cost."
+  },
+  {
+    "question": "How much will I save?",
+    "answer": "It depends on your traffic. A workload where most requests need a frontier model saves less than one with many routine requests. Cache and effort decisions add savings for agentic workloads. Measure on a sample of your own traffic."
+  },
+  {
+    "question": "Does the router add latency?",
+    "answer": "A routing decision takes some time, so a router adds a small amount to each request. Requests that go to a faster model finish sooner. Measure end-to-end latency on your workload rather than the routing step alone."
+  },
+  {
+    "question": "Which models can I route between?",
+    "answer": "The models in your router's catalog, which you choose when you create it."
+  },
+  {
+    "question": "Can I create a router through the API?",
+    "answer": "Not yet. Routers are created and configured in the dashboard. Once created, you call a router through the gateway API."
+  },
+  {
+    "question": "How do I know why a request went to a particular model?",
+    "answer": "Click into the request in Activity. You'll see each model's confidence and the routing reason."
+  },
+  {
+    "question": "What happens when a new model is released?",
+    "answer": "The router already scores models you haven't enabled, so you can see whether it could take a meaningful share of your traffic. Enabling it needs no application changes."
+  },
+  {
+    "question": "When shouldn't I use a router?",
+    "answer": "When you can select models offline, for example a workflow with fixed steps."
+  },
+  {
+    "question": "How do I choose a router?",
+    "answer": "Use the router selection checklist. It covers fit, decision quality, state and cost, modality, integration and evidence. To compare specific products, see compare LLM routers."
+  }
+]} />
+
+## Basics
+
+### What is model routing?
+
+Model routing is choosing, for each request, which model should handle it. A model router sits in
+front of a pool of models, reads each request, and sends it to the model best suited to the job.
+See [what is model routing?](./what-is-model-routing).
+
+### What is an LLM router?
+
+An LLM router is another name for a model router: software that decides which large language model
+serves each request, so easy requests stop paying for a frontier model. See
+[what is model routing?](./what-is-model-routing).
+
+### How does Emissary's router decide which model to use?
+
+It estimates each model's confidence that it can complete the request, keeps the models at or above
+your confidence threshold, and picks the cheapest of them. If none is confident, the request goes to
+your default model. See [how a routing decision is made](./how-routing-works/decision).
+
+### Does Emissary work with the OpenAI and Anthropic SDKs?
+
+Yes. Every router is reached through one gateway URL that is compatible with the OpenAI and
+Anthropic APIs. To switch an existing integration, change the base URL and the `model` string. See
+[connect an app or agent](./guides/connect).
+
+### Can I route Claude Code or other coding agents?
+
+Yes. Point the agent at the gateway and every request it makes is routed. See
+[connect an app or agent](./guides/connect#coding-agents).
+
+### Does Emissary retain my prompts and responses?
+
+Not by default. Zero data retention is on by default, so Emissary doesn't retain input, output or
+session replay data from gateway traffic, only routing decisions, token counts and cost telemetry.
+Turning it off lets you replay sessions and is the raw material for
+[what emerges from routing](./insights). See [get started](./get-started).
 
 ## Concepts
 
-<details>
-<summary>What's the difference between a router and a gateway?</summary>
+### What's the difference between a router and a gateway?
 
 A gateway handles *how* requests reach models, and a router decides *which model* serves each one.
 Emissary can be both: one gateway URL with a router behind it, which we recommend, or the routing
 policy alongside a gateway you already run. See
 [routers and gateways](./how-routing-works/routers-and-gateways).
 
-</details>
 
-<details>
-<summary>What's the difference between complexity-based and performance-based routing?</summary>
+### What's the difference between complexity-based and performance-based routing?
 
 Complexity-based routing guesses how hard a task is from its input and picks a cheap or expensive
 model, and that's hard to do reliably. Performance-based routing, which is what Emissary does, asks
 which models can actually do the task, based on how they've performed. See
 [the router design space](./how-routing-works/design-space#what-the-router-optimizes-for).
 
-</details>
 
-<details>
-<summary>Does the router choose effort, or only the model?</summary>
+### Does the router choose effort, or only the model?
 
 Both. Changing a model's effort keeps you on the same model, so the prompt cache is preserved,
 while switching models loses it. See
 [what the router sees](./how-routing-works/what-the-router-sees#effort).
 
-</details>
 
-<details>
-<summary>Can the router handle images?</summary>
+### Can the router handle images?
 
 The router knows which models accept images and won't send an image request to a text-only model.
 It doesn't interpret the image content itself. See
 [what the router sees](./how-routing-works/what-the-router-sees#modality).
 
-</details>
 
-<details>
-<summary>What's the relationship to the older router quickstart?</summary>
+### What's the relationship to the older router quickstart?
 
 The earlier [router quickstart](../quickstart/router) describes the stateless router. The routers
 documented in this section are stateful, model-aware, and rank on cache state, output length and
 effort.
 
-</details>
 
 ## Quality, cost and latency
 
-<details>
-<summary>Does routing reduce quality?</summary>
+### Does routing reduce quality?
 
 It shouldn't, and it can improve it. Models are strong at different things, so routing each request
 to the model that handles it best can outperform any single model on your workload as a whole. The
 router first keeps models it's confident can do the task, and only then ranks them by cost. See
 [how a routing decision is made](./how-routing-works/decision).
 
-</details>
 
-<details>
-<summary>How much will I save?</summary>
+### How much will I save?
 
 It depends on your traffic. A workload where most requests need a frontier model saves less than
 one with many routine requests. Cache and effort decisions add savings for agentic workloads.
 Measure on a sample of your own traffic. See [run a trial](./evaluate/run-a-trial).
 
-</details>
 
-<details>
-<summary>Does the router add latency?</summary>
+### Does the router add latency?
 
 A routing decision takes some time, so a router adds a small amount to each request. Requests that
 go to a faster model finish sooner. Measure end-to-end latency on your workload rather than the
 routing step alone.
 
-</details>
 
 ## Using Emissary
 
-<details>
-<summary>Which models can I route between?</summary>
+### Which models can I route between?
 
 The models in your router's catalog, which you choose when you create it. See
 [choose your models](./guides/choose-your-models).
 
-</details>
 
-<details>
-<summary>Can I create a router through the API?</summary>
+### Can I create a router through the API?
 
 Not yet. Routers are created and configured in the dashboard. Once created, you call a router
 through the gateway API. See [get started](./get-started).
 
-</details>
 
-<details>
-<summary>How do I know why a request went to a particular model?</summary>
+### How do I know why a request went to a particular model?
 
 Click into the request in Activity. You'll see each model's confidence and the routing reason. See
 [monitor and debug](./guides/monitor-and-debug).
 
-</details>
 
-<details>
-<summary>What happens when a new model is released?</summary>
+### What happens when a new model is released?
 
 The router already scores models you haven't enabled, so you can see whether it could take a
 meaningful share of your traffic. Enabling it needs no application changes. See
 [migrate to new models](./guides/migrate-to-new-models).
 
-</details>
 
 ## Choosing
 
-<details>
-<summary>When shouldn't I use a router?</summary>
+### When shouldn't I use a router?
 
 When you can select models offline, for example a workflow with fixed steps. See
 [when to route, and when not to](./why-route#when-to-route-and-when-not-to).
 
-</details>
 
-<details>
-<summary>How do I choose a router?</summary>
+### How do I choose a router?
 
-Use the [router selection checklist](./evaluate/selection-checklist).
+Use the [router selection checklist](./evaluate/selection-checklist). It covers fit, decision quality,
+state and cost, modality, integration and evidence. To compare specific products, see
+[compare LLM routers](./evaluate/llm-router-comparison).
 
-</details>

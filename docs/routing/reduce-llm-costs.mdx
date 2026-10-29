@@ -1,0 +1,104 @@
+---
+title: 'How to reduce LLM costs with model routing'
+sidebar_label: 'Reduce LLM costs'
+description: 'Cut LLM API spend by routing each request to the cheapest model that can do the job. Where the savings come from, typical results, and how to measure them.'
+keywords: [reduce LLM costs, LLM cost optimization, LLM API cost, model routing savings, prompt caching, reasoning effort]
+---
+import FaqSchema from '@site/src/components/FaqSchema';
+
+<FaqSchema items={[
+  {
+    question: 'How do you reduce LLM API costs without lowering quality?',
+    answer: 'Stop sending every request to the same expensive model. Route each request to the cheapest model that is confident it can complete it, and account for prompt cache state, expected output length and reasoning effort when ranking models.',
+  },
+  {
+    question: 'How much does model routing typically save?',
+    answer: 'A cost reduction of 30 to 50 percent is typical. The result depends on your traffic, your catalog of models and your default model, and these are typical figures rather than guarantees.',
+  },
+  {
+    question: 'How do I measure LLM routing savings?',
+    answer: 'Run a representative sample of your own requests through your current setup to get a baseline, run the same sample through a router, and compare cost, latency and quality, looking at quality first.',
+  },
+]} />
+
+The most reliable way to reduce LLM API costs without lowering quality is to **stop sending every
+request to the same expensive model**. Route each request to the **cheapest model that is confident
+it can complete it**, and let cache state, output length and reasoning effort inform which model is
+actually cheapest. A cost reduction of **30–50%** is typical. This page explains where the savings
+come from and how to measure them on your own traffic.
+
+## Why do LLM costs get so high?
+
+Teams usually **peak provision**: they choose the one model that can handle *any* request and use it
+for *every* request. Requests that a smaller model could handle pay for intelligence they don't
+need. The bill is also shaped by things a per-token price list doesn't show:
+
+- **Output length.** A model with a lower per-token price that needs far more tokens to answer can
+  cost more overall.
+- **Prompt caching.** Sending a long conversation to a model that already holds it in cache can
+  cost far less than sending it to a nominally cheaper model that has to process it from scratch.
+- **Reasoning effort.** Running a model at higher effort buys more reasoning at more cost and
+  latency, whether or not the request needed it.
+- **Your actual rates.** Contract discounts and provider markups change which model is cheapest.
+
+## What are the levers for lowering LLM spend?
+
+| Lever | What it does | Where it's covered |
+| --- | --- | --- |
+| **Right-size the model per request** | Easy requests go to cheaper models, and only requests that need a frontier model pay for one | [How a routing decision is made](./how-routing-works/decision) |
+| **Rank by expected cost, not list price** | Estimates output tokens per model, so a cheap model that rambles doesn't win | [What the router sees](./how-routing-works/what-the-router-sees#expected-output-length) |
+| **Respect the prompt cache** | Credits a model that already holds the context, so long conversations and agent loops don't throw away paid-for tokens | [What the router sees](./how-routing-works/what-the-router-sees#cache-state) |
+| **Choose the lowest sufficient effort** | A confident model is served at the lowest effort that clears the threshold, and changing effort keeps the cache | [What the router sees](./how-routing-works/what-the-router-sees#effort) |
+| **Use your real prices** | Ranking follows your contract rates, not list prices | [Use your own pricing](./guides/pricing) |
+
+## How does Emissary's router lower cost without lowering quality?
+
+It splits the decision in two. First it **protects quality**: the router estimates each model's
+confidence that it can complete the request, and keeps only the models at or above your
+[confidence threshold](./guides/confidence-threshold). Then it **optimizes cost**, only within that
+set, by picking the cheapest confident model. If no model is confident, the request goes to your
+default model, so the default is your safety net. A router that blends quality and cost into one
+score can trade a quality loss for a saving without you noticing. See
+[why capability comes before cost](./how-routing-works/decision#why-capability-comes-before-cost).
+
+## How much will I save?
+
+- **30–50% cost reduction** is typical. The more options you give the router, the more it saves.
+  - **Bottom of the range** when routing within a family of models, for example across the sizes of
+    one provider's lineup.
+  - **Top of the range** when routing across open-source and closed-source models, since open
+    models widen the gap between the cheapest capable model and the default.
+- **About 60% deflection from the default model**: roughly 60% of requests are served by a model
+  other than the default. This is usually measured against a default of Opus 5.x-grade models.
+
+These are typical figures, not guarantees. A workload where most requests need a frontier model
+saves less than one with many routine requests, and cache and effort decisions add savings for
+agentic workloads.
+
+## How do I measure the savings on my own traffic?
+
+1. **Build a representative sample** of real requests, including easy, hard and odd ones. For
+   agents, use whole multi-step runs.
+2. **Set a baseline** by running the sample through your current setup and recording cost, latency
+   and quality.
+3. **Run the same sample through a router** and compare. Look at quality first, because savings that
+   come with a quality drop aren't savings.
+4. **Read the routing decisions** and adjust the threshold, catalog and pricing one change at a
+   time.
+
+See [run a trial on your traffic](./evaluate/run-a-trial) for the full procedure. Once a router has
+traffic, the **Saved** figure in Activity shows spend against a baseline of your default model. See
+[monitor and debug](./guides/monitor-and-debug#activity).
+
+## When won't routing reduce my costs?
+
+If almost every request needs the same model, routing won't help much. And if your workload is a
+fixed workflow with predictable steps, you can pick and pin a model for each step ahead of time,
+with no routing step to pay for. See
+[when to route, and when not to](./why-route#when-to-route-and-when-not-to).
+
+## Next steps
+
+- [What is model routing?](./what-is-model-routing) for the basics.
+- [Get started](./get-started) to create your first router in about ten minutes.
+- [Set the confidence threshold](./guides/confidence-threshold), the main quality-versus-cost dial.

@@ -1,6 +1,11 @@
 ---
-title: 'Get started'
+title: 'Post-training quickstart: fine-tune a model'
+sidebar_label: 'Quickstart'
+description: 'Fine-tune your first model on Emissary: create a project, upload a dataset, run a training job, compare checkpoints, and deploy the best one.'
 ---
+This quickstart walks you through **post-training (fine-tuning) your first model** on Emissary: create a
+project, upload a dataset, run a training job, compare checkpoints, and deploy the best one for
+inference. New to the terms? Start with [what is post-training?](./what-is-post-training).
 
 ## Overview
 Once you have a clear idea of your AI use case, the next step is building systems that adapt to your specific needs—and fine-tuning your own models is how you get there.
@@ -17,17 +22,17 @@ In short, fine-tuning is what lets you move beyond being another prompt wrapper 
 A training project is a workspace that groups together the fine-tuning jobs you run toward a single goal.
 For example, if you're building a model to classify support tickets, you might create a project named `support-triage` and run and manage all related jobs within it.
 
-![new_project](/img/quickstart/new_project.png)
+![Create training project dialog on Emissary](/img/quickstart/new_project.png)
 
 ### 2. Prepare and Upload Dataset
 
 Before starting a fine-tuning job, you'll need to select a task type and prepare a dataset that conforms to the format described in the **Schema Guide**.
 
-<img src="/img/quickstart/schema_guide.png" alt="schema_guide" width="600" />
+<img src="/img/quickstart/schema_guide.png" alt="Schema Guide showing the dataset format for the selected task type" width="600" />
 
 We support `JSON`, `JSONL`, and `CSV`, though we strongly recommend `JSONL` for more reliable dataset profiling.
 
-![dataset_profile](/img/quickstart/dataset_profile.png)
+![Dataset profile showing row counts, class balance and token-length distributions](/img/quickstart/dataset_profile.png)
 
 When you upload a dataset, we run a quick profiling pass that validates it against our schema and surfaces key metadata. This helps you confirm the dataset is well-formed and catch outlier samples before training begins.
 
@@ -44,7 +49,7 @@ With your dataset uploaded, you're ready to launch your first job. Go to the **T
 
 First, choose whether to fine-tune from a foundation model (**Pre-trained**) or continue from one of your existing checkpoints (**Fine-tuned**). If this is your first job on the platform, leave **Pre-trained** selected—you won't have any checkpoints yet.
 
-![base_model_list](/img/quickstart/base_model_list.png)
+![List of base models with the task types each supports](/img/quickstart/base_model_list.png)
 
 When selecting a model, the dropdown lists every available base model along with the task types each one supports. Choose any model that supports your target task type.
 
@@ -74,13 +79,13 @@ Click the job in the list which you create from the previous step to open its **
 
 - **Overview:** Displays the job's metadata (technique, base model, train/test datasets) along with a training loss graph that populates as the job emits loss data points.
 
-    ![training_overview_tab](/img/quickstart/training_overview_tab.png)
+    ![Training job Overview tab with a training loss graph](/img/quickstart/training_overview_tab.png)
 
 - **Checkpoints:** As the job progresses, checkpoints appear here. You can deploy any checkpoint directly from this tab, and if you provided a test dataset, its results are shown here as well.
 
-    ![training_checkpoints_tab](/img/quickstart/training_checkpoints_tab.png)
+    ![Training job Checkpoints tab listing checkpoints with a Deploy button](/img/quickstart/training_checkpoints_tab.png)
 
-    ![training_checkpoints_test_results](/img/quickstart/training_checkpoints_test_results.png)
+    ![Checkpoint evaluation results on the test dataset](/img/quickstart/training_checkpoints_test_results.png)
 
 - **Logs:** Real-time logs with a 7-day retention period.
 - **Configuration:** Review the hyperparameters you set for the job.
@@ -91,9 +96,9 @@ Once a job completes, you can deploy any checkpoint from within the platform. Th
 
 Open the **Checkpoints** tab on the training job details page and click **Deploy**.
 
-![checkpoint_deploy](/img/quickstart/checkpoint_deploy.png)
+![Deploy button on a training checkpoint](/img/quickstart/checkpoint_deploy.png)
 
-<img src="/img/quickstart/create_deployment.png" alt="create_deployment" width="450" />
+<img src="/img/quickstart/create_deployment.png" alt="Create deployment form for a fine-tuned checkpoint" width="450" />
 
 Configuring an Inference Engine (deployment) involves four sections, all prefilled—so in most cases you can simply click **Deploy** to launch your inference server.
 
@@ -128,7 +133,7 @@ From the left sidebar, go to **Inference**, where you'll find the Inference Engi
 
 - **Overview:** Lists the deployments attached to this engine. You can add more deployments here as long as they share the same base model and task type, and you can track each deployment's status. Once a deployment shows as **Deployed**, it's ready to use.
 
-    ![engine_overview](/img/quickstart/engine_overview.png)
+    ![Inference engine Overview tab listing the deployments on the engine](/img/quickstart/engine_overview.png)
 
 - **Testing:** A built-in UI for testing any deployment that's live. (Image-related task testing isn't supported in the UI yet—coming soon.)
 - **API:** A ready-to-use code snippet for integrating the engine into your service. If you haven't created an API key yet, generate one under **Settings > Credentials**.

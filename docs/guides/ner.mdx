@@ -1,6 +1,12 @@
 ---
 title: Named Entity Recognition (NER)
 ---
+import Head from '@docusaurus/Head';
+
+<Head>
+  <meta name="robots" content="noindex" />
+</Head>
+
 ## 1. Objective
 
 This guide provides step-by-step instructions on fine-tuning a model for **Named Entity Recognition** tasks on Emissary using our novel NER approach. In this approach, we add a token classification head on top of the base LLMs that returns probabilities for a each tokens. We recommend using **Qwen3-4B-Base** for this task.
