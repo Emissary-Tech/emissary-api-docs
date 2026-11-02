@@ -63,6 +63,14 @@ const config: Config = {
           // Shows "Last updated" on each page and feeds dateModified / sitemap lastmod.
           // Needs full git history at build time (no shallow clone).
           showLastUpdateTime: true,
+          // Contributor notes that live in docs/ but are not part of the published site.
+          exclude: [
+            "**/_*.{js,jsx,ts,tsx,md,mdx}",
+            "**/_*/**",
+            "**/*.test.{js,jsx,ts,tsx}",
+            "**/__tests__/**",
+            "**/SEO-CHANGES.md",
+          ],
         },
         blog: false,
         sitemap: {

@@ -7,11 +7,14 @@ export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 export const DOCS_DIR = path.join(ROOT, "docs");
 export const SITE_URL = "https://docs.withemissary.com";
 
+// Files in docs/ that are excluded from the published site (see `exclude` in docusaurus.config.ts).
+const UNPUBLISHED = new Set(["SEO-CHANGES.md"]);
+
 export function walk(dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
     const p = path.join(dir, e.name);
     if (e.isDirectory()) return walk(p);
-    return /\.mdx?$/.test(e.name) ? [p] : [];
+    return /\.mdx?$/.test(e.name) && !UNPUBLISHED.has(e.name) ? [p] : [];
   });
 }
 
