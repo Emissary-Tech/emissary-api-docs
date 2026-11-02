@@ -1,0 +1,54 @@
+---
+id: when-to-train
+title: 'When to train your own'
+description: 'Signs that zero-shot is no longer enough, and how to choose between quick-train and a LoRA fine-tune.'
+---
+
+# When to train your own
+
+A zero-shot Decision LM is the right place to start. You write class names and descriptions, and you get a working endpoint in under a second. Most tasks never need more. This page helps you tell when yours does, and which level of training to use.
+
+---
+
+## Signs zero-shot has run out
+
+Consider training your own when you notice any of these:
+
+- **Confidence doesn't match reality.** A score of 0.9 is wrong far more than 10% of the time, so thresholds and escalation rules can't be trusted.
+- **It keeps missing the same cases.** The errors cluster around your edge cases or your own definition of a label, which a description can't capture.
+- **The class descriptions are doing too much work.** Rewording a description changes your results, or the descriptions keep growing to patch failures.
+- **Requests are long.** Every request carries the description of each class. A trained model learns what the classes mean from your examples, so requests get shorter, cheaper, and faster.
+- **You need multi-label.** More than one label per input is only available in post-trained models, and only through a [LoRA fine-tune](./lora-fine-tune).
+- **You already have labeled data.** If you have been logging decisions, for example after running [Discover your own](../use-cases/discover-your-own), you have the raw material.
+
+If none of these apply, stay on zero-shot. Training adds a dataset to maintain and a model to keep up to date.
+
+---
+
+## The three levels
+
+The levels differ in how much of the model changes.
+
+| Level | What changes | Data you need | Reach for it when |
+|---|---|---|---|
+| **Zero-shot** | The head is *set* from your class descriptions. Nothing is trained. | None | You are starting out, or the task matches a standard use case |
+| **[Quick-train](./quick-train)** | The head is *trained*. The language model underneath stays frozen. | 10-50 labeled examples | Zero-shot is close, but misses your definitions or edge cases |
+| **[LoRA fine-tune](./lora-fine-tune)** | A LoRA adapter and the head are *both trained*, so the model's own representations adapt | Hundreds of examples or more | Quick-train plateaus, you need multi-label, or you want the highest accuracy |
+
+### How to choose
+
+1. **Start with quick-train** if you have a small set of labeled examples. It is the cheapest way to find out how much your data can help.
+2. **Move to a LoRA fine-tune** if any of these are true:
+   - Quick-train plateaus. A head on a frozen model can only redraw the boundary between classes using features the model already produces. If those features don't separate your classes, only adapting the model itself helps.
+   - You need multi-label output.
+   - You have a large labeled dataset and want the best accuracy, calibration, and latency.
+
+Whichever level you choose, hold back a test set first and measure the result against zero-shot. If it isn't better, you have learned that cheaply.
+
+---
+
+## Next steps
+
+- Small labeled set: [Quick-train](./quick-train).
+- Large labeled set, or multi-label: [LoRA fine-tune](./lora-fine-tune).
+- What it costs: [Costs and FAQ](../costs-and-faq).

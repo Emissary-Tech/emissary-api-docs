@@ -30,8 +30,6 @@ const sidebars: SidebarsConfig = {
         items: [
             'decision-lm/overview',
             'decision-lm/deep-dive',
-            'decision-lm/compare',
-            'decision-lm/build-your-own',
             {
               type: 'category',
               label: 'Use Cases',
@@ -42,6 +40,18 @@ const sidebars: SidebarsConfig = {
                   'decision-lm/use-cases/discover-your-own',
               ],
             },
+            {
+              type: 'category',
+              label: 'Train your own',
+              items: [
+                  'decision-lm/train-your-own/when-to-train',
+                  'decision-lm/train-your-own/quick-train',
+                  'decision-lm/train-your-own/lora-fine-tune',
+                  'decision-lm/train-your-own/maintain',
+              ],
+            },
+            'decision-lm/costs-and-faq',
+            'decision-lm/compare',
         ],
       },
       {

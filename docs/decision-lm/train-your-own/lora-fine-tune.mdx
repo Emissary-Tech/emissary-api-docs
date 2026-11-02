@@ -1,40 +1,33 @@
 ---
-id: build-your-own
-title: 'Build your own'
-description: 'When and why to train your own classifier or regressor on Emissary, and how to format data, train, evaluate, and deploy it.'
+id: lora-fine-tune
+title: 'LoRA fine-tune'
+description: 'Post-train a LoRA adapter and classification head on your own labeled data, then evaluate and deploy it.'
 ---
 
-# Build your own
+# LoRA fine-tune
 
-Zero-shot Decision LMs are the fastest way to get started, but once your task is well defined and you have labeled data, you can **post-train your own classifier or regressor** on Emissary. This page covers whether you should, and walks through how.
+A **LoRA fine-tune** trains a lightweight adapter and the classification head together, so the model's own representations adapt to your task. It is the deepest level of customization, and the one to use when [quick-train](./quick-train) plateaus, when you need multi-label output, or when you want the highest accuracy.
 
----
+See [When to train your own](./when-to-train) to decide whether you need it. Plan for **at least 100 labeled samples per class**. For a regressor, aim for a comparable total number of examples that cover the full range of the target. Balanced classes help, and profiling warns if any class has fewer than about 20 examples.
 
-## Why?
+## What you get
 
 A model trained on your data usually beats a zero-shot one on the things that matter in production:
 
 - **Calibrated probabilities.** A trained model's scores line up with how often it is actually right, so a threshold of 0.9 means roughly 90% precision. That makes thresholds, escalation rules, and human-in-the-loop routing reliable.
 - **Greater precision and recall.** The model learns your label boundaries, edge cases, and vocabulary instead of inferring them from a class description.
-- **Consistency.** The same input gets the same decision, run after run. There is no prompt drift and no dependence on prompt wording.  Encode your policy, your tone, and your edge cases, including ones that are hard to put in a prompt.
+- **Consistency.** The same input gets the same decision, run after run. There is no prompt drift and no dependence on prompt wording. Encode your policy, your tone, and your edge cases, including ones that are hard to put in a prompt.
 - **Lower cost and latency.** No longer need to put a description of each class in your input, because the model learns what each class means from your examples. Requests are shorter, so you pay for fewer tokens per request and each one processes faster.
 - **Ownership.** The checkpoint is yours. You can version it, A/B test it, and retrain it as your data grows.
-
-## When?
-
-Build your own once you have **at least 100 labeled samples per class**. For a regressor, aim for a comparable total number of examples that cover the full range of the target.
-
-With fewer examples, start from a zero-shot [Decision LM](./overview), collect real traffic, label it, and come back here. Balanced classes help. Profiling warns if any class has fewer than about 20 examples.
-
-## Validation
 
 Third parties have benchmarked trained LLM classifiers against prompted LLMs and published the results. See the [llm-classifier-bench](https://github.com/lucasbiagettia/llm-classifier-bench) repository for the methodology, datasets, and numbers.
 
 ---
 
-## How?
+## How
 
 The lifecycle is: **format dataset → train → measure → deploy**. This page uses the API. Every step can also be done in the dashboard, as described in the [post-training quickstart](/fine-tuning/quickstart).
+
 
 Set these up once:
 
@@ -110,7 +103,7 @@ with open('train.jsonl', 'rb') as f:
     ).json()
 ```
 
-Now start the job. **Pick `Qwen3-8B` as the base model if you want to deploy serverless.** Do not pick `Qwen3-8B-Base`, which cannot be served serverless. See [Which base model should I pick?](#faq).
+Now start the job. **Pick `Qwen3-8B` as the base model if you want to deploy serverless.** Do not pick `Qwen3-8B-Base`, which cannot be served serverless. See [Which base model should I pick?](../costs-and-faq#which-base-model-should-i-pick).
 
 ```python
 job = requests.post(
@@ -257,47 +250,7 @@ Classifiers and regressors are called the same way, through `POST /v1/classifica
 
 ---
 
-## FAQ
+## Next steps
 
-<a id="faq"></a>
-
-### Classification vs. regression: how do I choose?
-
-Choose by the shape of your answer.
-
-- Use **classification** when the answer is a choice among known options, such as route A or B, safe or unsafe, or which of five intents. You get a probability per class.
-- Use **regression** when the answer is a point on a scale, such as urgency from 0 to 1, a quality score, or a sentiment intensity. You get a single number.
-
-Both train and deploy the same way. The only difference is the loss function used in training, so a regressor is served from a classification inference engine just like a classifier.
-
-If your labels are really ordered buckets (low, medium, high) and you have enough examples at a finer grain, regression often uses your data more efficiently. If you only ever act on a few discrete outcomes, classification is simpler to threshold and evaluate.
-
-### How can this be deployed?
-
-- **Serverless on `Qwen3-8B`.** Pay per token with no engine to manage.
-- **Dedicated for everything else.** Any other backbone runs on a dedicated engine.
-
-Use **dedicated** when you have high throughput or a predefined time window, such as scheduled workflows. Use **serverless** when your workload is spiky, low-volume, or unpredictable. Autoscaling is also available on dedicated engines, so [reach out](mailto:support@withemissary.com) if you want it set up for your workload.
-
-### Which base model should I pick?
-
-Choose **Qwen3-8B** (not Qwen3-8B-Base) because it is the one you can deploy serverless.
-
-- Go **bigger** if you need a smarter model, for example when the task is subtle and the smaller model's held-out score is still improving.
-- Go **smaller** if your eval is already maxed out. A simpler task doesn't need a bigger model, and a smaller one is cheaper and faster.
-
-Bigger and smaller backbones run on dedicated engines.
-
-### What does it cost to build your own?
-
-Training a classifier or regressor is cheap, and you can start small.
-
-- **Typical:** for 3-5 classes with about 100 samples each, training usually costs **under $15**.
-- **Larger datasets:** training on up to about 5,000 samples costs **under $50 at most**.
-
-Start with the smaller dataset to confirm your labels and setup work, then scale up to more data if your held-out score is still improving.
-
-### What does it cost to run?
-
-- **Serverless:** **$0.05 per million tokens.**
-- **Dedicated:** **$3/hr for models under 30B parameters.** Contact us for larger models. Bigger models are slower, so the effective cost on a 27B model is roughly **$0.15 per million tokens**, depending on your workload pattern. Steady, high-volume traffic that keeps the GPU busy lands at the low end.
+- [Maintain your model](./maintain) as your data changes.
+- Costs, base-model choice, and deployment options: [Costs and FAQ](../costs-and-faq).

@@ -1,0 +1,45 @@
+---
+id: quick-train
+title: 'Quick-train'
+description: 'Adapt a Decision LM to your data with 10-50 labeled examples by training only the head.'
+---
+
+{/*
+  TODO: this page is a skeleton. Fill in from the product before publishing:
+  - how to run quick-train (dashboard and API), including the request shapes
+  - the dataset format, and whether it matches /fine-tuning/datasets
+  - how long it takes and what it costs
+  - what a quick-train run produces and how to deploy it
+  - whether a quick-train head can warm-start a LoRA fine-tune
+  - guidance on 10 vs 50 examples (number of classes, ambiguity)
+*/}
+
+# Quick-train
+
+**Quick-train** adapts a Decision LM to your data using only **10-50 labeled examples**. It trains the classification head and leaves the language model underneath frozen, so it needs very little data.
+
+Use it when zero-shot is close but misses your definitions or edge cases. See [When to train your own](./when-to-train) to decide.
+
+## What it does and doesn't fix
+
+A head on a frozen model redraws the boundary between your classes, using features the model already produces.
+
+- **It helps** when the model already understands your inputs but draws the line between classes in the wrong place: your label definitions, your thresholds, your edge cases.
+- **It doesn't help** when the model's features don't separate your classes at all. If quick-train plateaus, move to a [LoRA fine-tune](./lora-fine-tune), which also adapts the model itself.
+- **It can't do multi-label.** Multi-label output needs a LoRA fine-tune.
+
+## Before you start
+
+- A zero-shot Decision LM for your task, with class descriptions.
+- 10-50 labeled examples, plus a few held back as a test set.
+
+## Steps
+
+1. Format your examples.
+2. Run quick-train.
+3. Evaluate against the zero-shot baseline.
+4. Deploy.
+
+## Next steps
+
+- Not accurate enough yet: [LoRA fine-tune](./lora-fine-tune).

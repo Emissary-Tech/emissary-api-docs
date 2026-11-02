@@ -1,14 +1,14 @@
 ---
 id: deep-dive
-title: 'Technical Deep Dive'
+title: 'How it works'
 description: 'How Decision LMs work: the classification head, ways to build it, how classes become prompts, and the tradeoffs.'
 ---
 
-# Technical deep dive
+# How it works
 
 A Decision LM uses a language model to produce a decision in a single forward pass, without autoregressive text generation. Depending on the implementation, the decision comes from a constrained language-modeling head or a dedicated classification or regression head. There is no sampling loop and no generated text. The model reads the input once and the output is a distribution (or a number) read straight off the final hidden state.
 
-This deep-dive is designed for those hoping to understand how the model is built, how your classes reach the model, and what to expect in production. For a high-level introduction, see the [overview](./overview).
+This page is designed for those hoping to understand how the model is built, how your classes reach the model, and what to expect in production. For a high-level introduction, see the [overview](./overview).
 
 ---
 
