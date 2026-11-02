@@ -1,0 +1,56 @@
+---
+title: 'Migrate to new models'
+description: 'How to adopt new models without guesswork: the router scores models you haven''t enabled, so you can see when one could take a meaningful share of your traffic.'
+---
+
+New models ship constantly, and the usual way to adopt one is slow and uncertain: swap it in
+somewhere, hand-test a few prompts, and hope. Routing gives you a better way.
+
+## The router scores models you haven't enabled
+
+Emissary's router predicts confidence across **all** models, including ones you haven't added to
+your catalog. Over time that tells you something you'd otherwise have to find out by experiment:
+when there's a model you aren't using that the router believes could handle a large share of your
+requests.
+
+So migration isn't a leap. You see the evidence first, then decide.
+
+## A migration workflow
+
+The safest way to adopt a new model is as an A/B experiment. Create a second router with the same
+setup plus the new model, send it a share of your traffic, and compare it with your current router
+before you commit.
+
+1. **Notice the opportunity.** Open a request in Activity and look at **Classifier probabilities**.
+   It lists every model the router scores, including ones outside your catalog. Look for a model
+   you haven't enabled that is confident for a meaningful share of your traffic. See
+   [what emerges from routing](../insights).
+2. **Create a second router.** Create a new router with the **same models, default model, and
+   confidence threshold** as your current one, **plus the new model**. Add a key for the new
+   model's provider if you don't have one yet. Keeping everything else identical means any
+   difference you see comes from the new model. See [get started](../get-started).
+3. **Check pricing.** Confirm the new model's [pricing](./pricing) reflects your rates, since the
+   router ranks on it.
+4. **Send it some traffic.** Use the second router's name as the `model` for a portion of your
+   requests, for example a small percentage, and keep the rest on your current router. Your
+   application changes only in which router name it sends.
+5. **Compare.** Put the two routers side by side in [Activity and Metrics](./monitor-and-debug):
+   spend, savings against baseline, latency, model mix, and routing reasons. Then check quality
+   against your own measures. See [run a trial on your traffic](../evaluate/run-a-trial).
+6. **Promote it.** If the new router does better, move all your traffic to it. Or add the new model
+   to your original router with **Edit configuration**, so your application keeps using the same
+   router name.
+
+Once the new model is in your main router, your application needs no changes. Requests still go to
+the same gateway URL with the same router name, and the router decides what serves them.
+
+## Retiring a model
+
+The same applies in reverse. If a model is deprecated or you want to drop a provider, remove it
+from the catalog and the router stops sending it traffic. Nothing in your application refers to it.
+
+## Why this works
+
+Every request is already being classified for every model, so the router accumulates evidence on
+how each one would have done on *your* traffic. A new model benchmark on someone else's tasks says
+little about yours. Confidence on your own requests does.

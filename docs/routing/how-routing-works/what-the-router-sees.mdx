@@ -1,0 +1,77 @@
+---
+title: 'What the router sees'
+description: 'The signals Emissary''s router uses beyond the request itself: cache state, expected output length, modality, effort, and your pricing.'
+---
+
+A router that only reads the request text can only guess. Emissary's router also sees the situation
+around the request, and that's what lets it find the cheapest *good* option rather than the
+cheapest *nominal* one. This page covers each signal. For how they combine into a decision, see
+[how a routing decision is made](./decision).
+
+## Cache state
+
+*Also called: stateful routing.*
+
+Prompt caching changes the economics of a request. Sending a long conversation to a model that
+already holds it in cache can be far cheaper than sending it to a nominally cheaper model that has
+to process it from scratch. A router that can't see cache state can't make that tradeoff.
+
+Emissary's router knows what each model has cached and takes it into account. Each target model's
+cache read and write prices are part of its configuration, so cached context is priced in.
+
+## Expected output length
+
+*Also called: intelligence density.*
+
+Models differ in how many output tokens they need to complete the same task. A model with a lower
+per-token price that needs far more tokens to answer can cost more overall. The router estimates
+how many output tokens each model will need for the task and prices that in, instead of comparing
+per-token prices alone.
+
+## Effort
+
+Emissary routes across **models and effort**, not just models. Many models can run at different
+effort levels, trading more reasoning for more cost and latency. For a request that doesn't need a
+different model, the router can change the effort instead.
+
+The classifier has **one head per model and effort**, for example `@low`, `@medium`, and `@high`
+for a model that supports them. Each head is the probability that the model passes the request at
+that effort. A model is confident when any effort clears the confidence threshold, and it's served
+at the **lowest effort that does**. Models without effort levels have a single head and run at the
+provider's default effort.
+
+This matters because it **preserves the cache.** Prompt cache lives with the model, so switching
+models forfeits whatever the previous model had cached. Staying on the same model and changing the
+effort keeps it warm. A router that can see cache state prefers the cheaper move: adjust effort
+first, and switch models only when the capability gain is worth losing the cache.
+
+Where effort routing applies to a model, the **Effort routing** column in the router's
+Configuration tab shows it.
+
+## Modality
+
+A router needs to know which models can accept which inputs. The router knows which models handle
+images, shown in the **Vision** column of the Configuration tab, so it never sends an image request
+to a text-only model. Being modality-aware doesn't mean the router interprets the image content.
+That is a further step, called *multimodal* routing. See [the design space](./design-space).
+
+## Your pricing
+
+The ranking uses the prices on your router: input, output, and cache read and write, per model.
+Pricing is prefilled with list prices, and you can change it to match your contracts. That way the
+router's idea of "cheapest" is *your* cheapest. See [use your own pricing](../guides/pricing).
+
+## Context limits
+
+Each model's context window is part of its configuration, so a request that's too long for a model
+isn't routed there.
+
+## At a glance
+
+| Signal | What it prevents |
+| --- | --- |
+| Cache state | Paying to re-process context another model already holds |
+| Expected output length | Choosing a "cheap" model that costs more once it answers |
+| Effort | Losing the cache by switching models when changing effort would do |
+| Modality | Sending an image to a model that can't read it |
+| Your pricing | Optimizing for list prices you don't actually pay |

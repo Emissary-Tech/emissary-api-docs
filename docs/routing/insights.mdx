@@ -1,0 +1,115 @@
+---
+title: 'What emerges from routing'
+description: 'Routing does more than pick a model. It produces audit-level intelligence about your workload, and it sets up dedicated inference and post-training, so routing compounds over time.'
+---
+
+The obvious reasons to route are cost, performance, and latency. The less obvious ones emerge from
+routing itself. A router classifies every request against every model and keeps the result. That
+gives you two things a single-model setup can't:
+
+1. **Intelligence about your workload**: what's easy, what's hard, and what you're missing.
+2. **A path to your own models**: dedicated inference for the open models you route to, and
+   post-training on the trajectories your traffic leaves behind.
+
+## What you learn
+
+### What's recorded for every request
+
+For each request, the router records:
+
+- **Each model's confidence** that it could complete the request.
+- **The routing reason**: why a particular model was chosen, including whether the request fell to
+  the default because nothing was confident, or escalated because the only confident model was more
+  expensive.
+
+You see both by clicking into a request in **Activity**. The detail also shows an estimated cost
+per candidate, the saving against the baseline, and an execution trace. See
+[monitor and debug](./guides/monitor-and-debug).
+
+### Which models you're missing
+
+The router predicts confidence across all models, including ones you haven't enabled, and lists
+them all under **Classifier probabilities** in each request's detail. If a model
+outside your catalog is confident on a large share of your traffic, that's a candidate to add,
+whether for cost, speed, or quality. See [migrate to new models](./guides/migrate-to-new-models).
+
+### Which requests nothing can handle
+
+Requests that end in `default_no_confident` are the ones **no model in your catalog could vouch
+for**. Looking at what they have in common tells you where your capability gaps are:
+
+- If they're a coherent type of task, that's a candidate for a **stronger model**, or for a model
+  of your own, trained on that task. See
+  [from routing to your own models](#from-routing-to-your-own-models).
+- If they're scattered, your threshold may be set too high, and the router is being cautious on
+  requests that a lower threshold would handle.
+
+### Where your default model is doing the work
+
+A high share of traffic on the default model tells you the catalog's cheaper models aren't
+covering enough, or that the default is carrying work a cheaper model could do. Frequent
+**escalation** says the opposite: the default is too weak for the traffic it receives.
+
+### How difficult your traffic really is
+
+Spread across models, with confidence, shows what share of your workload is easy and what share
+needs a frontier model. Teams often guess at this, and the routing record measures it.
+
+## From routing to your own models
+
+Routing is the first step of a loop: **route, serve, post-train.** Each step makes the next one
+possible, and the last makes routing cheaper again.
+
+```
+        ┌───────────────────────────────────────────────────────────┐
+        ▼                                                           │
+     route ──▶ serve open models ──▶ post-train on trajectories ────┘
+   (decide)    (dedicated capacity)   (your model joins the catalog)
+```
+
+### Dedicated inference
+
+Routing sends a lot of work to open models, and **shared endpoints price those models for the
+average workload, not yours.** Dedicated inference runs them on compute that's tuned to your
+traffic shape, so the cheap option stays cheap and predictable:
+
+- **Dedicated capacity**, with no noisy neighbors.
+- **Tuned to your traffic shape**, rather than to an average.
+- **Predictable latency under load.**
+
+The router shows you which models carry your traffic, which tells you what to put on dedicated
+capacity. See [inference](../inference/concept) and [deployments](../inference/deployments).
+
+### Post-training
+
+Every routed request leaves a **trajectory**. Post-training turns those trajectories into a model of
+your own, specialized to the work you actually do:
+
+- **Cheaper** on work you've already seen.
+- **Better on your domain** than any general model.
+- **Faster**, because it's smaller.
+
+When a model you trained becomes the better call for a request, the router sends it there
+automatically. It's just another model in the catalog, scored for confidence like the rest. See
+[post-training concepts](../fine-tuning/concept).
+
+Your data trains your models, and your signal never trains anyone else's.
+
+:::note
+Training uses the trajectories your traffic leaves behind, so it needs that data to be kept. With
+**zero data retention** on, which is the default, Emissary doesn't retain input, output, or session
+replay data. See [monitor and debug](./guides/monitor-and-debug#sessions-and-replay).
+:::
+
+### The loop
+
+**Routing feeds your training data, and training makes routing cheaper.** The more you route, the
+more trajectories you have to learn from. The routing record shows which requests nothing handles
+confidently, which are the best candidates for a model of your own. And the router decides, request
+by request, when that model is the better call.
+
+## Why it's useful
+
+Most model decisions are made on public benchmarks and intuition. Routing data comes from *your*
+requests, so it answers questions specific to your workload: which model should I add, where is my
+catalog weak, what should I serve on dedicated capacity, and what should I train next.

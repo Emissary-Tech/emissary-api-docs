@@ -1,0 +1,46 @@
+---
+title: 'Emissary vs LiteLLM'
+description: 'How Emissary compares with LiteLLM: automated, trained model routing with tracked savings vs. a self-hosted gateway with near-complete model coverage and self-managed routing.'
+---
+
+[LiteLLM](https://docs.litellm.ai) is an open-source SDK and proxy server that exposes many model
+providers behind one OpenAI-compatible interface. Its routing features are about **reliability and
+traffic management**: load balancing across deployments of the same model, retries, cooldowns, and
+fallbacks to another model group when a call fails.
+
+Emissary can also be your gateway: one URL, compatible with the OpenAI and Anthropic APIs, calling
+providers with your own keys. The difference is what decides *which model* serves a request. With
+LiteLLM, you manage that yourself, with rules and configuration you write. With Emissary, it's
+automated, by a router trained to predict which models can do the task. See
+[routers and gateways](../how-routing-works/routers-and-gateways).
+
+*Based on public information as of October 2026. Check each vendor's site for current details.*
+
+## At a glance
+
+| | **Emissary** | **LiteLLM** |
+| --- | --- | --- |
+| **Category** | Router, with a gateway | Gateway / proxy, with a routing layer |
+| **Model routing** | Automated: a router trained on rollouts predicts, per model, whether it can complete the task | Self-managed: rules and config you write, such as model groups, weights, and fallbacks |
+| **Model coverage** | The models in Emissary's catalog | Almost all models |
+| **Savings** | Tracked per request and in aggregate against a baseline | Cost tracking, with routing savings up to your rules |
+| **Model migration** | The router scores models you haven't enabled, and you can A/B a new model | You update your config and rules |
+| **Hosting** | Managed gateway at `api.withemissary.com` | Open source, self-hosted |
+
+## When LiteLLM is a good fit
+
+- You need the broadest **model coverage** in a gateway. LiteLLM supports almost every model.
+- You want to **self-host** the gateway, with keys, retries, timeouts, and fallbacks under your own
+  infrastructure.
+- Your routing is simple enough to manage yourself as rules, or you only need reliability across
+  deployments of the same model.
+
+## When Emissary is a better fit
+
+- You want **automated model routing** rather than self-managed routing: the choice of model made
+  per request from evidence about what each model can do, with no rules to maintain as models and
+  prices change.
+- You want **actual, tracked, meaningful savings**: Activity and Metrics show spend against a
+  baseline, and each request records why it went where it did.
+- You want **easy model migrations**: the router tells you which new models fit your traffic, and
+  you can test one on a second router before you commit.

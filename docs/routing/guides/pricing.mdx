@@ -1,0 +1,39 @@
+---
+title: 'Use your own pricing'
+description: 'Router pricing is prefilled with list prices. Adjust it to your contract rates so the router''s idea of cheapest is your cheapest.'
+---
+
+The router picks the cheapest confident model, so what it believes things cost matters. If your
+rates differ from list prices, because of a committed-spend discount, a negotiated contract, or a
+provider route with its own markup, tell the router, and its rankings will follow your real costs.
+
+## What's on a model's price
+
+Each target model on your router carries:
+
+| Field | Meaning |
+| --- | --- |
+| **Input $/Mtok** | Price per million input tokens |
+| **Output $/Mtok** | Price per million output tokens |
+| **Cache R/W $/Mtok** | Price per million tokens to read from, and write to, the prompt cache |
+| **Context** | The model's context window |
+| **Vision** | Whether the model accepts images |
+| **Effort routing** | Whether the router can adjust effort for the model |
+
+Prices are prefilled when you add a model. They show next to each model in the New router form and
+in the **Target models** table on the Configuration tab.
+
+## Change them
+
+1. Open the router and go to **Configuration**.
+2. Click **Edit configuration**.
+3. Adjust a model's pricing, and save.
+
+Cache read and write prices matter more than they look. The router credits a model that already
+holds your context in cache, so an accurate cache price is what makes
+[cache-aware routing](../how-routing-works/what-the-router-sees#cache-state) choose well.
+
+## Why it matters
+
+A model that's the cheapest at list price might not be the cheapest at the price you pay. If your
+rates are different and the router doesn't know, it'll rank on the wrong numbers.

@@ -1,0 +1,63 @@
+---
+title: 'Emissary vs Not Diamond'
+description: 'How Emissary compares with Not Diamond: Emissary predicts, per request, which models can do the task; Not Diamond Code routes from metadata such as complexity and usage telemetry.'
+---
+
+[Not Diamond](https://www.notdiamond.ai) is a model routing company. Its API router recommends a
+model for an input, and your application then executes the request through its own gateway, with
+custom routers trained on your evaluation data. Its coding-agent product, Not Diamond Code, works
+differently: it's a local proxy that routes from **derived metadata** rather than from the content
+of each request.
+
+According to its data dictionary, Not Diamond Code always collects metadata such as request and
+session IDs, the requested and routed models, a **complexity classification**, the effort level,
+and token counts. Request and response bodies, and local transcripts, are off by default and are
+collected only if an account owner or admin enables sensitive data collection. Without consent,
+routing relies on that metadata.
+
+*Based on public information as of October 2026. Check each vendor's site for current details.*
+
+## At a glance
+
+| | **Emissary** | **Not Diamond Code** |
+| --- | --- | --- |
+| **Routing signal** | The request itself, scored against each model: one confidence estimate per model and effort | Derived metadata: complexity classification, effort, and usage telemetry such as token and session data |
+| **Query × model prediction** | Yes: the probability that *this model* passes *this request* | No: routing doesn't predict per-request, per-model success from the content |
+| **What it optimizes for** | Performance: which models can do the task, then the cheapest of them | Complexity: how hard the task looks, then a cheap or expensive model |
+| **Cache, output-length and effort awareness** | Part of the ranking | Effort level is tracked |
+| **Execution** | The gateway calls the chosen model, on your provider keys | A local proxy sits between your agent and the provider |
+
+## Where the approaches differ
+
+**What the router looks at.** Emissary's router reads the request and estimates, for each model and
+effort, the probability that it completes the task. That's a prediction about a specific query and
+a specific model. A metadata-based router never sees the query's content, so it can't make that
+kind of prediction. It can only act on signals such as how complex the work looks and how usage is
+trending.
+
+**Complexity vs performance.** Estimating complexity from metadata is a version of
+complexity-based routing, which is hard to do reliably, because complexity is hard to read from the
+input. Emissary asks which models can actually do the task, based on how they've performed. See
+[the router design space](../how-routing-works/design-space#what-the-router-optimizes-for).
+
+**Privacy trade-off.** Not routing on content is a real benefit if you can't send prompts, code, or
+outputs to a third party. Emissary's router does read the request to score it, with
+[zero data retention](../get-started) on by default, so Emissary doesn't keep input, output, or
+session replay data unless you turn it off.
+
+**Cost as a second step.** Emissary separates capability from cost. Models above your threshold
+form the confident pool, and only then are they ranked on price, expected output length, and cache
+state. That keeps cost from overriding quality.
+
+## When Not Diamond is a good fit
+
+- You want routing that works only from metadata, without request content.
+- Your priority is a local proxy for a coding agent, and a rough complexity-based split is enough.
+
+## When Emissary is a better fit
+
+- You want routing based on whether a specific model can do a specific request, not on how complex
+  the request looks.
+- You run long conversations or agent loops where cache state matters.
+- You need output length, effort, and your own contract pricing in the cost decision.
+- You'd rather have one endpoint that both decides and executes.

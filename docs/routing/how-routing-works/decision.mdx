@@ -1,0 +1,111 @@
+---
+title: 'How a routing decision is made'
+description: 'How Emissary decides which model serves a request: estimate each model''s confidence, keep the confident ones, then pick the cheapest. Includes a worked example.'
+---
+
+Every request to an Emissary router goes through the same decision. In short: **find the models
+that can do the job, then pick the cheapest of them.** Capability first, cost second.
+
+## The decision, step by step
+
+### 1. Estimate each model's confidence
+
+The router's classifier reads the request and gives each model a **confidence**: how likely that
+model is to complete the task. It has **one head per model and effort level**, so it estimates the
+probability that a model passes this request *at that effort*. It can do this because it was
+**post-trained on thousands of rollouts** of these models, so it has seen what each one does well
+and badly. See [the router design space](./design-space) for why that matters.
+
+The classifier scores every model it knows, not only the ones in your catalog. Your catalog decides
+which models are *candidates* for serving the request. The rest still get a score, which is how you
+find out about models you haven't enabled. See
+[migrate to new models](../guides/migrate-to-new-models).
+
+### 2. Keep the confident models
+
+You set a **confidence threshold**, 0.80 by default. A model is **confident** when any of its
+effort levels clears the threshold. The confident models in your catalog are the **confident pool**
+for this request. Raising the threshold makes the router more conservative, and lowering it saves
+more but accepts more risk. See [set the confidence threshold](../guides/confidence-threshold).
+
+### 3. Pick the cheapest confident model
+
+Among the confident models, the router ranks by expected cost. For each one it works out:
+
+- the **price**, including any pricing you've customized,
+- the **expected output length** for that model on this task,
+- the **cache state**, so a model that already holds the context is credited for it,
+- and the **effort** level: a confident model is served at the **lowest effort that clears the
+  threshold**, since less effort means less reasoning cost, and the same model keeps its cache.
+
+The cheapest wins. See [what the router sees](./what-the-router-sees) for each of these.
+
+### 4. Fall back or escalate when needed
+
+Your **default model** is the anchor. Two cases move the decision away from a plain "cheapest
+confident":
+
+- **No model is confident.** The request goes to the default model, and the routing reason is
+  recorded as `default_no_confident`.
+- **The default isn't confident but a pricier model is.** The request is **escalated** to the more
+  expensive model that can vouch for the task.
+
+```
+request ─▶ confidence per model ─▶ ≥ threshold? ─┬─ some models ─▶ cheapest of them
+                                                 │                (cheapest_confident)
+                                                 └─ none ─▶ default model
+                                                            (default_no_confident)
+```
+
+Every decision records the classifier's probability for each model and effort, an estimated cost
+per candidate, and the routing reason, so you can see why any request went where it did. See [monitor and debug](../guides/monitor-and-debug).
+
+## Why capability comes before cost
+
+Splitting the decision this way keeps quality and cost separate. The first stage protects quality
+by filtering to models that can do the job. The second optimizes cost, only within that set. A
+router that mixes them into a single score can trade a quality loss for a cost saving without you
+noticing.
+
+It's also the difference between **performance-based** and **complexity-based** routing. A
+complexity-based router guesses how hard a task is from the input, then picks a cheap or an
+expensive model, and complexity is hard to read from the input alone. Emissary asks which models
+can actually do the task, based on how they've performed. See
+[the router design space](./design-space#what-the-router-optimizes-for).
+
+## Worked example
+
+*The numbers here are illustrative. They show the mechanics, not real measurements.*
+
+A router has three models, a default of `claude-opus-5.5`, and a threshold of 0.80.
+
+| Model | Price per Mtok (in / out) |
+| --- | --- |
+| `deepseek-v4.1-flash` | $0.15 / $0.6 |
+| `claude-sonnet-5.5` | $2 / $10 |
+| `claude-opus-5.5` (default) | $4 / $20 |
+
+Three requests arrive:
+
+| | `deepseek-v4.1-flash` | `claude-sonnet-5.5` | `claude-opus-5.5` | Result |
+| --- | --- | --- | --- | --- |
+| **A.** Routine edit in a long agent run | 0.52 | 0.91 | 0.97 | `claude-sonnet-5.5`: confident and cheaper than the default |
+| **B.** Very hard, unusual task | 0.41 | 0.63 | 0.78 | `claude-opus-5.5`: none confident, so the default serves (`default_no_confident`) |
+| **C.** Simple lookup | 0.93 | 0.96 | 0.98 | `deepseek-v4.1-flash`: confident and cheapest |
+
+For request A, two models clear the threshold, `claude-sonnet-5.5` and `claude-opus-5.5`. Both
+are confident, so cost decides. `claude-sonnet-5.5` is cheaper per token, and if the conversation
+is already cached on it, cheaper still. It wins.
+
+Request B is the interesting one for your own tuning. If a lot of traffic looks like B, no model
+in the catalog can vouch for it. That's a signal to add a stronger model, or to post-train one for
+that kind of task. See [from routing to your own models](../insights#from-routing-to-your-own-models).
+
+## What this means for you
+
+- **Quality is a setting, not a side effect.** The threshold, not the cost ranking, controls how
+  much risk the router accepts.
+- **The default model is your safety net.** Pick one you'd trust with any request, because it
+  serves everything nothing else is confident about. See
+  [choose your models](../guides/choose-your-models).
+- **Every decision can be audited.** Confidence and reason are recorded per request.

@@ -1,0 +1,81 @@
+---
+title: 'The router design space'
+description: 'A map of how model routers differ: what they optimize for, how much they know about the models, and what state they track. Useful for evaluating any router.'
+---
+
+Routers aren't all the same kind of thing. This page maps the main ways they differ. It's neutral
+background, useful for evaluating any router, and the
+[comparisons](../evaluate/emissary-vs-notdiamond) and the
+[selection checklist](../evaluate/selection-checklist) build on it. For how Emissary's own router
+works, see [how a routing decision is made](./decision).
+
+## What the router optimizes for
+
+**Complexity-based routing** estimates how hard a task is, then routes to a cheap or an expensive
+model accordingly. It rests on an assumption that is hard to meet: that you can tell how complex a
+task is *from the input alone*. A short prompt can require deep reasoning and a long one can be
+routine, so complexity estimates are often wrong in both directions.
+
+**Performance-based routing** doesn't ask how hard the task is. It asks which models can do it.
+Model capabilities form a **jagged frontier**: a smaller model may beat a larger one on some tasks
+and fail on others, and that doesn't line up with a single easy-to-hard scale. A performance-based
+router learns the strengths and weaknesses of each model and routes along that frontier.
+
+| | Complexity-based | Performance-based |
+| --- | --- | --- |
+| **Question it answers** | How hard is this task? | Which models can do this task? |
+| **Assumes** | Models sit on one cheap-to-expensive scale | Each model has its own strengths and weaknesses |
+| **Main weakness** | Complexity is hard to estimate from the input | Needs evidence of how each model performs |
+| **Trained on** | Query labels or complexity scores | Rollouts of each model in the pool |
+
+## How much the router knows about the models
+
+### Blind: a small decision model
+
+The simplest router is a small **decision model** that reads the query and predicts which of *N*
+models it should go to, trained on labeled examples. It's cheap and fast, but it is **blind to what
+it's routing**. It learns a mapping from query text to a label, with no direct evidence of how each
+model performs. When models are added or change, the labels go stale.
+
+### Model-aware: one head per model
+
+A more technical approach plays out a large number of **trajectories** with each candidate model
+and trains the decision model on that distribution. The decision model has **one head per model**,
+and each head learns the likelihood that *its* model can complete the task. The router is now
+**aware of what it is routing**. It isn't asking "what does this query look like?" but "given what
+I've seen this model do, will it succeed here?"
+
+## What state the router tracks
+
+A **stateless** router makes each decision in isolation, and doesn't know what it's done before. A
+**stateful** router knows the current situation, most importantly **cache state**, and uses it.
+Prompt caching changes which option is cheapest, so a stateless router can pick the wrong model
+for a long conversation. See [what the router sees](./what-the-router-sees#cache-state).
+
+## What the router knows about inputs
+
+- **Modality-blind** routers treat every request as text.
+- **Modality-aware** routers know which models can handle images, even if they can't interpret the
+  images.
+- **Multimodal** routers also use the image content in the decision.
+
+Modality-aware does not imply multimodal.
+
+## What the router knows about cost
+
+A router that compares only per-token prices is **intelligence-density unaware**. An
+**intelligence-density aware** router estimates how many output tokens a model will need for a task
+and prices that in. See [what the router sees](./what-the-router-sees#expected-output-length).
+
+## Summary
+
+| Dimension | One end | Other end |
+| --- | --- | --- |
+| **Optimizes for** | Complexity | Performance |
+| **Model awareness** | Blind | Aware (trained on rollouts) |
+| **State** | Stateless | Stateful (cache-aware) |
+| **Modality** | Modality-blind | Modality-aware, then multimodal |
+| **Cost** | Per-token price only | Intelligence-density aware |
+
+Emissary's router sits at the right-hand end of the first four rows and is intelligence-density
+aware. It is performance-based, model-aware, stateful and modality-aware, not multimodal.

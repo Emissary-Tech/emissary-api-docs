@@ -1,0 +1,77 @@
+---
+title: 'Routers and gateways'
+description: 'The difference between a model router and a gateway, and how Emissary can be both: a gateway for your calls, and a router that decides which model serves each one. You can also use it alongside your existing gateway.'
+---
+A **gateway** is infrastructure for *how* requests reach models. It gives you one interface over
+many providers and typically handles credentials, retries, timeouts, rate limits, load balancing,
+logging, and failover. It sends each request to the model *you*, or your rules, specified.
+
+A **router** decides *which model* should handle each request. It makes a per-request decision
+based on what the request needs, and optimizes for cost, latency, or quality.
+
+| | Gateway | Router |
+| --- | --- | --- |
+| **Question it answers** | How do I reach and manage models? | Which model should answer this request? |
+| **Typical features** | Keys, retries, fallbacks, load balancing, observability | Capability prediction, cost ranking |
+| **Decision basis** | Config and rules | The request itself, and for stateful routers, the current state |
+
+Many products do one of these. A pure gateway has no opinion about which model is right, and a
+pure router returns a recommendation and leaves execution to you.
+
+## Emissary can be both
+
+Emissary is a router, and it can also be your gateway. You choose how to use it:
+
+| | **Router and gateway** (recommended) | **Routing policy alongside your gateway** |
+| --- | --- | --- |
+| **How it works** | Your apps call Emissary, which decides which model serves the request and makes the call | You keep your existing gateway, and Emissary supplies the routing decision |
+| **What you change** | The base URL and the `model` string | Your gateway's routing step |
+| **Who calls the provider** | Emissary, on your provider keys | Your gateway |
+| **Simplicity** | One URL, one place for keys and config | Two systems to keep in step |
+| **Insights** | Full: Emissary sees each request from start to finish | Limited to what Emissary sees |
+
+### Emissary as the router and the gateway
+
+We recommend this. An Emissary router comes with a gateway:
+
+- **One gateway URL** for all your agents and applications.
+- **Wire-compatible with the OpenAI and Anthropic APIs**, so you use the official SDKs, any
+  compatible library, or plain HTTP.
+- **Your own provider keys.** Calls to model providers use keys you've stored, encrypted, in the
+  router's configuration.
+- **A router behind the URL.** Each router is a model catalog and a routing policy of its own, and
+  you address it by sending its name as the request's `model`.
+
+The same call that reaches your models also makes the routing decision, so there's no separate
+service to call for a recommendation and then execute yourself.
+
+```
+your app ──▶ one gateway URL ──▶ router "production-agents" ──▶ chosen model ──▶ provider
+              model: "production-agents"   (decide)                (call, on your keys)
+```
+
+**Why we recommend it.** It makes everything simpler, with one URL to point at and one place to
+manage keys, models, and pricing. It also gives you better insights. When Emissary handles the
+whole request, it sees the outcome as well as the decision: cost, cache hits, latency, tokens, and
+whole sessions. That's what powers [Activity and Metrics](../guides/monitor-and-debug) and
+[what emerges from routing](../insights).
+
+### Emissary alongside your gateway
+
+If you already run a gateway and want to keep it, Emissary can sit alongside it as the **routing
+policy**. Your gateway keeps doing what it does today, such as credentials, retries, and failover,
+and Emissary decides which model should serve each request. This suits teams with a gateway they
+rely on or can't change.
+
+You get the routing decision, and the savings that follow from it. Insights are limited to what
+Emissary can see from its side of the request.
+
+## Where this matters in practice
+
+- **Switching from a single model:** change the base URL and the `model` string. See
+  [connect an app or agent](../guides/connect).
+- **Comparing products:** some gateways have routing features, but those are usually rules and
+  fallbacks rather than per-request capability prediction. See the
+  [comparisons](../evaluate/emissary-vs-litellm).
+- **Routing across providers you already use:** a router's catalog can span providers, for example
+  Anthropic, OpenAI, and OpenRouter, using a key for each.
