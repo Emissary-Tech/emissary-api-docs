@@ -26,6 +26,36 @@ const sidebars: SidebarsConfig = {
       },
       {
         type: 'category',
+        label: 'Decision LM',
+        items: [
+            'decision-lm/overview',
+            'decision-lm/deep-dive',
+            {
+              type: 'category',
+              label: 'Use Cases',
+              items: [
+                  'decision-lm/use-cases/model-routing',
+                  'decision-lm/use-cases/llm-judges',
+                  'decision-lm/use-cases/content-classification',
+                  'decision-lm/use-cases/discover-your-own',
+              ],
+            },
+            {
+              type: 'category',
+              label: 'Train your own',
+              items: [
+                  'decision-lm/train-your-own/when-to-train',
+                  'decision-lm/train-your-own/quick-train',
+                  'decision-lm/train-your-own/lora-fine-tune',
+                  'decision-lm/train-your-own/maintain',
+              ],
+            },
+            'decision-lm/costs-and-faq',
+            'decision-lm/compare',
+        ],
+      },
+      {
+        type: 'category',
         label: 'Model Routing',
         link: { type: 'doc', id: 'routing/what-is-model-routing' },
         items: [

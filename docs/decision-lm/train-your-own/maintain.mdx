@@ -1,0 +1,39 @@
+---
+id: maintain
+title: 'Maintain your model'
+description: 'Keep a trained Decision LM accurate over time: watch for drift, retrain, and re-check thresholds.'
+---
+
+# Maintain your model
+
+A trained model is a snapshot of your data at one point in time. Plan to maintain it.
+
+## Watch for drift
+
+Inputs change over time, and the model's accuracy can quietly follow. Monitor two things:
+
+- **Confidence.** If scores drift lower on live traffic, the inputs may have moved away from what the model was trained on.
+- **Class frequency.** If the share of traffic in each class shifts, the world has changed, or the model has.
+
+Log every decision with its input, probabilities, and chosen branch. Those logs are both your monitoring data and your next training set.
+
+## Retrain
+
+Retrain when drift shows up, when you have collected meaningfully more labeled data, or when you find a new category of error.
+
+1. Label a sample of recent traffic, including the cases the model got wrong or was unsure about.
+2. Add it to your training data and keep a fresh test set.
+3. Train a new version and compare it to the deployed one on the same test set.
+4. Deploy it alongside the current version and compare on live traffic before switching over. Checkpoints are yours, so you can version them and A/B test.
+
+## Re-check thresholds after every retrain
+
+Thresholds tuned on one version may not transfer to the next. Re-run your calibration check ([step 5 of the LoRA fine-tune](./lora-fine-tune#5-measure-on-your-own-hold-out-set)) and re-pick the cutoff each time.
+
+## Plan for new base models
+
+A LoRA adapter is trained on a specific base model. When you move to a newer base model, plan to retrain on the same dataset, so keep your datasets and test sets versioned alongside your checkpoints.
+
+## Next steps
+
+- [LoRA fine-tune](./lora-fine-tune)
