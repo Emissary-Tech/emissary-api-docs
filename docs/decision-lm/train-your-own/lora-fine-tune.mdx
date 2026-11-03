@@ -17,7 +17,7 @@ A model trained on your data usually beats a zero-shot one on the things that ma
 - **Calibrated probabilities.** A trained model's scores line up with how often it is actually right, so a threshold of 0.9 means roughly 90% precision. That makes thresholds, escalation rules, and human-in-the-loop routing reliable.
 - **Greater precision and recall.** The model learns your label boundaries, edge cases, and vocabulary instead of inferring them from a class description.
 - **Consistency.** The same input gets the same decision, run after run. There is no prompt drift and no dependence on prompt wording. Encode your policy, your tone, and your edge cases, including ones that are hard to put in a prompt.
-- **Lower cost and latency.** No longer need to put a description of each class in your input, because the model learns what each class means from your examples. Requests are shorter, so you pay for fewer tokens per request and each one processes faster.
+- **Lower cost and latency.** No longer need to put a description of each class in your input, because the model learns what each class means from your examples. Requests are shorter, so you pay for fewer tokens per request and each one processes faster. This matters most when your class descriptions have grown large relative to the size of your input or state: if every request carries a long block of definitions to classify a short input, most of what you pay for and wait on is the definitions, and a trained model removes them.
 - **Ownership.** The checkpoint is yours. You can version it, A/B test it, and retrain it as your data grows.
 
 Third parties have benchmarked trained LLM classifiers against prompted LLMs and published the results. See the [llm-classifier-bench](https://github.com/lucasbiagettia/llm-classifier-bench) repository for the methodology, datasets, and numbers.
@@ -26,13 +26,14 @@ Third parties have benchmarked trained LLM classifiers against prompted LLMs and
 
 ## How
 
-The lifecycle is: **format dataset → train → measure → deploy**. This page uses the API. Every step can also be done in the dashboard, as described in the [post-training quickstart](/fine-tuning/quickstart).
+The lifecycle is: **format dataset → train → pick a checkpoint → deploy → measure**. This page uses the API. Every step can also be done in the dashboard, as described in the [post-training quickstart](/fine-tuning/quickstart).
 
 
 Set these up once:
 
 ```python
 import json
+import time
 import requests
 
 BASE = 'https://api.withemissary.com'
@@ -42,6 +43,8 @@ HEADERS = {'X-API-Key': YOUR_API_KEY}
 ### 1. Format your dataset
 
 Datasets are JSONL, one example per line. Each example has a `prompt` (the input text) and a `completion` (the target). For the full schema reference, see [Datasets](/fine-tuning/datasets).
+
+You can include your class descriptions in the `prompt` if you want to, but you don't have to. Because the model learns what each class means from your examples, a `prompt` that is just the input works. Leaving the descriptions out keeps requests short. Whichever you choose, send the same format at inference time that you trained on.
 
 **Multi-class classification.** `completion` maps every label to `1` or `0`, and exactly one label is `1`:
 
@@ -65,7 +68,7 @@ Datasets are JSONL, one example per line. Each example has a `prompt` (the input
 ```
 
 :::note
-Multi-label classification is only available in **post-trained** Decision LMs. It is not supported by zero-shot Decision LMs, so you need to train your own model to use it. Multi-label datasets also don't support rebalancing.
+Multi-label classification needs a LoRA fine-tune. It is not supported by zero-shot Decision LMs or by [quick-train](./quick-train). Multi-label datasets also don't support rebalancing.
 :::
 
 **Regression.** `completion` is a single number:
@@ -77,7 +80,7 @@ Multi-label classification is only available in **post-trained** Decision LMs. I
 :::tip
 - Keep the same label keys on every row.
 - Normalize wide-ranging regression targets (for example to 0-1) before training.
-- Hold back a test set now, **before** training, if you plan to run your own evaluation. See [step 3](#3-measure-performance).
+- Hold back a test set now, **before** training, if you plan to run your own evaluation. See [step 5](#5-measure-on-your-own-hold-out-set).
 :::
 
 ### 2. Kick off training
@@ -103,6 +106,23 @@ with open('train.jsonl', 'rb') as f:
     ).json()
 ```
 
+:::warning Wait for the upload to finish
+The upload completes asynchronously. The response above reports `is_uploaded: false`, and the dataset is not ready to train on until it is uploaded and profiled. Wait for both flags before you start a job. This usually takes a few seconds.
+
+```python
+while True:
+    ds = requests.get(
+        f'{BASE}/v1/projects/{project_id}/datasets/{train_ds["id"]}',
+        headers=HEADERS
+    ).json()
+    if ds['is_uploaded'] and ds['is_profiled']:
+        break
+    time.sleep(2)
+```
+
+Once profiling is done, `compatible_task_types` lists the task types the dataset can be used for, such as `classification`.
+:::
+
 Now start the job. **Pick `Qwen3-8B` as the base model if you want to deploy serverless.** Do not pick `Qwen3-8B-Base`, which cannot be served serverless. See [Which base model should I pick?](../costs-and-faq#which-base-model-should-i-pick).
 
 ```python
@@ -119,17 +139,33 @@ job = requests.post(
 ).json()
 ```
 
-Training emits a **checkpoint** (typically one per epoch). Watch progress with [Retrieve training job](/api/retrieve-training-job-by-id), and list checkpoints with [List checkpoints](/api/list-checkpoints). Hyperparameters have good defaults, so you can start without setting any.
+Training emits a **checkpoint** (typically one per epoch). Hyperparameters have good defaults, so you can start without setting any.
 
-### 3. Measure performance
+Poll [Retrieve training job](/api/retrieve-training-job-by-id) to watch progress. The job moves through `Pending`, `Running`, and `Testing`, and ends in `Success`, `Failed`, `TimedOut`, or `Cancelled`:
 
-You have two options. Use either, or both.
+```python
+while True:
+    status = requests.get(
+        f'{BASE}/v1/projects/{project_id}/training-jobs/{job["id"]}',
+        headers=HEADERS
+    ).json()
+    print(status['status'], status['progress'])
+    if status['status'] in ('Success', 'Failed', 'TimedOut', 'Cancelled'):
+        break
+    time.sleep(30)
+```
 
-#### Option A: Integrated testing
+:::note
+The dashboard shows a successful job as **Completed**, while the API reports `Success`.
+:::
 
-Give the training job a test set and Emissary evaluates **every checkpoint** against it as training finishes. Either split one off your training data, as above with `train_test_split_ratio`, or upload a dedicated test dataset and pass `test_dataset_id`.
+When it finishes, list the checkpoints with [List checkpoints](/api/list-checkpoints).
 
-You can also attach test functions to aggregate metrics per checkpoint. For classification we recommend starting with the shared `sample match combined metric shared` function. List what is available with [List test functions](/api/list-test-functions):
+### 3. Pick a checkpoint
+
+Deploying needs a checkpoint number, so decide which one first. Emissary can evaluate **every checkpoint** against a test set as training finishes. Either split one off your training data, as above with `train_test_split_ratio`, or upload a dedicated test dataset and pass `test_dataset_id`.
+
+Checkpoint metrics only appear if you attach test functions. Without them, `aggregated_results` comes back empty for every checkpoint. Attach test functions to aggregate metrics per checkpoint. For classification we recommend starting with the shared `sample match combined metric shared` function. List what is available with [List test functions](/api/list-test-functions):
 
 ```python
 json={
@@ -141,36 +177,13 @@ json={
 
 Results appear on the job's **Checkpoints** tab, so you can compare checkpoints and pick the best one rather than defaulting to the last. See [Testing and evaluation](/fine-tuning/testing) to write custom metric functions.
 
-#### Option B: Your own hold-out set
-
-If you want full control, for example to compute precision and recall at your production threshold, keep a hold-out set that never touched training and score it against the deployed model:
-
-```python
-from sklearn.metrics import classification_report
-
-y_true, y_pred = [], []
-for row in holdout:   # [{'prompt': ..., 'label': ...}, ...]
-    r = requests.post(
-        f'{BASE}/v1/classification',
-        headers=HEADERS,
-        json={'model': 'ticket-triage-v1', 'input': row['prompt'], 'data_format': 'probs'}
-    ).json()
-    probs = r['data'][0]['probs']
-    y_pred.append(max(probs, key=probs.get))
-    y_true.append(row['label'])
-
-print(classification_report(y_true, y_pred))
-```
-
-To check calibration, bucket predictions by their top probability and compare each bucket's average confidence to its actual accuracy. For regression, compare predictions to targets with MAE, RMSE, or Spearman correlation.
-
 :::note
 A later checkpoint is not always better. Training too long can overfit, so choose the checkpoint with the best held-out score.
 :::
 
 ### 4. Deploy
 
-Deploy the best checkpoint, then call it by its deployment name. You can deploy in one of two ways.
+Deploy the best checkpoint, then call it by its deployment name. You can deploy to serverless, or to a dedicated engine if you are an enterprise customer.
 
 :::note Regressors deploy to a classification engine
 Both classification and regression models deploy to a **classification** inference engine. The only difference between them is the **loss function** used during training. Inference is identical, so you create the same kind of engine and call the same endpoint either way.
@@ -182,21 +195,39 @@ You can deploy multiple classifiers and regressors onto the same engine, as long
 
 #### Serverless
 
-Pay per token with no infrastructure to manage. **Serverless requires the `Qwen3-8B` backbone.** Deploy your checkpoint, then call it:
+Pay per token with no infrastructure to manage. **Serverless requires the `Qwen3-8B` backbone.** Deploy your checkpoint onto the shared serverless engine, `engine-qwen-3-8b-classification`, then call it:
 
 ```python
-requests.post(
-    f'{BASE}/v1/projects/{project_id}/deployments',
+deployment = requests.post(
+    f'{BASE}/v1/engines/engine-qwen-3-8b-classification/deploy',
     headers=HEADERS,
     json={
         'name': 'ticket-triage-v1',
-        'training_job_id': job['id'],
+        'project_id': project_id,
+        'training_id': job['id'],
         'checkpoint': 3     # the best checkpoint from step 3
     }
-)
+).json()
+```
+
+The response includes the deployment's `id` and a `status` of `Deploying`. Poll [Retrieve deployment](/api/retrieve-deployment-by-id) until it reports `Deployed`:
+
+```python
+while True:
+    dep = requests.get(
+        f'{BASE}/v1/projects/{project_id}/deployments/{deployment["id"]}',
+        headers=HEADERS
+    ).json()
+    if dep['status'] in ('Deployed', 'Failed', 'Cancelled', 'Terminated'):
+        break
+    time.sleep(10)
 ```
 
 #### Dedicated
+
+:::note Enterprise only
+Dedicated inference is available to enterprise customers only. If you're not on an enterprise plan, train on `Qwen3-8B` and deploy to serverless.
+:::
 
 A GPU engine reserved for your workload. **Any backbone works.** Create an engine for the base model and task type, then deploy your checkpoint onto it:
 
@@ -247,6 +278,29 @@ print(response.json())
 ```
 
 Classifiers and regressors are called the same way, through `POST /v1/classification`. See the [API reference](/api/get-classification-from-deployment) for the full request and response shapes.
+
+### 5. Measure on your own hold-out set
+
+Checkpoint metrics from step 3 tell you which checkpoint to deploy. To measure the deployed model on your own data, for example to compute precision and recall at your production threshold, keep a hold-out set that never touched training and score it against the deployment. This needs a deployed endpoint, so it comes after step 4:
+
+```python
+from sklearn.metrics import classification_report
+
+y_true, y_pred = [], []
+for row in holdout:   # [{'prompt': ..., 'label': ...}, ...]
+    r = requests.post(
+        f'{BASE}/v1/classification',
+        headers=HEADERS,
+        json={'model': 'ticket-triage-v1', 'input': row['prompt'], 'data_format': 'probs'}
+    ).json()
+    probs = r['data'][0]['probs']
+    y_pred.append(max(probs, key=probs.get))
+    y_true.append(row['label'])
+
+print(classification_report(y_true, y_pred))
+```
+
+To check calibration, bucket predictions by their top probability and compare each bucket's average confidence to its actual accuracy. For regression, compare predictions to targets with MAE, RMSE, or Spearman correlation.
 
 ---
 

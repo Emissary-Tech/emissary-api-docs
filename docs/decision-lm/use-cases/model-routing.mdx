@@ -91,4 +91,4 @@ print(response.json())
 
 - **Use the confidence.** If the top probability is low, fall back to your most capable route rather than guessing.
 - **Describe routes by the work, not the model.** "Multi-step analysis" ages better than "the big model," and lets you swap the destination later.
-- **Improve it with your own traffic.** Once you have logged decisions, [post-train](/fine-tuning/concept) the router so it learns your actual distribution.
+- **Improve it with your own traffic.** Once you have logged decisions, [quick-train](/decision-lm/train-your-own/quick-train) the router on a handful of corrected examples, or [fine-tune it with LoRA](/decision-lm/train-your-own/lora-fine-tune) once you have more, so it learns your actual distribution. See [When to train your own](/decision-lm/train-your-own/when-to-train).

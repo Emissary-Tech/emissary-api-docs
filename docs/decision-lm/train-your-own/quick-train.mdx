@@ -1,22 +1,20 @@
 ---
 id: quick-train
 title: 'Quick-train'
-description: 'Adapt a Decision LM to your data with 10-50 labeled examples by training only the head.'
+description: 'Adapt a Decision LM to your data with a handful of labeled examples by training only the head, in about 20 seconds.'
 ---
 
 {/*
-  TODO: this page is a skeleton. Fill in from the product before publishing:
-  - how to run quick-train (dashboard and API), including the request shapes
-  - the dataset format, and whether it matches /fine-tuning/datasets
-  - how long it takes and what it costs
-  - what a quick-train run produces and how to deploy it
+  TODO before publishing:
+  - API/programmatic path for quick-train (this page covers the dashboard only)
+  - cost of a quick-train run, and where a quick-trained version can be deployed
   - whether a quick-train head can warm-start a LoRA fine-tune
-  - guidance on 10 vs 50 examples (number of classes, ambiguity)
+  - guidance on how many samples to use for different class counts
 */}
 
 # Quick-train
 
-**Quick-train** adapts a Decision LM to your data using only **10-50 labeled examples**. It trains the classification head and leaves the language model underneath frozen, so it needs very little data.
+**Quick-train** adapts a Decision LM to your data using a handful of labeled examples, typically **10 to 50**. It trains only the classification head and leaves the language model underneath frozen, so it needs very little data and finishes in about **20 seconds**.
 
 Use it when zero-shot is close but misses your definitions or edge cases. See [When to train your own](./when-to-train) to decide.
 
@@ -30,16 +28,49 @@ A head on a frozen model redraws the boundary between your classes, using featur
 
 ## Before you start
 
-- A zero-shot Decision LM for your task, with class descriptions.
-- 10-50 labeled examples, plus a few held back as a test set.
+- An experiment in the [Playground](https://www.withemissary.com/app/playground) with your classes defined. Quick-train starts from the zero-shot model, so a zero-shot experiment is all you need.
+- A handful of real inputs that cover your classes, including the hard and ambiguous ones. Quick-train needs at least **5 samples**.
+- A few more inputs held back, which you will not train on, to check the result.
 
-## Steps
+## 1. Build up samples
 
-1. Format your examples.
-2. Run quick-train.
-3. Evaluate against the zero-shot baseline.
-4. Deploy.
+Every query you run in the Playground is logged as a **labeled sample** for your next quick-train. Open your experiment and run representative inputs, one at a time.
+
+Open the **Training Data** tab to see them. Each row has the input, a label, the experiment version that produced it, and the completion, which is the one-hot label map the head will learn from.
+
+![The Training Data tab, listing each logged run and the Quick-train card](/img/decision-lm/quick-train/training-data.jpg)
+
+## 2. Check the labels
+
+Each sample starts with an **auto** label, which is the model's own prediction at the time you ran it. Training on auto labels teaches the head to agree with what zero-shot already says.
+
+Check each one, and correct any that are wrong with the pencil icon on the row. This is where most of the improvement comes from, so spend your effort on the cases the model got wrong or was unsure about.
+
+## 3. Start training
+
+The **Quick-train** card at the bottom of the Training Data tab shows how many samples you have against the minimum, for example `6 / 5 samples`. Once you meet it, select **Start training**.
+
+The head trains from your latest samples, usually in about 20 seconds. When it finishes, a dialog confirms that your new version is ready and selected as the active version.
+
+![The Quick-train complete dialog](/img/decision-lm/quick-train/complete.jpg)
+
+Each quick-train creates a new version, such as `v0.0.1`, and leaves the earlier ones in place. All versions are listed in **Playground → Artifacts**.
+
+## 4. Compare against zero-shot
+
+Run your held-out inputs on the new version and compare against the earlier one. Look at the probabilities as well as the top label: a head that is right more often should also be more confident when it is right.
+
+![The same query on the quick-trained version](/img/decision-lm/quick-train/result.jpg)
+
+In this example, a query that zero-shot split across three classes (43% on the top class) came back at 97% on the quick-trained version. Treat a result like this with care, because that query was one of the training samples. The held-out inputs are what tell you whether quick-train generalizes.
+
+If a version is worse, run quick-train again after adding more samples or fixing labels. The earlier versions are still there.
+
+## 5. Use it
+
+Call a quick-trained version the same way as any zero-shot experiment, with the model name `<experiment_id>/<version>`, for example `ex-nlaprbs5edr7hzl28xngbk/0.0.1`. The **Integration** tab has a ready-to-copy snippet with your model name filled in. See the [API reference](/api/get-classification-from-deployment) for the request and response shapes.
 
 ## Next steps
 
-- Not accurate enough yet: [LoRA fine-tune](./lora-fine-tune).
+- Still not accurate enough: [LoRA fine-tune](./lora-fine-tune).
+- Keep it accurate over time: [Maintain your model](./maintain).

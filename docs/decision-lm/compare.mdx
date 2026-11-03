@@ -41,7 +41,7 @@ Figures for Jev and the Luna Decisions API are vendor-reported and may have chan
 | **Latency** | ~56 ms per decision | 70–500 ms reported | ~150 ms vendor-stated (preview) |
 | **Security / deployment** | Managed endpoints, plus [dedicated inference engines](/inference/concept) on GPU capacity for your organization | Hosted API; reported as early access with no published weights or on-prem option | Hosted by OpenAI |
 | **Calibratability** | Post-train to improve confidence scores on your own data | Calibrated by design through the vendor's own training (RLCD); no customer-side recalibration documented | Not published |
-| **Customization** | Zero-shot from class descriptions, then [post-train](/fine-tuning/concept) with SFT | Zero-shot via typed questions | Not published |
+| **Customization** | Zero-shot from class descriptions, then [quick-train](/decision-lm/train-your-own/quick-train) the head on a handful of examples or [LoRA fine-tune](/decision-lm/train-your-own/lora-fine-tune) | Zero-shot via typed questions | Not published |
 | **Output types** | Zero-shot: binary, multi-class, and score. Post-trained: also multi-label | Binary and multi-class | Binary and multi-class |
 | **Input** | Text and images | Text and images | Text and images |
 | **Ownership** | You post-train your own checkpoints on Emissary | Vendor-owned model | Vendor-owned model |

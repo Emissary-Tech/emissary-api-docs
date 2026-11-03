@@ -9,7 +9,7 @@ description: 'What Decision LMs cost to train and run, how to deploy them, and w
 ## What does it cost to run?
 
 - **Serverless:** **$0.05 per million tokens.**
-- **Dedicated:** **$3/hr for models under 30B parameters.** Contact us for larger models. Bigger models are slower, so the effective cost on a 27B model is roughly **$0.15 per million tokens**, depending on your workload pattern. Steady, high-volume traffic that keeps the GPU busy lands at the low end.
+- **Dedicated (enterprise only):** **$3/hr for models under 30B parameters.** Contact us for larger models. Bigger models are slower, so the effective cost on a 27B model is roughly **$0.15 per million tokens**, depending on your workload pattern. Steady, high-volume traffic that keeps the GPU busy lands at the low end.
 
 Trained models are often cheaper to run than zero-shot ones. A zero-shot request carries every class description, while a trained model learns what the classes mean from your examples, so requests are shorter.
 
@@ -29,7 +29,7 @@ Start with the smaller dataset to confirm your labels and setup work, then scale
 ## How can this be deployed?
 
 - **Serverless on `Qwen3-8B`.** Pay per token with no engine to manage.
-- **Dedicated for everything else.** Any other backbone runs on a dedicated engine.
+- **Dedicated for everything else (enterprise only).** Any other backbone runs on a dedicated engine, which is available to enterprise customers only.
 
 Use **dedicated** when you have high throughput or a predefined time window, such as scheduled workflows. Use **serverless** when your workload is spiky, low-volume, or unpredictable. Autoscaling is also available on dedicated engines, so [reach out](mailto:support@withemissary.com) if you want it set up for your workload.
 
@@ -42,7 +42,7 @@ Choose **Qwen3-8B** (not Qwen3-8B-Base) because it is the one you can deploy ser
 - Go **bigger** if you need a smarter model, for example when the task is subtle and the smaller model's held-out score is still improving.
 - Go **smaller** if your eval is already maxed out. A simpler task doesn't need a bigger model, and a smaller one is cheaper and faster.
 
-Bigger and smaller backbones run on dedicated engines.
+Bigger and smaller backbones run on dedicated engines, which are enterprise only. If you're not on an enterprise plan, use `Qwen3-8B`.
 
 ## Classification vs. regression: how do I choose?
 

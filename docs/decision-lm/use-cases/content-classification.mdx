@@ -92,4 +92,4 @@ print(response.json())
 
 - **Add an escape class.** Include `other` or `none` so off-topic inputs have somewhere to go instead of being forced into a real category.
 - **Act on confidence.** Auto-handle high-confidence results and send the uncertain middle to review.
-- **Move to post-training for high-stakes tasks.** Moderation and compliance deserve a model trained on your labeled data. See [Datasets](/fine-tuning/datasets).
+- **Move to a LoRA fine-tune for high-stakes tasks.** Moderation and compliance deserve a model trained on your labeled data. Start with [quick-train](/decision-lm/train-your-own/quick-train) to see how much your labels help, then see [LoRA fine-tune](/decision-lm/train-your-own/lora-fine-tune) and [Datasets](/fine-tuning/datasets).

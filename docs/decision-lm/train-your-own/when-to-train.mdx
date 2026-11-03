@@ -17,7 +17,7 @@ Consider training your own when you notice any of these:
 - **Confidence doesn't match reality.** A score of 0.9 is wrong far more than 10% of the time, so thresholds and escalation rules can't be trusted.
 - **It keeps missing the same cases.** The errors cluster around your edge cases or your own definition of a label, which a description can't capture.
 - **The class descriptions are doing too much work.** Rewording a description changes your results, or the descriptions keep growing to patch failures.
-- **Requests are long.** Every request carries the description of each class. A trained model learns what the classes mean from your examples, so requests get shorter, cheaper, and faster.
+- **Requests are long.** Every request carries the description of each class. A trained model learns what the classes mean from your examples, so requests get shorter, cheaper, and faster. A [LoRA fine-tune](./lora-fine-tune) is what removes the descriptions.
 - **You need multi-label.** More than one label per input is only available in post-trained models, and only through a [LoRA fine-tune](./lora-fine-tune).
 - **You already have labeled data.** If you have been logging decisions, for example after running [Discover your own](../use-cases/discover-your-own), you have the raw material.
 

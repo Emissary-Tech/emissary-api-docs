@@ -6,11 +6,11 @@ description: 'What a Decision Language Model is, what it is used for, and where 
 
 # Decision LM
 
-A **Decision Language Model (Decision LM)** is an AI model built to *decide* and *predict* rather than *write*. Instead of generating text token by token, it reads an input, runs a **single pass** through the model, and returns a discriminative value: a yes or no label, a set of probabilities across classes, or a number in a range.
+A **Decision Language Model (Decision LM)** is an AI model built to *decide* and *predict* rather than *write*. Instead of generating output text token by token, it reads an input, runs **one pass** through the model (equal to generating **one** output token), and returns a set of probabilities for that next token: which are then processed into a yes or no label, a set of confidence scores across classes, or a number in a range.
 
-It is effectively a large language model with a classification head that keeps the language understanding of an LLM, but it never produces a free-form answer, only a single output over a constrained vocabulary. That makes it exponentially faster (~50-500 ms E2E latency), cheaper (under $0.10/M tokens), and predictable enough to sit in pipeline relying on well-formatted outputs - making them incredibly valuable for real time or high volume use-cases.
+This way, we keep the language understanding of an LLM, but by stripping its ability to recurse (predict token after token till stop condition) and only emitting a single output over a limited vocabulary (your set of options), we make it exponentially faster (~50-500 ms E2E latency), cheaper (under $0.10/M tokens), and predictable enough to sit in pipeline relying on well-formatted outputs.
 
-You may also see them called  **System One models** (popularized by Daniel Kahneman's Thinking Fast and Slow), *LLM classifiers*, or *Decisions API*. They all mean the same thing.
+You may also see them called *System One models* (popularized by Daniel Kahneman's Thinking Fast and Slow & Jev), *LLM classifiers*, or *Decisions API* (OpenAI). They all mean the same thing.
 
 ---
 
@@ -20,15 +20,15 @@ A Decision LM handles three kinds of task.
 
 | Task | Output | Example |
 |---|---|---|
-| **Binary classification** | One probability that a statement is true | *Does this response answer the user's question?* |
-| **Multi-class classification** | A probability for each class, summing to 1 | *Which model should handle this query?* |
-| **Regression** | A single number on a scale you define | *How urgent is this ticket, from 0 to 1?* |
+| **Binary classification** (Noul/Predicate) | One probability that a statement is true | *Does this response answer the user's question?* |
+| **Multi-class classification** (Choice) | A probability per class, summing to 1 | *Which model should handle this query?* |
+| **Regression** (Score)  | A single number on a scale you define | *How urgent is this ticket, from 0 to 1?* |
 
 In practice these show up in a few recurring places:
 
-- **[Model routing](./use-cases/model-routing):** send each query to the right-sized model or agent.
 - **[LLM judges](./use-cases/llm-judges):** score outputs against criteria such as helpfulness, safety, or factuality.
 - **[Content classification](./use-cases/content-classification):** moderation, intent detection, sentiment, and ticket triage.
+- **[Model / Intent routing](./use-cases/model-routing):** send each query to the right-sized model or agent.
 - **Guardrails and verifiers:** check an agent's input or output before the next step runs.
 
 Not sure where a Decision LM fits in your own agent? Use the [Discover your own](./use-cases/discover-your-own) prompt to have Claude Code find the spots for you.
@@ -55,4 +55,5 @@ The tradeoffs, including calibration and input brittleness, are covered in [Adva
 - **Want to know how they work?** Read [How it works](./deep-dive).
 - **Choosing a provider?** See [Comparing Decision LMs](./compare).
 - **Want to see where they fit?** Browse the [use cases](./use-cases/model-routing).
+- **Zero-shot not accurate enough?** See [When to train your own](./train-your-own/when-to-train).
 - **Want to call the API directly?** See [Experiments](/experiment) for binary, multi-class, and regression snippets.
