@@ -13,7 +13,7 @@ Emissary's model router is reached through one gateway URL that is compatible wi
 
 - [ModelRouter quickstart: your first LLM router](https://docs.withemissary.com/quickstart/router): Create a router that sends each query to the best-suited model in about 56 ms for $0.23 per 10k requests. Use the public playground, the dashboard or the API.
 - [LLM-as-a-judge quickstart: create your first judge](https://docs.withemissary.com/quickstart/llm-as-judge): Create an LLM judge that scores any text against criteria you define and returns a calibrated probability in about 56 ms. Use the playground, dashboard or API.
-- [Experiments: zero-shot LLM deployments in minutes](https://docs.withemissary.com/experiment): Spin up a zero-shot model in under a minute and call it through a ready-made API: judge, decision, routing, tool calling, regression and NER modes.
+- [Experiments: zero-shot LLM deployments in minutes](https://docs.withemissary.com/experiment): Spin up a zero-shot model in under a minute and call it through a ready-made API: judge, decision, routing and regression modes.
 
 ## Decision LM
 
