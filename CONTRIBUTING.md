@@ -58,3 +58,45 @@ of making a fork and pull request yourself:
 Please use clear commit messages so we can understand what each commit does.
 We'll review every PR and might offer feedback or request changes before
 merging.
+
+## Writing docs for search and AI answers
+
+The docs are read by people, search engines and AI assistants (ChatGPT, Claude, Perplexity, Google AI
+Overviews). The same habits help all three. `npm run build` runs `npm run check:seo` first and fails on
+the mistakes below.
+
+**Every page**
+
+- Set a `title` of 58 characters or fewer that says what the page is about, not just where it sits
+  ("Confidence threshold: quality vs cost in routing", not "Settings"). Use `sidebar_label` for the
+  short name shown in the sidebar.
+- Set a `description` of 70 to 160 characters that stands on its own as the search snippet. Every title
+  and description must be unique.
+- Open with the answer. The first one or two sentences should define the thing or state the
+  conclusion, so they can be quoted without the rest of the page.
+- Phrase headings as the questions people ask ("How does model routing work?") where that reads
+  naturally. If you rename a heading that other pages link to, keep the old anchor with `{#old-id}`.
+- Keep one idea per section, with short paragraphs, lists and tables. A section should make sense
+  when read on its own.
+- Use the terms people search for: "model routing" and "LLM router", "post-training" and
+  "fine-tuning", "LLM inference". Define a term the first time you use it, and link to the
+  [glossary](docs/glossary.mdx).
+- Write alt text that describes the screenshot, never a file name.
+- Link to related pages in the body with descriptive link text, not "click here".
+- State numbers with their conditions, and say when a figure is typical rather than guaranteed.
+
+**FAQ markup.** `routing/faq.mdx`, the home page and the "What is ..." pages emit FAQPage structured
+data through `<FaqSchema items={[...]} />`. The questions and answers there must match what the page
+shows. `check:seo` verifies this for the FAQ.
+
+**New pages.** Add the page to `sidebars.ts` and to `SECTIONS` in `scripts/generate-llms.mjs`, which
+builds `llms.txt` and `llms-full.txt`. The build tells you if a page is missing from either.
+
+**Pages that aren't ready.** Add `<Head><meta name="robots" content="noindex" /></Head>` (with
+`import Head from '@docusaurus/Head'`) and an entry in `sitemap.ignorePatterns` in
+`docusaurus.config.ts`. The task guides in `docs/guides` and `docs/fine-tuning/testing.mdx` are
+hidden this way until they are reviewed against the current product.
+
+**Hosting.** `url` in `docusaurus.config.ts` must be the host the docs are served from, because
+canonical URLs, `og:url` and the sitemap are built from it. "Last updated" dates and sitemap `lastmod`
+come from git history, so build with full history (no shallow clone).

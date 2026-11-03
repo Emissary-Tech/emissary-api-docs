@@ -1,8 +1,8 @@
 ---
-title: 'What the router sees'
-description: 'The signals Emissary''s router uses beyond the request itself: cache state, expected output length, modality, effort, and your pricing.'
+title: 'What an LLM router sees: cache, effort and cost'
+sidebar_label: 'What the router sees'
+description: 'The signals Emissary''s router uses beyond the request: prompt cache state, expected output length, reasoning effort, modality, context limits and your pricing.'
 ---
-
 A router that only reads the request text can only guess. Emissary's router also sees the situation
 around the request, and that's what lets it find the cheapest *good* option rather than the
 cheapest *nominal* one. This page covers each signal. For how they combine into a decision, see
@@ -66,7 +66,7 @@ router's idea of "cheapest" is *your* cheapest. See [use your own pricing](../gu
 Each model's context window is part of its configuration, so a request that's too long for a model
 isn't routed there.
 
-## At a glance
+## Which signals does the router use? {#at-a-glance}
 
 | Signal | What it prevents |
 | --- | --- |

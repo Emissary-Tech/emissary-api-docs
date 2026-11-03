@@ -1,7 +1,9 @@
 ---
-title: 'Create Your First Judge'
+title: 'LLM-as-a-judge quickstart: create your first judge'
+sidebar_label: 'Create Your First Judge'
+description: 'Create an LLM judge that scores any text against criteria you define and returns a calibrated probability in about 56 ms. Use the playground, dashboard or API.'
 ---
-LLM as Judge lets you score any text — a model's answer, a support reply, a user message — against criteria you define, and get back a calibrated probability instead of a vague verdict.
+**LLM-as-a-judge** (also written LLM as Judge) lets you score any text — a model's answer, a support reply, a user message — against criteria you define, and get back a calibrated probability instead of a vague verdict.
 
 Emissary runs these judges as small, purpose-built classifiers rather than full frontier models. The result: a judgment that takes a frontier model **1.6–2.6 seconds** and **$10–15 per 10k requests** returns on Emissary in about **56 ms** at **$0.29 per 10k requests** — the same verdict, orders of magnitude faster and cheaper (see the side-by-side comparison in Path A).
 
@@ -30,17 +32,17 @@ Every path below is just a different way to set these two fields.
 
 Open the [public playground](https://www.withemissary.com/demo?mode=judge). You'll land on a ready-to-use judge with our default configuration: a simple **`helpful`** judge that decides whether an assistant's answer actually helps the user. Type any input and hit **Run** — no sign-in required.
 
-![try-default](/img/quickstart/llm-as-judge/try-default.png)
+![Public playground with the default helpful judge](/img/quickstart/llm-as-judge/try-default.png)
 
 You'll get the judge's verdict alongside the same input run through frontier models (Claude, GPT), so you can compare result, latency, and cost side by side. In this example the dismissive answer scores **0% `helpful`** across all three — but Emissary returns that verdict in ~56 ms for $0.29 / 10k requests, versus seconds and dollars for the frontier models.
 
-![playground-result](/img/quickstart/llm-as-judge/playground-result.png)
+![Judge verdict next to frontier model results, with latency and cost](/img/quickstart/llm-as-judge/playground-result.png)
 
 ### Customize your judge
 
 The default `helpful` judge is intentionally minimal. To make it your own, edit the **Metric** and **Criteria** in the left sidebar. For example, to build a judge that detects anger:
 
-<img src="/img/quickstart/llm-as-judge/customize-sidebar.png" alt="customize_judge_sidebar" width="450" />
+<img src="/img/quickstart/llm-as-judge/customize-sidebar.png" alt="Playground sidebar for editing a judge's Metric and Criteria" width="450" />
 
 - **Metric:** `anger`
 - **Criteria:** A text should be labeled as expressing anger (YES) if it contains explicit or strongly implied hostile emotional state directed at a target (person, group, system, or situation), characterized by emotional agitation and adversarial tone. This includes expressions of irritation, frustration, outrage, resentment, or contempt when they are intensified and accompanied by blame, condemnation, or rejection. Indicators include derogatory language, insults, profanity used in a hostile manner, accusatory phrasing, emotionally charged criticism, dismissive or demeaning statements, emphatic negativity (e.g., “this is unacceptable,” “I’m sick of this,” “what the hell is wrong with this”), or any language implying loss of patience or emotional control. Passive or neutral disagreement, calm critique, or factual negative evaluation without emotional escalation should NOT be labeled as anger. The key requirement is the presence of an emotionally activated, antagonistic stance rather than mere negativity or disagreement. Does this text express anger?
@@ -51,7 +53,7 @@ Hit **Save**. That's it — you've built a custom judge. Test it with any input 
 
 When you're ready, hit **Deploy** in the **Ready to integrate?** section to turn your playground judge into a live API endpoint. (Sign up / sign in to get your API key.)
 
-![deploy-public](/img/quickstart/llm-as-judge/deploy-public.png)
+![Deploy button in the Ready to integrate section of the playground](/img/quickstart/llm-as-judge/deploy-public.png)
 
 Your judge is saved as an **Experiment**, and the **Integration** tab gives you a copy-paste snippet with your real model name and key prefilled. See [Integration](#integration) below.
 
@@ -63,7 +65,7 @@ From the **Playground** tab, click **New experiment**.
 
 ### 1. Identity & mode
 
-![identity-mode](/img/quickstart/llm-as-judge/identity-mode.png)
+![Judge identity and mode form in the dashboard](/img/quickstart/llm-as-judge/identity-mode.png)
 
 - **Name** — how you'll recognize this experiment in the Playground list (e.g., `AngerJudge`).
 - **Mode** — select **LLM as Judge**.
@@ -72,7 +74,7 @@ From the **Playground** tab, click **New experiment**.
 
 Fill in the **Metric** and **Criteria** ([defined above](#customize-your-judge)). We'll use the same `anger` judge as in Path A.
 
-![judge-config](/img/quickstart/llm-as-judge/judge-config.png)
+![Judge configuration with Metric and Criteria filled in](/img/quickstart/llm-as-judge/judge-config.png)
 
 Click **Create & run zero-shot**.
 
@@ -80,7 +82,7 @@ Click **Create & run zero-shot**.
 
 From the Playground tab, type any input ("I'm so mad!") and hit **Run** to see your judge's score next to the frontier models.
 
-![test-judge](/img/quickstart/llm-as-judge/test-judge.png)
+![Playground tab showing a judge score next to frontier models](/img/quickstart/llm-as-judge/test-judge.png)
 
 Ready to ship it? Head to [Integration](#integration).
 
@@ -152,7 +154,7 @@ A high `anger` probability confirms the judge correctly flagged the angry messag
 
 However you built your judge — Path A, B, or C — the **Integration** tab gives you a ready-to-use snippet.
 
-![integration](/img/quickstart/llm-as-judge/integration.png)
+![Integration tab with a ready-to-use code snippet for the judge](/img/quickstart/llm-as-judge/integration.png)
 
 - Switch between **cURL / Python / TypeScript**.
 - Your `<experiment_id>/<version>` and **API key are prefilled**.
