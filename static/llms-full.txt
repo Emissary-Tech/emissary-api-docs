@@ -1289,6 +1289,1207 @@ Head to the **Datasets** and **Training** sections of the docs to continue.
 
 ---
 
+# Overview
+
+Source: https://docs.withemissary.com/decision-lm/overview
+
+# Decision LM
+
+A **Decision Language Model (Decision LM)** is an AI model built to *decide* and *predict* rather than *write*. Instead of generating output text token by token, it reads an input, runs **one pass** through the model (equal to generating **one** output token), and returns a set of probabilities for that next token: which are then processed into a yes or no label, a set of confidence scores across classes, or a number in a range.
+
+This way, we keep the language understanding of an LLM, but by stripping its ability to recurse (predict token after token till stop condition) and only emitting a single output over a limited vocabulary (your set of options), we make it exponentially faster (~50-500 ms E2E latency), cheaper (under $0.10/M tokens), and predictable enough to sit in pipeline relying on well-formatted outputs.
+
+You may also see them called *System One models* (popularized by Daniel Kahneman's Thinking Fast and Slow & Jev), *LLM classifiers*, or *Decisions API* (OpenAI). They all mean the same thing.
+
+---
+
+## What Decision LMs are used for
+
+A Decision LM handles three kinds of task.
+
+| Task | Output | Example |
+|---|---|---|
+| **Binary classification** (Noul/Predicate) | One probability that a statement is true | *Does this response answer the user's question?* |
+| **Multi-class classification** (Choice) | A probability per class, summing to 1 | *Which model should handle this query?* |
+| **Regression** (Score)  | A single number on a scale you define | *How urgent is this ticket, from 0 to 1?* |
+
+In practice these show up in a few recurring places:
+
+- **[LLM judges](https://docs.withemissary.com/decision-lm/use-cases/llm-judges):** score outputs against criteria such as helpfulness, safety, or factuality.
+- **[Content classification](https://docs.withemissary.com/decision-lm/use-cases/content-classification):** moderation, intent detection, sentiment, and ticket triage.
+- **[Model / Intent routing](https://docs.withemissary.com/decision-lm/use-cases/model-routing):** send each query to the right-sized model or agent.
+- **Guardrails and verifiers:** check an agent's input or output before the next step runs.
+
+Not sure where a Decision LM fits in your own agent? Use the [Discover your own](https://docs.withemissary.com/decision-lm/use-cases/discover-your-own) prompt to have Claude Code find the spots for you.
+
+---
+
+## Why use one
+
+If the answer to a question is a choice among known options, a frontier model is overkill. A Decision LM gives you:
+
+- **Low latency.** One forward pass, typically 50-500ms, with no generation loop.
+- **Low cost.** Orders of magnitude cheaper per request than prompting a frontier model for the same call (~$0.04-$0.10/M tokens --> 2% of Opus)
+- **Confidence scores.** Every decision comes with probabilities you can threshold, log, and route on.
+
+For example, an Emissary judge returns in about **56 ms** at **$0.29 per 10k requests**, where a frontier model takes 1.6–2.6 seconds and $10–15 per 10k. See the [LLM judge](https://docs.withemissary.com/quickstart/llm-as-judge) and [router](https://docs.withemissary.com/quickstart/router) quickstarts for the side-by-side numbers.
+
+The tradeoffs, including calibration and input brittleness, are covered in [Advantages and challenges](https://docs.withemissary.com/decision-lm/deep-dive#advantages). To see how Emissary stacks up against other Decision LMs on cost, latency, security, and calibration, read [Comparing Decision LMs](https://docs.withemissary.com/decision-lm/compare).
+
+---
+
+## Where to go next
+
+- **Want to see one work?** Start with the [LLM judge quickstart](https://docs.withemissary.com/quickstart/llm-as-judge) or the [router quickstart](https://docs.withemissary.com/quickstart/router).
+- **Want to know how they work?** Read [How it works](https://docs.withemissary.com/decision-lm/deep-dive).
+- **Choosing a provider?** See [Comparing Decision LMs](https://docs.withemissary.com/decision-lm/compare).
+- **Want to see where they fit?** Browse the [use cases](https://docs.withemissary.com/decision-lm/use-cases/model-routing).
+- **Zero-shot not accurate enough?** See [When to train your own](https://docs.withemissary.com/decision-lm/train-your-own/when-to-train).
+- **Want to call the API directly?** See [Experiments](https://docs.withemissary.com/experiment) for binary, multi-class, and regression snippets.
+
+
+---
+
+# How it works
+
+Source: https://docs.withemissary.com/decision-lm/deep-dive
+
+# How it works
+
+A Decision LM uses a language model to produce a decision in a single forward pass, without autoregressive text generation. Depending on the implementation, the decision comes from a constrained language-modeling head or a dedicated classification or regression head. There is no sampling loop and no generated text. The model reads the input once and the output is a distribution (or a number) read straight off the final hidden state.
+
+This page is designed for those hoping to understand how the model is built, how your classes reach the model, and what to expect in production. For a high-level introduction, see the [overview](https://docs.withemissary.com/decision-lm/overview).
+
+---
+
+## The basic mechanism
+
+A standard LLM ends in a language-modeling head: a linear layer that maps the last hidden state to a score for every token in the vocabulary. Generation repeats that step, sampling a token and feeding it back in.
+
+A Decision LM replaces that loop with one step.
+
+```
+input + class definitions
+        │
+        ▼
+  transformer layers      (one forward pass)
+        │
+        ▼
+ last-token hidden state
+        │
+        ▼
+ classification head  / constrained LM head    
+        │
+        ▼
+ softmax / sigmoid / scalar  →  probabilities or a number
+```
+
+The head has one output per class for multi-class tasks, a single logit for binary tasks, and a single scalar for regression. Because the output is read from one position, latency is roughly that of the prompt's prefill, with no decoding at all - your entire latency is roughly equal to TTFT. 
+
+---
+
+## Four ways to build a Decision LM
+
+The interesting design question is how to create this new constrained output space for every request - that is, how the decision gets its meaning while keeping it a single pass. Two choices define how a Decision LM is built:
+
+- **The head.** Reuse the language model's existing head, or give the model a new one.
+- **The LLM.** Use a model as it is, or train it.
+
+Crossing them gives four approaches.
+
+| | **Static head** | **Dynamic head** |
+|---|---|---|
+| **Existing LLM** | 1. Constrained decoding | 2. Semantic initialization |
+| **New (trained) LLM** | 3. Post-trained mappings | 4. Custom Decision LM |
+
+### 1. Constrained decoding
+
+*Existing LLM, existing head.*
+
+Keep the original language-modeling head and restrict it. The class labels are written into the prompt and each maps to an existing token, and decoding is constrained to the label tokens with a maximum of one generated token. The model's probabilities over those tokens become the class probabilities.
+
+- **Pros:** no training and no new weights. It works with any instruction-following model and requires no additional work for any number of classifications. It also allows you to use existing batching logic during inference for high throughput.
+- **Cons:** the model is still, at its core, a generative model. It is very sensitive to label wording and token choice, and you pay for the full ouptut vocabulary projection. Constrained decoding has also been shown to decrease the capability of models in various domains.
+
+This is very likely how Luna's decision API works, and the constrained decoding performance loss explains why just using Luna feels better.
+
+### 2. Semantic initialization
+
+*Existing LLM, new head.*
+
+Build a dedicated classification head whose weights are *initialized from the language-modeling head itself*. For each class, we can take the output-head weights for the tokens that best represent it, so that the new head starts out behaving like the model's own next-token probabilities for those labels. This is the same vocabulary distribution the constrained approach reads, but now it lives in a small head you can control more effectively.
+
+- **Pros:** works zero-shot from class names and descriptions, produces a real head that is cheaper to run, and can be tuned further.
+- **Cons:** zero-shot quality depends on how well the class descriptions line up with what the base model already knows. There is also a small but present memory and latency overhead in generating the new head. 
+
+**This is how Emissary [experiments](https://docs.withemissary.com/experiment) start.** You provide class names and descriptions, and you get a working zero-shot endpoint in under a second. You can then improve it with [quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train), which trains just that head on a handful of labeled examples, or go further with a custom head (option 4). See [When to train your own](https://docs.withemissary.com/decision-lm/train-your-own/when-to-train) to choose.
+
+### 3. Post-training with mapped choices
+
+*New LLM, pre-defined head.* This is the Jev approach. 
+
+The head is a fixed, pre-defined set of answer tokens. Then, you generate a large amount of synthetic data and train with ordinary **cross-entropy** loss. The task has an obvious right answer, so no reward modeling or preference data is needed. This allows you to skip per-question initialization and teach the model the task more generally, with the input rewritten so that classes are mapped to simple answer tokens, such as `A`, `B`, `C`, `D`, or dedicated special tokens:
+
+```
+Which route should handle this query?
+
+A: simple_task    – short factual or lookup questions
+B: complex_task   – multi-step reasoning or code
+C: creative_task  – writing and brainstorming
+
+Query: Design and implement an infrastructure platform
+Answer: A:0.01 B:0.98 C:0.01
+```
+
+**Why there is a maximum number of choices.** The head is a pre-defined set of special tokens, one per possible answer. A prompt can use only as many choices as the model has answer tokens, so the number of classes is capped at the size of that set (255 for Jev-like models). Adding more choices means adding tokens and training again.
+
+- **Pros:** the strongest accuracy floor. The model is trained for exactly this task, and the label tokens are unambiguous. 
+- **Cons:** The high floor is paired with a low ceiling - optimizations on this approach are minimal. The set of answer tokens is fixed, which caps the number of choices and limits regression to a fixed set of levels.  Furthermore, building your own this way is not very feasible: it needs a data-generation pipeline and a training run, with deep upfront capital investment. 
+
+The labels don't have to be letters. Special tokens work well because they carry no prior meaning, so the model learns the mapping from scratch rather than fighting what `A` usually means.
+
+### 4. Custom head
+
+*New LLM, new head.*
+
+This is the most involved approach. Train the model and give it a purpose-built head together. A LoRA adapter updates the model's own representations for your task, and a new classification or regression head reads the decision off the result, with one output per class, or a single scalar for regression. Because the head is part of the model, the classes live in its weights rather than in the prompt. The class descriptions can stay out of the request entirely, so requests are shorter, faster and cheaper. 
+
+- **Pros:** typically the highest quality on a well-defined task, and the lowest cost and latency per request, since the prompt is just the input. Confidence scores are calibrated against your own labels.
+- **Cons:** it is built for one task. A new set of classes means a new head and a new training run. It needs labeled data, and it needs maintaining as your inputs drift or the base model changes.
+
+On Emissary, this is a [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune).
+
+### Which should I use?
+
+The first three trade depth for breadth. They are the right choice when you have many different decisions to make, or when the classes change often, because adding a task costs almost nothing. A custom head makes the opposite trade: it gives up breadth for quality and cost. That is worth it for a decision you will make many times with a stable definition, such as routing, moderation, or scoring against your own rubric.
+
+These are not exclusive. A common path is to start with a zero-shot head (option 2), train that head on a few examples, and move to a custom head (option 4) once the task is stable and the volume justifies it. On Emissary, zero-shot experiments and quick-train are option 2, and a LoRA fine-tune is option 4.
+
+---
+
+## How inference works
+
+Your classes are not passed to the model as structured data. They are rendered into the **prompt template** that matches the technique used to build the model, and the model reads them as text.
+
+- With **constrained decoding**, the template lists the labels and the instruction, and the allowed output tokens are restricted to those labels.
+- With **semantic initialization**, the template contains each class's name and description, and the head's rows are tied to those classes.
+- With **post-trained mappings**, the template assigns each class to its answer token (`A: class 1`, `B: class 2`, and so on), exactly as it did during training. The model's probability over those tokens is the decision.
+- With a **custom head**, the template can be just the input. The classes live in the head and adapter, so the descriptions can be left out. If you trained with descriptions in the prompt, serve with them.
+
+Two consequences follow:
+
+1. **The template is part of the model.** A model trained with one template should be served with that template. Changing it at inference time is a distribution shift.
+2. **Class order and wording matter.** Where a class appears in the prompt, and how it is described, can move the probabilities. Keep descriptions specific and mutually exclusive, and test reorderings.
+
+On Emissary the template is applied for you. You supply `classes` when you create an experiment and an `input` when you call the model, and the platform builds the prompt.
+
+---
+
+## Advantages
+
+- **Low latency.** One forward pass with no decoding loop. Emissary returns judgments in tens of milliseconds, against seconds for a frontier model.
+- **Low cost.** Small models, a single pass, and shared GPU serving make each call a fraction of the price of a generative call.
+- **Confidence scores.** You get probabilities, not just a label. Threshold them, escalate low-confidence cases to a bigger model, and log them for monitoring.
+- **Deterministic output shape.** The result is always a valid label or number, so there is no output parsing and no malformed JSON.
+- **Easy to improve.** Because the output is a clean label, training data is cheap to create and evaluation is simple accuracy or error.
+
+---
+
+## Common challenges
+
+Decision LMs are not free of failure modes. Plan for these.
+
+- **Miscalibrated confidence.** A probability of 0.9 doesn't always mean 90% of such cases are correct. Models are often overconfident, especially on out-of-distribution inputs. Measure calibration on your own data and pick thresholds empirically rather than assuming 0.5 is right.
+- **Brittleness to input.** Small changes in phrasing, formatting, or length can shift the output. Test with paraphrases, typos, and different input lengths.
+- **Sensitivity to class definitions.** Vague or overlapping classes produce unstable results. Write each description as a precise criterion. Class definitions / descriptions are your new prompt templates.
+- **Position and label bias.** The order of choices, or the identity of the answer token, can bias the output. Randomize order during training and evaluate with shuffled orderings.
+- **No reasoning.** A single pass can't work through a multi-step problem. If the decision needs real deliberation, route that case to a generative model.
+- **Closed label set.** The model must pick from the classes you defined. Inputs that fit none of them still get a label, so include an `other` or `none` class when that is possible.
+- **Distribution drift.** Inputs change over time. Monitor confidence and class frequency, and re-train when they move.
+- **Long inputs.** Very long inputs can dilute the signal or exceed the context window. Truncate or chunk deliberately.
+- **Threshold maintenance.** Thresholds tuned on one model version may not transfer to the next, so re-check them after every re-train.
+
+A good pattern is to use the confidence score as a gate: act on high-confidence decisions directly, and send the uncertain middle to a stronger model or a human.
+
+---
+
+## Why a decoder LLM? (for MLEs)
+
+Encoders like BERT and ModernBERT, or embeddings with a logistic regression on top, have classified text for years, and they are cheaper per request. A decoder LLM is the better base for two reasons. The first is **sample efficiency and generalization**. A decoder is pretrained on far more data and carries far more background knowledge, so it can work zero-shot from class names and descriptions, and it needs fewer labeled examples to adapt: a quick-train on a few dozen samples, or a fine-tune on around a hundred per class. An encoder or an embedding has far weaker zero-shot performance and less knowledge to draw on, so it needs more labels to reach the same quality and tends to generalize worse to inputs unlike its training data. With enough labeled data and a fixed label set, a fine-tuned encoder closes much of that gap and can be the cheaper choice.
+
+The second is **ease of inference**. Decision LMs built on a shared decoder are served with multi-head and / or multi-LoRA serving: every classifier is a small adapter and head on the same base model, and one engine serves all of them, batching requests across classifiers. Adding a classifier means adding an adapter, not standing up another deployment, so many classifiers get more efficient together and you don't have to plan scaling for each one separately. See [Many models, one engine](https://docs.withemissary.com/inference/deployments#multiple-deployments-on-one-engine).
+
+---
+
+## Next steps
+
+- Try it: [LLM judge](https://docs.withemissary.com/quickstart/llm-as-judge) or [router](https://docs.withemissary.com/quickstart/router) quickstart.
+- Improve it: [when to train your own](https://docs.withemissary.com/decision-lm/train-your-own/when-to-train), then [quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train) or [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune). Background: [post-training concepts](https://docs.withemissary.com/fine-tuning/concept) and [datasets](https://docs.withemissary.com/fine-tuning/datasets).
+- Apply it: [use cases](https://docs.withemissary.com/decision-lm/use-cases/model-routing).
+
+
+---
+
+# Model Routing
+
+Source: https://docs.withemissary.com/decision-lm/use-cases/model-routing
+
+A router decides where a request should go before any expensive work happens. Sending every query to a frontier model wastes money on easy requests, and sending everything to a small model hurts quality on hard ones. A Decision LM makes that call in tens of milliseconds, so routing doesn't add noticeable latency.
+
+This is a **multi-class** decision: each class is a destination, and the model returns a probability for each. The route with the highest probability wins.
+
+**Typical routes**
+
+- Fast, cheap model vs. heavyweight reasoning model
+- Specialist agents (research, coding, creative)
+- Support queues or internal teams
+
+For a full walkthrough, including the playground and dashboard paths, see [Create Your First ModelRouter](https://docs.withemissary.com/quickstart/router).
+
+---
+
+## Create the router
+
+Each route has a `name` and a `description`. The description is what the router matches queries against, so make it specific.
+
+```python
+
+response = requests.post(
+    "https://api.withemissary.com/v1/experiments",
+    headers={
+        "Content-Type": "application/json",
+        "X-API-Key": YOUR_API_KEY,
+    },
+    data=json.dumps({
+        'name': 'ModelRouter',
+        'mode': 'routing',
+        'classes': [
+            {'name': 'Claude Haiku',   'description': 'Simple, straightforward queries that can be handled by a small, fast model.'},
+            {'name': 'Claude Opus',  'description': 'Complex queries requiring reasoning, code generation, or multi-step analysis.'},
+            {'name': 'GPT 5', 'description': 'Creative writing, brainstorming, or content generation tasks.'}
+        ]
+    })
+)
+print(response.json())
+```
+
+```json
+{ "id": "ex-ahejacuehandheha", "latest_version": "0.0.0" }
+```
+
+## Call the router
+
+```python
+response = requests.post(
+    "https://api.withemissary.com/v1/classification",
+    headers={
+        "Content-Type": "application/json",
+        "X-API-Key": YOUR_API_KEY,
+    },
+    data=json.dumps({
+        "model": "ex-ahejacuehandheha/0.0.0",  # <experiment_id>/<version>
+        "input": "Design and implement a infrastructure platform",
+        "data_format": "probs",
+    }),
+)
+print(response.json())
+```
+
+```json
+{
+    "id": "classify-fec5cbf726b44af2ade51065232ad182",
+    "model": "ex-ahejacuehandheha/0.0.0",
+    "data": [{
+            "index": 0,
+            "probs": {
+                    "Claude Haiku": 0.09003042429685593,
+                    "Claude Opus": 0.8626418709754944,
+                    "GPT 5": 0.047327760607004166
+            }
+    }],
+    "created": 1780085360
+}
+```
+
+`Claude Opus` has the highest probability (~0.86), so this query goes to Claude Opus.
+
+---
+
+## Tips
+
+- **Use the confidence.** If the top probability is low, fall back to your most capable route rather than guessing.
+- **Describe routes by the work, not the model.** "Multi-step analysis" ages better than "the big model," and lets you swap the destination later.
+- **Improve it with your own traffic.** Once you have logged decisions, [quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train) the router on a handful of corrected examples, or [fine-tune it with LoRA](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune) once you have more, so it learns your actual distribution. See [When to train your own](https://docs.withemissary.com/decision-lm/train-your-own/when-to-train).
+
+
+---
+
+# LLM Judges
+
+Source: https://docs.withemissary.com/decision-lm/use-cases/llm-judges
+
+An LLM judge scores a piece of text, such as a model's answer, a support reply, or a user message, against a criterion. Frontier models can do this, but at 1.6–2.6 seconds and $10–15 per 10k requests, running a judge on every request is rarely affordable. A Decision LM runs the same judgment in about 56 ms for $0.29 per 10k.
+
+This is a **binary** decision. You phrase the criterion as a yes/no question, and the model returns the probability that the answer is yes.
+
+**Typical uses**
+
+- Online evals: score every production response for helpfulness, tone, or factuality
+- Guardrails: block or flag responses that fail a check
+- Reward signals and filtering: label large datasets cheaply
+
+For the full walkthrough, see [Create Your First Judge](https://docs.withemissary.com/quickstart/llm-as-judge).
+
+---
+
+## Create the judge
+
+A judge has a `name` (the metric) and a `description` (the criterion, phrased as a yes/no question).
+
+```python
+
+response = requests.post(
+    "https://api.withemissary.com/v1/experiments",
+    headers={
+        "Content-Type": "application/json",
+        "X-API-Key": YOUR_API_KEY,
+    },
+    data=json.dumps({
+        "name": "AngerJudge",
+        "mode": "judge",
+        "classes": [
+            {"name": "anger", "description": "Does this text express anger?"}
+        ],
+    }),
+)
+print(response.json())
+```
+
+```json
+{ "id": "ex-ahejacuehandheha", "latest_version": "0.0.0" }
+```
+
+## Call the judge
+
+```python
+response = requests.post(
+    "https://api.withemissary.com/v1/classification",
+    headers={
+        "Content-Type": "application/json",
+        "X-API-Key": YOUR_API_KEY,
+    },
+    data=json.dumps({
+        "model": "ex-ahejacuehandheha/0.0.0",  # <experiment_id>/<version>
+        "input": "I'm so mad!",
+        "data_format": "probs",
+    }),
+)
+print(response.json())
+```
+
+```json
+{
+    "id": "classify-3c52592c7a404f97aa494861a79db220",
+    "model": "ex-ahejacuehandheha/0.0.0",
+    "data": [{ "index": 0, "probs": { "anger": 0.96 } }],
+    "created": 1779906329
+}
+```
+
+A high `anger` probability means the judge flagged the message. For a calm input, expect a value near 0.
+
+---
+
+## Tips
+
+- **Be specific about what "yes" looks like.** A one-line question works, but a short rubric stabilizes the score.
+- **Choose thresholds on your own data.** Don't assume 0.5. Label a small sample and pick the cut-off that matches the precision and recall you need.
+- **One criterion per judge.** Create several judges rather than packing multiple criteria into one question.
+- **Need a numeric score instead?** Use a `regression` experiment. See [Experiments](https://docs.withemissary.com/experiment#regression).
+
+
+---
+
+# Content Classification
+
+Source: https://docs.withemissary.com/decision-lm/use-cases/content-classification
+
+Content classification assigns an input to exactly one of several categories. Because each call is a single fast forward pass, you can classify every message, ticket, or document as it arrives.
+
+This is a **multi-class** decision. The model returns a probability for each class, and the probabilities sum to 1.
+
+**Typical uses**
+
+- Content moderation and safety triage
+- Intent detection in chat or voice agents
+- Sentiment analysis
+- Support ticket triage and tagging
+
+The snippets below come from the [Experiments reference](https://docs.withemissary.com/experiment#decision), which covers the `decision` mode in full.
+
+---
+
+## Create the classifier
+
+Each class has a `name` and a `description`. Write descriptions so the classes are mutually exclusive.
+
+```python
+
+response = requests.post(
+    'https://api.withemissary.com/v1/experiments',
+    headers={
+        'Content-Type': 'application/json',
+        'X-API-Key': YOUR_API_KEY
+    },
+    data=json.dumps({
+        'name': 'MyDecision',
+        'mode': 'decision',
+        'classes': [
+            {'name': 'positive', 'description': 'The text expresses a positive sentiment, satisfaction, or approval.'},
+            {'name': 'negative', 'description': 'The text expresses a negative sentiment, dissatisfaction, or complaint.'},
+            {'name': 'neutral',  'description': 'The text is factual or does not express a strong opinion.'}
+        ]
+    })
+)
+print(response.json())
+```
+
+```json
+{"id": "ex-ahejacuehandhehe", "latest_version": "0.0.0"}
+```
+
+## Call the classifier
+
+```python
+response = requests.post(
+    'https://api.withemissary.com/v1/classification',
+    headers={
+        'Content-Type': 'application/json',
+        'X-API-Key': YOUR_API_KEY
+    },
+    data=json.dumps({
+        'model': 'ex-ahejacuehandhehe/0.0.0',
+        'input': 'This product is absolutely wonderful!',
+        'data_format': 'probs'
+    })
+)
+print(response.json())
+```
+
+```json
+{
+    "id": "classify-eac7451c54174ebc8da47be77dfe9581",
+    "model": "ex-ahejacuehandhehe/0.0.0",
+    "data": [{
+        "index": 0,
+        "probs": {
+            "negative": 0.017637422308325768,
+            "neutral":  0.024233082309365273,
+            "positive": 0.9581295251846313
+        }
+    }],
+    "created": 1779907078
+}
+```
+
+---
+
+## Tips
+
+- **Add an escape class.** Include `other` or `none` so off-topic inputs have somewhere to go instead of being forced into a real category.
+- **Act on confidence.** Auto-handle high-confidence results and send the uncertain middle to review.
+- **Move to a LoRA fine-tune for high-stakes tasks.** Moderation and compliance deserve a model trained on your labeled data. Start with [quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train) to see how much your labels help, then see [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune) and [Datasets](https://docs.withemissary.com/fine-tuning/datasets).
+
+
+---
+
+# Discover Your Own
+
+Source: https://docs.withemissary.com/decision-lm/use-cases/discover-your-own
+
+Every agent has decisions buried in it: which tool to call, whether an answer is good enough, which model to use. Many of them are being made by a full generative call that could be a single fast classification.
+
+The prompt below turns Claude Code into a guide for finding those spots in **your** codebase and replacing them with Emissary Decision LMs. It:
+
+1. Maps your agent's LLM calls.
+2. Finds **replacement tasks**: existing calls that are really a decision followed by generation.
+3. Finds **net new tasks**: verifiers and routers that would make the agent better.
+4. Implements the changes using **only Emissary** for the decision layer.
+
+## Before you start
+
+- Create an Emissary API key under **Settings → Credentials** and export it as `EMISSARY_API_KEY`.
+- Open Claude Code in the root of the repository that contains your agent.
+- Skim the [overview](https://docs.withemissary.com/decision-lm/overview) and the [Experiments reference](https://docs.withemissary.com/experiment) so you know what the result should look like.
+
+## The prompt
+
+Paste this into Claude Code.
+
+````text
+You are helping me add Emissary Decision LMs to this AI agent. A Decision LM is an LLM with
+a classification head that makes one decision in a single forward pass: binary
+classification, multi-class classification, or regression. It returns probabilities or a
+number in tens of milliseconds, at a small fraction of the cost of a generative call.
+
+Docs: https://docs.withemissary.com  (see "Experiments" and the Decision LM section)
+API:  POST https://api.withemissary.com/v1/experiments       (create a decision model)
+      POST https://api.withemissary.com/v1/classification    (binary / multi-class)
+      POST https://api.withemissary.com/v1/regression        (numeric score)
+Auth: header X-API-Key, read from the EMISSARY_API_KEY environment variable.
+Experiment modes: judge (binary yes/no), decision (multi-class), routing (multi-class
+destinations), regression (numeric scale).
+
+Work in four phases. Do not skip ahead, and stop for my approval at the end of phase 3.
+
+## Phase 1 - Map the agent
+Read the codebase and list every place it calls an LLM or makes a branching decision.
+For each, record: file and line, what the call does, what the input is, what the output
+is, and whether the output is free-form text or a choice among known options.
+
+## Phase 2 - Find candidates
+
+A) REPLACEMENT TASKS - existing LLM calls that are really a decision.
+Look for calls where the model's job is to pick, label, grade, or gate, even if it
+currently returns prose or JSON. Typical examples:
+  - intent or topic classification before choosing a prompt or tool
+  - "which tool/agent should handle this?" selection
+  - choosing between a small and a large model
+  - yes/no checks ("is this on topic?", "is this safe?", "did the user ask for X?")
+  - sentiment, urgency, priority, or severity scoring
+  - extracting a category from a ticket, email, or document
+For each one, split it into two steps:
+  1. DECISION - what exactly is being decided, and what are the classes (or the scale)?
+  2. GENERATION - what text still needs to be written once the decision is made?
+The decision moves to an Emissary Decision LM. The generation stays with the existing
+model, but now it can use a decision-specific prompt, or be skipped entirely.
+
+B) NET NEW TASKS - decisions the agent does not make today but should.
+Include where sensible:
+  - VERIFIERS: judge checks on the agent's outputs before they are returned or acted on
+    (groundedness, policy compliance, tone, completeness, hallucination risk, tool-call
+    arguments that look wrong)
+  - DECISION ROUTERS: routing between models, agents, or workflows by query difficulty or
+    type, with a confidence-based fallback to the strongest option
+  - GATES: input filtering (off-topic, prompt injection, PII) and escalation to a human
+    when confidence is low
+Only propose a net new task if there is a concrete place in the code where its output
+would change behavior.
+
+## Phase 3 - Present a plan
+Show me a table with one row per candidate:
+  | # | Type (replace / new) | Location | Mode (judge / decision / routing / regression) |
+  | Classes or scale | Replaces or adds | Expected benefit | Risk |
+Rank by impact. For each, define the classes with precise, mutually exclusive
+descriptions (include an "other" class where inputs may not fit), or for a judge, a
+single yes/no question. Recommend a confidence threshold and say what happens below it.
+Then STOP and wait for my approval of which items to implement.
+
+## Phase 4 - Implement (after approval)
+Use ONLY Emissary for the decision layer. Do not add any other classifier, embedding
+model, keyword heuristic, or third-party moderation or routing service in its place.
+For each approved item:
+  1. Add a small module that creates the experiment with POST /v1/experiments (idempotent:
+     reuse the experiment id if it already exists; store ids in config, not in code).
+  2. Add a typed client function that calls /v1/classification or /v1/regression with
+     data_format "probs" where applicable, and returns the probabilities.
+  3. Replace the existing decision call, or insert the new verifier / router, at the
+     location from the plan. Keep the generation step with the existing model.
+  4. Apply the confidence threshold. Below it, fall back to the previous behavior or the
+     strongest route. Never fail silently.
+  5. Log the input, the probabilities, and the chosen branch, so decisions can be
+     reviewed later and used as training data.
+  6. Add tests that mock the Emissary API for each branch, plus one test for the
+     low-confidence fallback.
+Read the API key from EMISSARY_API_KEY and never hard-code it. Make timeouts and retries
+explicit. Keep each change small and reviewable.
+
+When done, summarize what changed, how to run the tests, and which decisions I should
+review first with real traffic before trusting the thresholds.
+````
+
+## What to expect
+
+Claude Code will walk the repository, then come back with a ranked plan before it changes anything. A typical agent turns up a handful of candidates, such as an intent classifier, a model-selection step, and a missing output verifier.
+
+After you approve, it creates the experiments, wires them in with a fallback path, and logs every decision. Those logs are your future training data. Once you have a handful of corrected examples, [quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train) the models, and move to a [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune) when you have more, to raise accuracy on your real traffic.
+
+Start with one or two high-traffic items. Verify the thresholds against real inputs before adding more.
+
+
+---
+
+# When to train your own
+
+Source: https://docs.withemissary.com/decision-lm/train-your-own/when-to-train
+
+# When to train your own
+
+A zero-shot Decision LM is the right place to start. You write class names and descriptions, and you get a working endpoint in under a second. Most tasks never need more. This page helps you tell when yours does, and which level of training to use.
+
+---
+
+## Signs zero-shot has run out
+
+Consider training your own when you notice any of these:
+
+- **Confidence doesn't match reality.** A score of 0.9 is wrong far more than 10% of the time, so thresholds and escalation rules can't be trusted.
+- **It keeps missing the same cases.** The errors cluster around your edge cases or your own definition of a label, which a description can't capture.
+- **The class descriptions are doing too much work.** Rewording a description changes your results, or the descriptions keep growing to patch failures.
+- **Requests are long.** Every request carries the description of each class. A trained model learns what the classes mean from your examples, so requests get shorter, cheaper, and faster. A [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune) is what removes the descriptions.
+- **You need multi-label.** More than one label per input is only available in post-trained models, and only through a [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune).
+- **You already have labeled data.** If you have been logging decisions, for example after running [Discover your own](https://docs.withemissary.com/decision-lm/use-cases/discover-your-own), you have the raw material.
+
+If none of these apply, stay on zero-shot. Training adds a dataset to maintain and a model to keep up to date.
+
+---
+
+## The three levels
+
+The levels differ in how much of the model changes.
+
+| Level | What changes | Data you need | Reach for it when |
+|---|---|---|---|
+| **Zero-shot** | The head is *set* from your class descriptions. Nothing is trained. | None | You are starting out, or the task matches a standard use case |
+| **[Quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train)** | The head is *trained*. The language model underneath stays frozen. | 10-50 labeled examples | Zero-shot is close, but misses your definitions or edge cases |
+| **[LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune)** | A LoRA adapter and the head are *both trained*, so the model's own representations adapt | Hundreds of examples or more | Quick-train plateaus, you need multi-label, or you want the highest accuracy |
+
+### How to choose
+
+1. **Start with quick-train** if you have a small set of labeled examples. It is the cheapest way to find out how much your data can help.
+2. **Move to a LoRA fine-tune** if any of these are true:
+   - Quick-train plateaus. A head on a frozen model can only redraw the boundary between classes using features the model already produces. If those features don't separate your classes, only adapting the model itself helps.
+   - You need multi-label output.
+   - You have a large labeled dataset and want the best accuracy, calibration, and latency.
+
+Whichever level you choose, hold back a test set first and measure the result against zero-shot. If it isn't better, you have learned that cheaply.
+
+---
+
+## Next steps
+
+- Small labeled set: [Quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train).
+- Large labeled set, or multi-label: [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune).
+- What it costs: [Costs and FAQ](https://docs.withemissary.com/decision-lm/costs-and-faq).
+
+
+---
+
+# Quick-train
+
+Source: https://docs.withemissary.com/decision-lm/train-your-own/quick-train
+
+# Quick-train
+
+**Quick-train** adapts a Decision LM to your data using a handful of labeled examples, typically **10 to 50**. It trains only the classification head and leaves the language model underneath frozen, so it needs very little data and finishes in about **20 seconds**.
+
+Use it when zero-shot is close but misses your definitions or edge cases. See [When to train your own](https://docs.withemissary.com/decision-lm/train-your-own/when-to-train) to decide.
+
+## What it does and doesn't fix
+
+A head on a frozen model redraws the boundary between your classes, using features the model already produces.
+
+- **It helps** when the model already understands your inputs but draws the line between classes in the wrong place: your label definitions, your thresholds, your edge cases.
+- **It doesn't help** when the model's features don't separate your classes at all. If quick-train plateaus, move to a [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune), which also adapts the model itself.
+- **It can't do multi-label.** Multi-label output needs a LoRA fine-tune.
+
+## Before you start
+
+- An experiment in the [Playground](https://www.withemissary.com/app/playground) with your classes defined. Quick-train starts from the zero-shot model, so a zero-shot experiment is all you need.
+- A handful of real inputs that cover your classes, including the hard and ambiguous ones. Quick-train needs at least **5 samples**.
+- A few more inputs held back, which you will not train on, to check the result.
+
+## 1. Build up samples
+
+Every query you run in the Playground is logged as a **labeled sample** for your next quick-train. Open your experiment and run representative inputs, one at a time.
+
+Open the **Training Data** tab to see them. Each row has the input, a label, the experiment version that produced it, and the completion, which is the one-hot label map the head will learn from.
+
+## 2. Check the labels
+
+Each sample starts with an **auto** label, which is the model's own prediction at the time you ran it. Training on auto labels teaches the head to agree with what zero-shot already says.
+
+Check each one, and correct any that are wrong with the pencil icon on the row. This is where most of the improvement comes from, so spend your effort on the cases the model got wrong or was unsure about.
+
+## 3. Start training
+
+The **Quick-train** card at the bottom of the Training Data tab shows how many samples you have against the minimum, for example `6 / 5 samples`. Once you meet it, select **Start training**.
+
+The head trains from your latest samples, usually in about 20 seconds. When it finishes, a dialog confirms that your new version is ready and selected as the active version.
+
+Each quick-train creates a new version, such as `v0.0.1`, and leaves the earlier ones in place. All versions are listed in **Playground → Artifacts**.
+
+## 4. Compare against zero-shot
+
+Run your held-out inputs on the new version and compare against the earlier one. Look at the probabilities as well as the top label: a head that is right more often should also be more confident when it is right.
+
+In this example, a query that zero-shot split across three classes (43% on the top class) came back at 97% on the quick-trained version. Treat a result like this with care, because that query was one of the training samples. The held-out inputs are what tell you whether quick-train generalizes.
+
+If a version is worse, run quick-train again after adding more samples or fixing labels. The earlier versions are still there.
+
+## 5. Use it
+
+Call a quick-trained version the same way as any zero-shot experiment, with the model name `<experiment_id>/<version>`, for example `ex-nlaprbs5edr7hzl28xngbk/0.0.1`. The **Integration** tab has a ready-to-copy snippet with your model name filled in. See the [API reference](https://docs.withemissary.com/api/get-classification-from-deployment) for the request and response shapes.
+
+## Next steps
+
+- Still not accurate enough: [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune).
+- Keep it accurate over time: [Maintain your model](https://docs.withemissary.com/decision-lm/train-your-own/maintain).
+
+
+---
+
+# LoRA fine-tune
+
+Source: https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune
+
+# LoRA fine-tune
+
+A **LoRA fine-tune** trains a lightweight adapter and the classification head together, so the model's own representations adapt to your task. It is the deepest level of customization, and the one to use when [quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train) plateaus, when you need multi-label output, or when you want the highest accuracy.
+
+See [When to train your own](https://docs.withemissary.com/decision-lm/train-your-own/when-to-train) to decide whether you need it. Plan for **at least 100 labeled samples per class**. For a regressor, aim for a comparable total number of examples that cover the full range of the target. Balanced classes help, and profiling warns if any class has fewer than about 20 examples.
+
+## What you get
+
+A model trained on your data usually beats a zero-shot one on the things that matter in production:
+
+- **Calibrated probabilities.** A trained model's scores line up with how often it is actually right, so a threshold of 0.9 means roughly 90% precision. That makes thresholds, escalation rules, and human-in-the-loop routing reliable.
+- **Greater precision and recall.** The model learns your label boundaries, edge cases, and vocabulary instead of inferring them from a class description.
+- **Consistency.** The same input gets the same decision, run after run. There is no prompt drift and no dependence on prompt wording. Encode your policy, your tone, and your edge cases, including ones that are hard to put in a prompt.
+- **Lower cost and latency.** No longer need to put a description of each class in your input, because the model learns what each class means from your examples. Requests are shorter, so you pay for fewer tokens per request and each one processes faster. This matters most when your class descriptions have grown large relative to the size of your input or state: if every request carries a long block of definitions to classify a short input, most of what you pay for and wait on is the definitions, and a trained model removes them.
+- **Ownership.** The checkpoint is yours. You can version it, A/B test it, and retrain it as your data grows.
+
+Third parties have benchmarked trained LLM classifiers against prompted LLMs and published the results. See the [llm-classifier-bench](https://github.com/lucasbiagettia/llm-classifier-bench) repository for the methodology, datasets, and numbers.
+
+---
+
+## How
+
+The lifecycle is: **format dataset → train → pick a checkpoint → deploy → measure**. This page uses the API. Every step can also be done in the dashboard, as described in the [post-training quickstart](https://docs.withemissary.com/fine-tuning/quickstart).
+
+Set these up once:
+
+```python
+
+BASE = 'https://api.withemissary.com'
+HEADERS = {'X-API-Key': YOUR_API_KEY}
+```
+
+### 1. Format your dataset
+
+Datasets are JSONL, one example per line. Each example has a `prompt` (the input text) and a `completion` (the target). For the full schema reference, see [Datasets](https://docs.withemissary.com/fine-tuning/datasets).
+
+You can include your class descriptions in the `prompt` if you want to, but you don't have to. Because the model learns what each class means from your examples, a `prompt` that is just the input works. Leaving the descriptions out keeps requests short. Whichever you choose, send the same format at inference time that you trained on.
+
+**Multi-class classification.** `completion` maps every label to `1` or `0`, and exactly one label is `1`:
+
+```jsonl
+{"prompt": "My card was charged twice this month.", "completion": {"billing": 1, "bug": 0, "feature_request": 0}}
+{"prompt": "The export button does nothing when I click it.", "completion": {"billing": 0, "bug": 1, "feature_request": 0}}
+{"prompt": "Please add dark mode to the dashboard.", "completion": {"billing": 0, "bug": 0, "feature_request": 1}}
+```
+
+**Binary classification.** Use a single label key:
+
+```jsonl
+{"prompt": "Does this response answer the question? ...", "completion": {"is_helpful": 1}}
+```
+
+**Multi-label classification.** Use the same label map, but more than one label can be `1` on a single example:
+
+```jsonl
+{"prompt": "I was charged twice and the export button is also broken.", "completion": {"billing": 1, "bug": 1, "feature_request": 0}}
+{"prompt": "Please add dark mode, and fix the typo on the pricing page.", "completion": {"billing": 0, "bug": 1, "feature_request": 1}}
+```
+
+Multi-label classification needs a LoRA fine-tune. It is not supported by zero-shot Decision LMs or by [quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train). Multi-label datasets also don't support rebalancing.
+
+**Regression.** `completion` is a single number:
+
+```jsonl
+{"prompt": "Our site has been down for an hour and customers are calling.", "completion": 0.92}
+```
+
+- Keep the same label keys on every row.
+- Normalize wide-ranging regression targets (for example to 0-1) before training.
+- Hold back a test set now, **before** training, if you plan to run your own evaluation. See [step 5](#5-measure-on-your-own-hold-out-set).
+
+### 2. Kick off training
+
+Create a project, upload the dataset, then start a training job. See [Concepts](https://docs.withemissary.com/fine-tuning/concept) for what each entity is and [Hyperparameters](https://docs.withemissary.com/fine-tuning/parameters) for the knobs.
+
+```python
+# Create a project
+project = requests.post(
+    f'{BASE}/v1/projects',
+    headers=HEADERS,
+    json={'name': 'ticket-triage'}
+).json()
+project_id = project['id']
+
+# Upload the training dataset
+with open('train.jsonl', 'rb') as f:
+    train_ds = requests.post(
+        f'{BASE}/v1/projects/{project_id}/datasets',
+        headers=HEADERS,
+        files={'file': ('train.jsonl', f, 'application/json')},
+        data={'name': 'train'}
+    ).json()
+```
+
+The upload completes asynchronously. The response above reports `is_uploaded: false`, and the dataset is not ready to train on until it is uploaded and profiled. Wait for both flags before you start a job. This usually takes a few seconds.
+
+```python
+while True:
+    ds = requests.get(
+        f'{BASE}/v1/projects/{project_id}/datasets/{train_ds["id"]}',
+        headers=HEADERS
+    ).json()
+    if ds['is_uploaded'] and ds['is_profiled']:
+        break
+    time.sleep(2)
+```
+
+Once profiling is done, `compatible_task_types` lists the task types the dataset can be used for, such as `classification`.
+
+Now start the job. **Pick `Qwen3-8B` as the base model if you want to deploy serverless.** Do not pick `Qwen3-8B-Base`, which cannot be served serverless. See [Which base model should I pick?](https://docs.withemissary.com/decision-lm/costs-and-faq#which-base-model-should-i-pick).
+
+```python
+job = requests.post(
+    f'{BASE}/v1/projects/{project_id}/training-jobs',
+    headers=HEADERS,
+    json={
+        'name': 'ticket-triage-v1',
+        'base_model': 'Qwen3-8B',
+        'task_type': 'classification',   # or 'regression'. Only the training loss differs.
+        'train_dataset_id': train_ds['id'],
+        'train_test_split_ratio': 20     # hold out 20% for evaluation
+    }
+).json()
+```
+
+Training emits a **checkpoint** (typically one per epoch). Hyperparameters have good defaults, so you can start without setting any.
+
+Poll [Retrieve training job](https://docs.withemissary.com/api/retrieve-training-job-by-id) to watch progress. The job moves through `Pending`, `Running`, and `Testing`, and ends in `Success`, `Failed`, `TimedOut`, or `Cancelled`:
+
+```python
+while True:
+    status = requests.get(
+        f'{BASE}/v1/projects/{project_id}/training-jobs/{job["id"]}',
+        headers=HEADERS
+    ).json()
+    print(status['status'], status['progress'])
+    if status['status'] in ('Success', 'Failed', 'TimedOut', 'Cancelled'):
+        break
+    time.sleep(30)
+```
+
+The dashboard shows a successful job as **Completed**, while the API reports `Success`.
+
+When it finishes, list the checkpoints with [List checkpoints](https://docs.withemissary.com/api/list-checkpoints).
+
+### 3. Pick a checkpoint
+
+Deploying needs a checkpoint number, so decide which one first. Emissary can evaluate **every checkpoint** against a test set as training finishes. Either split one off your training data, as above with `train_test_split_ratio`, or upload a dedicated test dataset and pass `test_dataset_id`.
+
+Checkpoint metrics only appear if you attach test functions. Without them, `aggregated_results` comes back empty for every checkpoint. Attach test functions to aggregate metrics per checkpoint. For classification we recommend starting with the shared `sample match combined metric shared` function. List what is available with [List test functions](https://docs.withemissary.com/api/list-test-functions):
+
+```python
+json={
+    ...,
+    'test_dataset_id': test_ds['id'],
+    'test_functions': ['sample match combined metric shared']
+}
+```
+
+Results appear on the job's **Checkpoints** tab, so you can compare checkpoints and pick the best one rather than defaulting to the last. See [Testing and evaluation](https://docs.withemissary.com/fine-tuning/testing) to write custom metric functions.
+
+A later checkpoint is not always better. Training too long can overfit, so choose the checkpoint with the best held-out score.
+
+### 4. Deploy
+
+Deploy the best checkpoint, then call it by its deployment name. You can deploy to serverless, or to a dedicated engine if you are an enterprise customer.
+
+Both classification and regression models deploy to a **classification** inference engine. The only difference between them is the **loss function** used during training. Inference is identical, so you create the same kind of engine and call the same endpoint either way.
+
+You can deploy multiple classifiers and regressors onto the same engine, as long as they share a model backbone (the same base model). Each one is a lightweight LoRA adapter on the shared base model, and you pick which to call with the `model` field. See [Multiple deployments on one engine](https://docs.withemissary.com/inference/deployments#multiple-deployments-on-one-engine).
+
+#### Serverless
+
+Pay per token with no infrastructure to manage. **Serverless requires the `Qwen3-8B` backbone.** Deploy your checkpoint onto the shared serverless engine, `engine-qwen-3-8b-classification`, then call it:
+
+```python
+deployment = requests.post(
+    f'{BASE}/v1/engines/engine-qwen-3-8b-classification/deploy',
+    headers=HEADERS,
+    json={
+        'name': 'ticket-triage-v1',
+        'project_id': project_id,
+        'training_id': job['id'],
+        'checkpoint': 3     # the best checkpoint from step 3
+    }
+).json()
+```
+
+The response includes the deployment's `id` and a `status` of `Deploying`. Poll [Retrieve deployment](https://docs.withemissary.com/api/retrieve-deployment-by-id) until it reports `Deployed`:
+
+```python
+while True:
+    dep = requests.get(
+        f'{BASE}/v1/projects/{project_id}/deployments/{deployment["id"]}',
+        headers=HEADERS
+    ).json()
+    if dep['status'] in ('Deployed', 'Failed', 'Cancelled', 'Terminated'):
+        break
+    time.sleep(10)
+```
+
+#### Dedicated
+
+Dedicated inference is available to enterprise customers only. If you're not on an enterprise plan, train on `Qwen3-8B` and deploy to serverless.
+
+A GPU engine reserved for your workload. **Any backbone works.** Create an engine for the base model and task type, then deploy your checkpoint onto it:
+
+```python
+engine = requests.post(
+    f'{BASE}/v1/engines',
+    headers=HEADERS,
+    json={
+        'name': 'ticket-triage-engine',
+        'base_model': 'Qwen3-8B',          # any supported backbone
+        'task_type': 'classification',     # also use this for regression models
+        'resource_management_config': {
+            'management_type': 'inactive_timeout',
+            'management_config': {'inactive_duration': 3600}
+        }
+    }
+).json()
+
+requests.post(
+    f'{BASE}/v1/engines/{engine["id"]}/deploy',
+    headers=HEADERS,
+    json={
+        'name': 'ticket-triage-v1',
+        'project_id': project_id,
+        'training_id': job['id'],
+        'checkpoint': 3
+    }
+)
+```
+
+You can also set a schedule, or enable autoscaling. See [Inference concepts](https://docs.withemissary.com/inference/concept), [Deployments](https://docs.withemissary.com/inference/deployments), and [Autoscaling](https://docs.withemissary.com/inference/autoscaling).
+
+#### Call it
+
+Once the deployment shows **Deployed**, call it by name. The request is the same for serverless and dedicated.
+
+```python
+response = requests.post(
+    f'{BASE}/v1/classification',
+    headers=HEADERS,
+    json={
+        'model': 'ticket-triage-v1',
+        'input': 'My card was charged twice this month.',
+        'data_format': 'probs'
+    }
+)
+print(response.json())
+```
+
+Classifiers and regressors are called the same way, through `POST /v1/classification`. See the [API reference](https://docs.withemissary.com/api/get-classification-from-deployment) for the full request and response shapes.
+
+### 5. Measure on your own hold-out set
+
+Checkpoint metrics from step 3 tell you which checkpoint to deploy. To measure the deployed model on your own data, for example to compute precision and recall at your production threshold, keep a hold-out set that never touched training and score it against the deployment. This needs a deployed endpoint, so it comes after step 4:
+
+```python
+from sklearn.metrics import classification_report
+
+y_true, y_pred = [], []
+for row in holdout:   # [{'prompt': ..., 'label': ...}, ...]
+    r = requests.post(
+        f'{BASE}/v1/classification',
+        headers=HEADERS,
+        json={'model': 'ticket-triage-v1', 'input': row['prompt'], 'data_format': 'probs'}
+    ).json()
+    probs = r['data'][0]['probs']
+    y_pred.append(max(probs, key=probs.get))
+    y_true.append(row['label'])
+
+print(classification_report(y_true, y_pred))
+```
+
+To check calibration, bucket predictions by their top probability and compare each bucket's average confidence to its actual accuracy. For regression, compare predictions to targets with MAE, RMSE, or Spearman correlation.
+
+---
+
+## Next steps
+
+- [Maintain your model](https://docs.withemissary.com/decision-lm/train-your-own/maintain) as your data changes.
+- Costs, base-model choice, and deployment options: [Costs and FAQ](https://docs.withemissary.com/decision-lm/costs-and-faq).
+
+
+---
+
+# Maintain your model
+
+Source: https://docs.withemissary.com/decision-lm/train-your-own/maintain
+
+# Maintain your model
+
+A trained model is a snapshot of your data at one point in time. Plan to maintain it.
+
+## Watch for drift
+
+Inputs change over time, and the model's accuracy can quietly follow. Monitor two things:
+
+- **Confidence.** If scores drift lower on live traffic, the inputs may have moved away from what the model was trained on.
+- **Class frequency.** If the share of traffic in each class shifts, the world has changed, or the model has.
+
+Log every decision with its input, probabilities, and chosen branch. Those logs are both your monitoring data and your next training set.
+
+## Retrain
+
+Retrain when drift shows up, when you have collected meaningfully more labeled data, or when you find a new category of error.
+
+1. Label a sample of recent traffic, including the cases the model got wrong or was unsure about.
+2. Add it to your training data and keep a fresh test set.
+3. Train a new version and compare it to the deployed one on the same test set.
+4. Deploy it alongside the current version and compare on live traffic before switching over. Checkpoints are yours, so you can version them and A/B test.
+
+## Re-check thresholds after every retrain
+
+Thresholds tuned on one version may not transfer to the next. Re-run your calibration check ([step 5 of the LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune#5-measure-on-your-own-hold-out-set)) and re-pick the cutoff each time.
+
+## Plan for new base models
+
+A LoRA adapter is trained on a specific base model. When you move to a newer base model, plan to retrain on the same dataset, so keep your datasets and test sets versioned alongside your checkpoints.
+
+## Next steps
+
+- [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune)
+
+
+---
+
+# Costs and FAQ
+
+Source: https://docs.withemissary.com/decision-lm/costs-and-faq
+
+# Costs and FAQ
+
+## What does it cost to run?
+
+- **Serverless:** **$0.05 per million tokens.**
+- **Dedicated (enterprise only):** **$3/hr for models under 30B parameters.** Contact us for larger models. Bigger models are slower, so the effective cost on a 27B model is roughly **$0.15 per million tokens**, depending on your workload pattern. Steady, high-volume traffic that keeps the GPU busy lands at the low end.
+
+Trained models are often cheaper to run than zero-shot ones. A zero-shot request carries every class description, while a trained model learns what the classes mean from your examples, so requests are shorter.
+
+## What does it cost to train?
+
+Training a classifier or regressor is cheap, and you can start small.
+
+- **LoRA fine-tune, typical:** for 3-5 classes with about 100 samples each, training usually costs **under $15**.
+- **LoRA fine-tune, larger datasets:** training on up to about 5,000 samples costs **under $50 at most**.
+
+Start with the smaller dataset to confirm your labels and setup work, then scale up to more data if your held-out score is still improving.
+
+## How can this be deployed?
+
+- **Serverless on `Qwen3-8B`.** Pay per token with no engine to manage.
+- **Dedicated for everything else (enterprise only).** Any other backbone runs on a dedicated engine, which is available to enterprise customers only.
+
+Use **dedicated** when you have high throughput or a predefined time window, such as scheduled workflows. Use **serverless** when your workload is spiky, low-volume, or unpredictable. Autoscaling is also available on dedicated engines, so [reach out](mailto:support@withemissary.com) if you want it set up for your workload.
+
+See [Inference concepts](https://docs.withemissary.com/inference/concept), [Deployments](https://docs.withemissary.com/inference/deployments), and [Autoscaling](https://docs.withemissary.com/inference/autoscaling).
+
+## Which base model should I pick?
+
+Choose **Qwen3-8B** (not Qwen3-8B-Base) because it is the one you can deploy serverless.
+
+- Go **bigger** if you need a smarter model, for example when the task is subtle and the smaller model's held-out score is still improving.
+- Go **smaller** if your eval is already maxed out. A simpler task doesn't need a bigger model, and a smaller one is cheaper and faster.
+
+Bigger and smaller backbones run on dedicated engines, which are enterprise only. If you're not on an enterprise plan, use `Qwen3-8B`.
+
+## Classification vs. regression: how do I choose?
+
+Choose by the shape of your answer.
+
+- Use **classification** when the answer is a choice among known options, such as route A or B, safe or unsafe, or which of five intents. You get a probability per class.
+- Use **regression** when the answer is a point on a scale, such as urgency from 0 to 1, a quality score, or a sentiment intensity. You get a single number.
+
+Both train and deploy the same way. The only difference is the loss function used in training, so a regressor is served from a classification inference engine just like a classifier.
+
+If your labels are really ordered buckets (low, medium, high) and you have enough examples at a finer grain, regression often uses your data more efficiently. If you only ever act on a few discrete outcomes, classification is simpler to threshold and evaluate.
+
+
+---
+
+# Comparing Decision LMs
+
+Source: https://docs.withemissary.com/decision-lm/compare
+
+# Comparing Decision LMs
+
+Decision LMs look similar from the outside: you send an input and a set of options, and you get back a decision with a confidence. The differences that matter show up in production. This page lists the dimensions worth evaluating and compares Emissary with two other Decision LM offerings, **Jev** and the **Luna Decisions API**.
+
+For background on how these models work, read [How it works](https://docs.withemissary.com/decision-lm/deep-dive) first.
+
+Figures for Jev and the Luna Decisions API are vendor-reported and may have changed. Treat them as a starting point and benchmark on your own data. Cells marked *Not published* mean we couldn't find a public figure.
+
+---
+
+## What to compare
+
+**Cost and latency.** A Decision LM sits on the hot path and runs on every request, so both numbers compound quickly. Cost is usually quoted per million tokens, but what you pay depends on your real input lengths and call volume, so price it at your own scale. Latency matters because the decision usually happens before the user sees anything. Look at p95 and p99 including network time, not just the median, since tail latency is what users notice.
+
+**Security and deployment.** Decisions often run over sensitive inputs such as customer messages, internal documents, or agent traces. Check where the model runs and who else shares that capacity. The key question is whether you can use dedicated capacity, self-host, or keep data inside your own cloud. For regulated workloads this decides whether a provider is usable at all, so ask early rather than after you have built on it.
+
+**Calibratability.** A confidence score is only useful if it means what it says: when the model reports 0.9, it should be right about 90% of the time. Models are rarely perfectly calibrated on your data out of the box, so the more important question is whether you can *improve* calibration with your own labels, for example by post-training, or whether you are stuck with what the vendor ships. If you plan to threshold, escalate, or route on confidence, this matters more than raw accuracy.
+
+---
+
+## Side by side
+
+| | **Emissary** | **Jev** (TypeSafe) | **Luna Decisions API** (OpenAI) |
+|---|---|---|---|
+| **Cost** | $0.05 per 1M tokens | $0.042 per 1M input tokens | $0.10 per 1M input tokens |
+| **Latency** | ~56 ms per decision | 70–500 ms reported | ~150 ms vendor-stated (preview) |
+| **Security / deployment** | Managed endpoints, plus [dedicated inference engines](https://docs.withemissary.com/inference/concept) on GPU capacity for your organization | Hosted API; reported as early access with no published weights or on-prem option | Hosted by OpenAI |
+| **Calibratability** | Post-train to improve confidence scores on your own data | Calibrated by design through the vendor's own training (RLCD); no customer-side recalibration documented | Not published |
+| **Customization** | Zero-shot from class descriptions, then [quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train) the head on a handful of examples or [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune) | Zero-shot via typed questions | Not published |
+| **Output types** | Zero-shot: binary, multi-class, and score. Post-trained: also multi-label | Binary and multi-class | Binary and multi-class |
+| **Input** | Text and images | Text and images | Text and images |
+| **Ownership** | You post-train your own checkpoints on Emissary | Vendor-owned model | Vendor-owned model |
+| **Availability** | Generally available | Early access / waitlist reported | Preview reported |
+
+### Reading the table
+
+**Cost and latency.** Both are close to the floor for all three, and well below a frontier model. At these levels, cost is more likely to be decided by your token volume than by the headline rate, and latency by your network path than by the model. Compare using your own input lengths and measure p95.
+
+**Security.** If you handle regulated or sensitive data, check whether the provider offers dedicated capacity or self-hosting. Emissary's [inference engines](https://docs.withemissary.com/inference/concept) give you GPU-backed serving scoped to your organization, with [autoscaling](https://docs.withemissary.com/inference/autoscaling) and scheduling. Confirm current options with each vendor, since hosted-only previews often add private deployment later.
+
+**Calibration.** A model that is calibrated out of the box can still be wrong for your data. The more useful property is being able to *improve* calibration on your own labels. On Emissary, post-training on your data adjusts the confidence scores as well as the accuracy. See [Common challenges](https://docs.withemissary.com/decision-lm/deep-dive#common-challenges) for why this matters.
+
+---
+
+## Run your own comparison
+
+The most reliable comparison is a small, honest benchmark.
+
+1. **Label a sample.** 200–500 real inputs with a ground-truth label each, including hard and ambiguous cases.
+2. **Run every candidate** on the same inputs with equivalent class definitions.
+3. **Measure accuracy and calibration.** Compare accuracy, plus how often high-confidence answers are right. A reliability table by confidence bucket is enough.
+4. **Measure latency under load**, including network time and retries, as median, p95, and p99.
+5. **Price it at your volume**, using your real input lengths.
+6. **Check the fit.** Confirm data handling, and deployment options against your requirements.
+
+To set up the Emissary side, start from the [Experiments reference](https://docs.withemissary.com/experiment).
+
+
+---
+
 # What is model routing? LLM routers explained
 
 Source: https://docs.withemissary.com/routing/what-is-model-routing

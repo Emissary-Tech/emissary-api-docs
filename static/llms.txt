@@ -15,6 +15,21 @@ Emissary's model router is reached through one gateway URL that is compatible wi
 - [LLM-as-a-judge quickstart: create your first judge](https://docs.withemissary.com/quickstart/llm-as-judge): Create an LLM judge that scores any text against criteria you define and returns a calibrated probability in about 56 ms. Use the playground, dashboard or API.
 - [Experiments: zero-shot LLM deployments in minutes](https://docs.withemissary.com/experiment): Spin up a zero-shot model in under a minute and call it through a ready-made API: judge, decision, routing, tool calling, regression and NER modes.
 
+## Decision LM
+
+- [Overview](https://docs.withemissary.com/decision-lm/overview): What a Decision Language Model is, what it is used for, and where to go next.
+- [How it works](https://docs.withemissary.com/decision-lm/deep-dive): How Decision LMs work: the classification head, ways to build one, how classes become prompts, the tradeoffs, and why a decoder LLM.
+- [Model Routing](https://docs.withemissary.com/decision-lm/use-cases/model-routing): Use a Decision LM to send each query to the right model, agent, or workflow.
+- [LLM Judges](https://docs.withemissary.com/decision-lm/use-cases/llm-judges): Use a Decision LM to score outputs against criteria you define, at a fraction of the cost of a frontier model.
+- [Content Classification](https://docs.withemissary.com/decision-lm/use-cases/content-classification): Use a Decision LM for moderation, intent detection, sentiment, and triage.
+- [Discover Your Own](https://docs.withemissary.com/decision-lm/use-cases/discover-your-own): A prompt for Claude Code that finds where Emissary Decision LMs fit in your AI agent and implements them.
+- [When to train your own](https://docs.withemissary.com/decision-lm/train-your-own/when-to-train): Signs that zero-shot is no longer enough, and how to choose between quick-train and a LoRA fine-tune.
+- [Quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train): Adapt a Decision LM to your data with a handful of labeled examples by training only the head, in about 20 seconds.
+- [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune): Post-train a LoRA adapter and classification head on your own labeled data, then evaluate and deploy it.
+- [Maintain your model](https://docs.withemissary.com/decision-lm/train-your-own/maintain): Keep a trained Decision LM accurate over time: watch for drift, retrain, and re-check thresholds.
+- [Costs and FAQ](https://docs.withemissary.com/decision-lm/costs-and-faq): What Decision LMs cost to train and run, how to deploy them, and which base model and task type to choose.
+- [Comparing Decision LMs](https://docs.withemissary.com/decision-lm/compare): How to evaluate Decision LMs on cost, latency, security, calibration, and more, and how Emissary compares with Jev and the Luna Decisions API.
+
 ## Model routing
 
 - [What is model routing? LLM routers explained](https://docs.withemissary.com/routing/what-is-model-routing): Model routing sends each LLM request to the model best suited to handle it. Learn how an LLM router works, the types of routers, and when to use one.

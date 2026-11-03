@@ -9,6 +9,23 @@ const SECTIONS = [
   ["Overview", ["introduction.mdx", "glossary.mdx"]],
   ["Quickstarts", ["quickstart/router.mdx", "quickstart/llm-as-judge.mdx", "playground/experiments.mdx"]],
   [
+    "Decision LM",
+    [
+      "decision-lm/overview.mdx",
+      "decision-lm/deep-dive.mdx",
+      "decision-lm/use-cases/model-routing.mdx",
+      "decision-lm/use-cases/llm-judges.mdx",
+      "decision-lm/use-cases/content-classification.mdx",
+      "decision-lm/use-cases/discover-your-own.mdx",
+      "decision-lm/train-your-own/when-to-train.mdx",
+      "decision-lm/train-your-own/quick-train.mdx",
+      "decision-lm/train-your-own/lora-fine-tune.mdx",
+      "decision-lm/train-your-own/maintain.mdx",
+      "decision-lm/costs-and-faq.mdx",
+      "decision-lm/compare.mdx",
+    ],
+  ],
+  [
     "Model routing",
     [
       "routing/what-is-model-routing.mdx",
