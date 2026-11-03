@@ -1,0 +1,118 @@
+---
+title: 'What is post-training? SFT, GRPO and fine-tuning'
+sidebar_label: 'What is post-training?'
+description: 'Post-training adapts a base LLM to your task by changing its weights. Learn how SFT and GRPO work, what you need, and how to start post-training on Emissary.'
+keywords: [post-training, fine-tuning LLMs, SFT, supervised fine-tuning, GRPO, LoRA, fine-tune a model, reinforcement learning]
+---
+import FaqSchema from '@site/src/components/FaqSchema';
+
+<FaqSchema items={[
+  {
+    question: 'What is post-training?',
+    answer: 'Post-training is how you adapt a base model to a specific task. Prompting only changes what you put into a model, while post-training changes the model weights themselves, which gives more stable, precise and differentiated behavior than prompt engineering can reach.',
+  },
+  {
+    question: 'What is the difference between SFT and GRPO?',
+    answer: 'SFT trains the model to reproduce the input and output pairs in your dataset. GRPO, or Group Relative Policy Optimization, is a reinforcement-learning technique that improves the model against a reward signal by comparing several sampled completions per prompt.',
+  },
+  {
+    question: 'What is LoRA?',
+    answer: 'LoRA adds small, efficient weight layers called adapters on top of a frozen base model instead of rewriting all of its weights. Training is faster, and many fine-tuned checkpoints can be served from one base model.',
+  },
+]} />
+
+**Post-training** is how you adapt a base model to your specific task. Prompting only changes what
+you put *into* a model. Post-training changes the model's **weights**, which gives you more stable,
+precise and differentiated behavior than prompt engineering can reach. On Emissary you start from a
+base model, train it on examples of your task (or against a reward), and get back **checkpoints**
+that you evaluate and then deploy for inference.
+
+## How does post-training work on Emissary?
+
+The lifecycle runs from a project to a live deployment:
+
+```
+project → dataset → training job → checkpoints → evaluation → deployment
+```
+
+1. **Create a training project**, a workspace that groups the jobs you run toward one goal.
+2. **Upload a dataset** in the schema for your task type. Emissary profiles it and surfaces row
+   counts, class balance, token-length distributions and outliers before you train.
+3. **Start a training job** by choosing a base model, a technique and task type, your evaluation
+   data and your hyperparameters. Most settings are prefilled.
+4. **Compare checkpoints.** Each checkpoint is a snapshot of the model, typically one per epoch. A
+   later checkpoint isn't always better, because training too long can overfit.
+5. **Deploy the best checkpoint** on an inference engine and call it by name.
+
+The concepts behind each step are defined on [Concepts](./concept), and the hands-on version is the
+[post-training quickstart](./quickstart).
+
+## What post-training techniques does Emissary support?
+
+| | **SFT** (Supervised Fine-Tuning) | **GRPO** (Group Relative Policy Optimization) |
+| --- | --- | --- |
+| **How the model learns** | Reproduces the input-to-output pairs in your dataset | Improves against a reward signal by comparing several sampled completions per prompt |
+| **Type of method** | Supervised learning | Reinforcement learning |
+| **Task types** | Every fine-tunable task type | `text-generation` only |
+| **Default?** | Yes | No |
+
+Both techniques train **LoRA adapters**: small weight layers added on top of the frozen base model
+rather than a rewrite of all its weights. That keeps training fast and makes checkpoints cheap to
+serve, since many can share one base model on an engine. The knobs each technique exposes are in
+[Hyperparameters](./parameters).
+
+## What can I post-train a model to do?
+
+A **task type** defines what your model does, and it shapes the dataset schema, the model's output
+and the API you call once it's deployed. Supported task types include text `completion` and `chat`
+(`text-generation`), `classification`, `regression`, `embedding`, `ner` (named-entity recognition),
+and the vision tasks `clip-*` and `vlm-*`. See [Datasets](./datasets) for the schema of each.
+
+## When should I post-train instead of prompting?
+
+Prompting is the right first step for most tasks. Consider post-training when:
+
+- You run the **same kind of task repeatedly** and want consistent, precise behavior.
+- You have **examples of the right answer**, or a way to score answers that can serve as a reward.
+- You want to serve a **smaller, purpose-built model** for a narrow job instead of a large general
+  one.
+
+Dataset quality is the single biggest lever on the quality of the result, so invest there first.
+
+## How does post-training connect to routing and inference?
+
+Post-training sits between the other two parts of the platform:
+
+- **From routing.** Every routed request leaves a trajectory. Requests that no model in your
+  catalog was confident about show where you have a capability gap, and the traffic itself is raw
+  material for training a model of your own. See
+  [from routing to your own models](../routing/insights#from-routing-to-your-own-models).
+- **To inference.** A trained checkpoint serves nothing until you deploy it as a deployment on an
+  [inference engine](../inference/what-is-llm-inference). Because fine-tunes are LoRA adapters,
+  many checkpoints can share one engine.
+
+## Frequently asked questions
+
+### What do I need to start?
+
+A task you can describe, a **dataset** of examples in the schema for that task type, and a base
+model that supports the task. JSONL is recommended for the most reliable dataset profiling, and
+JSON and CSV are also supported.
+
+### How do I know a model is good enough to deploy?
+
+Provide a test dataset, either split from your training data or uploaded separately. Emissary runs
+the model against it at every checkpoint, and **test functions** score each one. Compare checkpoints
+on held-out scores, and watch for overfitting.
+
+### Can I keep training a model I've already trained?
+
+Yes. You can start a job from a published pre-trained model, or continue training from one of your
+own checkpoints to refine it or adapt it to new data.
+
+## Where to go next
+
+- [Post-training quickstart](./quickstart): train and deploy your first model.
+- [Concepts](./concept): projects, datasets, base models, jobs, checkpoints and evaluation.
+- [Datasets](./datasets) and [Hyperparameters](./parameters).
+- [What is LLM inference?](../inference/what-is-llm-inference) to serve what you train.

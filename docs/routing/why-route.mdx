@@ -1,7 +1,13 @@
 ---
-title: 'Why route'
-description: 'Why route across models instead of picking one: best-of-all-worlds performance, lower cost and latency, seamless migration, and insight into your workload, plus when not to route.'
+title: 'Why use model routing? Benefits and trade-offs'
+sidebar_label: 'Why route'
+description: 'Why route across LLMs instead of picking one model: better performance, typically 30-50% lower cost, lower latency, easier migration, and when not to route.'
 ---
+**Route across models when your traffic varies in difficulty and your inputs are open-ended.** A
+model router sends each request to the model best suited to it, so easy requests stop paying for a
+frontier model and hard requests stop getting stuck on a weak one. Typical results are a 30–50% cost
+reduction with quality held or improved. If you can choose a model ahead of time for every step,
+don't route. See [what is model routing?](./what-is-model-routing) for the definition.
 
 Most teams pick one model and send everything to it. Because they have to pick just one, they
 **peak provision**: they choose the model that can handle *any* request, and use it for *every*
@@ -24,7 +30,7 @@ request ───▶│       model router       │
      model
 ```
 
-## What you get
+## What are the benefits of model routing? {#what-you-get}
 
 - **Best-of-all-worlds performance.** *There is no one best model.* Every model is better at some
   kinds of tasks and worse at others, and those strengths don't line up on a neat scale from easy to
@@ -60,7 +66,7 @@ request ───▶│       model router       │
   feeds your training data and training makes routing cheaper. See
   [from routing to your own models](./insights#from-routing-to-your-own-models).
 
-## Expected outcomes
+## How much does model routing save? {#expected-outcomes}
 
 - **30–50% cost reduction** is typical. The more options you give the router, the more it saves,
   and where you land in that range depends on what's in your catalog:
@@ -76,7 +82,7 @@ so measure on your own requests. See [run a trial](./evaluate/run-a-trial). Once
 traffic, the **Saved** figure in Activity shows spend against a baseline of the default model. See
 [monitor and debug](./guides/monitor-and-debug#activity).
 
-## What it depends on
+## What does the value of routing depend on? {#what-it-depends-on}
 
 The value depends on the quality of the routing decision. A router that is wrong too often either
 sends hard requests to weak models, and quality drops, or plays it safe and sends everything to the
@@ -85,7 +91,7 @@ largest model, and there are no savings. How Emissary's router avoids both is co
 
 Routing isn't right for every workload. The last section of this page covers when not to use it.
 
-## When to route, and when not to
+## When should you route, and when not? {#when-to-route-and-when-not-to}
 
 Routing is **online model selection**: the model is chosen at request time, per step. The
 alternative is **offline model selection**: you choose the model ahead of time and pin it. The rule

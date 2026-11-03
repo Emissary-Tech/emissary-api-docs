@@ -1,6 +1,7 @@
 ---
-title: 'Concepts'
-description: 'Engines, deployments, server types, autoscaling, and lifecycle on Emissary.'
+title: 'Inference concepts: engines and deployments'
+sidebar_label: 'Concepts'
+description: 'Inference engines, deployments, server types, autoscaling and lifecycle on Emissary: how base and fine-tuned models are served on managed GPUs.'
 ---
 The **Inference Engine** is how you serve models on Emissary. When you create an engine,
 Emissary provisions GPU compute, loads a base model, and exposes an HTTP API you can call from
@@ -224,3 +225,13 @@ absorbs the retry rather than surfacing it to your application.
 Emissary logs each request's latency, token counts, and throughput so you can monitor an
 engine's performance from the dashboard.
 :::
+
+---
+
+## How does inference relate to routing and post-training?
+
+A model router sends a lot of work to open models, and shared endpoints price those models for the
+average workload. Dedicated inference runs them on capacity tuned to your traffic shape. See
+[from routing to your own models](../routing/insights#dedicated-inference). Checkpoints you
+[post-train](../fine-tuning/what-is-post-training) are served here as LoRA-adapter deployments. For
+the overview of inference, see [what is LLM inference?](./what-is-llm-inference).

@@ -1,0 +1,108 @@
+---
+title: 'What is LLM inference? Engines and autoscaling'
+sidebar_label: 'What is LLM inference?'
+description: 'LLM inference is running a trained model to produce outputs. See how Emissary serves base and fine-tuned models on managed GPUs with autoscaling.'
+keywords: [LLM inference, model serving, inference engine, GPU inference, autoscaling, LoRA adapters, deploy fine-tuned model]
+---
+import FaqSchema from '@site/src/components/FaqSchema';
+
+<FaqSchema items={[
+  {
+    question: 'What is LLM inference?',
+    answer: 'LLM inference is running a trained model on new input to produce an output. Serving a model means keeping GPU compute running and exposing the model through an API that your application can call.',
+  },
+  {
+    question: 'What is an inference engine on Emissary?',
+    answer: 'An inference engine is a managed, GPU-backed serving unit. Emissary provisions the GPU compute, loads a base model, and exposes an HTTP API. Each engine is bound to one base model and one task type.',
+  },
+  {
+    question: 'Can I serve multiple fine-tuned models on one engine?',
+    answer: 'Yes, for the text-generation, classification and regression task types. Fine-tuned deployments are served as LoRA adapters on a shared base model, so many can coexist on one engine and each request names the deployment it should use.',
+  },
+  {
+    question: 'How does autoscaling work?',
+    answer: 'On a cluster engine, Emissary adds GPU replicas when load rises and removes them when load falls, between a minimum and maximum you set, scaling on request rate or on concurrent requests per replica.',
+  },
+  {
+    question: 'Do I have to choose a GPU?',
+    answer: 'No. Emissary selects the GPU type and number of GPUs based on the base model and task, and shows an estimated hourly cost before you create the engine.',
+  },
+]} />
+
+**LLM inference** is running a trained model on new input to produce an output. **Serving** a model
+means keeping GPU compute running and exposing the model through an API your application can call.
+On Emissary, the unit you create is an **inference engine**: Emissary provisions the GPU compute,
+loads a base model, and exposes an HTTP API. You then deploy base models and your own fine-tuned
+checkpoints onto it, scale it to traffic, and put it on a schedule to control cost.
+
+## How does inference work on Emissary?
+
+Three resources, one on top of the other:
+
+1. **Inference engine.** A managed, GPU-backed serving unit, bound to one base model and one task
+   type for its lifetime. You don't choose hardware: Emissary selects the GPU type and number of
+   GPUs, and shows an estimated hourly cost before you create the engine. Billing starts when the
+   engine reaches the **Active** state and stops when it is deactivated.
+2. **Deployment.** A specific model version served on an engine. Every engine exposes a **base
+   model deployment**, and you can add **fine-tuned deployments** from your checkpoints. You call
+   each deployment by name.
+3. **Replicas.** The GPU-backed copies of an engine that handle traffic. On a cluster engine, the
+   number of replicas changes with load.
+
+See [Concepts](./concept) for each of these in detail, and [Deployments](./deployments) for creating,
+calling and managing them.
+
+## How do I serve many fine-tuned models cheaply?
+
+Fine-tuned deployments for the `text-generation`, `classification` and `regression` task types are
+served as **LoRA adapters**: lightweight weights layered on top of the shared base model. The base
+model stays resident in GPU memory and only the small adapter weights are swapped in, so many
+fine-tuned deployments can coexist on one engine. Each request names the deployment it should use,
+which lets you A/B test versions or serve many customers' adapters from one endpoint. Other task
+types serve a single model per engine.
+
+## What is the difference between on-demand and cluster engines?
+
+Emissary picks the server type for you, based on whether you enable autoscaling.
+
+| | **On-demand** | **Cluster** |
+| --- | --- | --- |
+| **Capacity** | Fixed, a single instance | Elastic, multiple replicas |
+| **Autoscaling** | No | Yes |
+| **Best for** | Development and steady traffic | Production, and bursty or high-throughput traffic |
+| **Enabled when** | Autoscaling is off (the default) | Autoscaling is on |
+
+## How does autoscaling work?
+
+Provision for peak load and you pay for idle GPUs whenever traffic is low. Provision for average
+load and requests pile up when traffic spikes. **Autoscaling** removes that trade-off: Emissary adds
+replicas when load rises and removes them when it falls, so capacity tracks demand. You set:
+
+- **Min and max replicas**, the floor and ceiling.
+- **The autoscaling metric:** request rate per replica, or concurrent requests per replica.
+- **Upscale and downscale delays**, which control how long sustained load must persist before a
+  replica is added or removed.
+
+See [Autoscaling](./autoscaling) for how the decision is made and how to tune it.
+
+## What can I serve?
+
+Supported task types include `text-generation` (chat and completion), `classification`,
+`regression`, `embedding`, `ner`, `image-detection`, `vlm-classification`, `vlm-generation`,
+`clip-classification` and `clip-embedding`. Which are available depends on the base model you pick.
+
+## How does inference connect to post-training and routing?
+
+- **From post-training.** A checkpoint you trained serves nothing until you deploy it on an engine.
+  See [What is post-training?](../fine-tuning/what-is-post-training).
+- **From routing.** A router sends a lot of work to open models, and shared endpoints price those
+  models for the average workload. Dedicated inference runs them on capacity tuned to your traffic
+  shape, with no noisy neighbors and more predictable latency under load. See
+  [from routing to your own models](../routing/insights#dedicated-inference).
+
+## Where to go next
+
+- [Concepts](./concept): engines, deployments, server types, autoscaling and lifecycle.
+- [Deployments](./deployments): create, call and manage deployments.
+- [Autoscaling](./autoscaling): tune replicas and scaling behavior.
+- [API reference](/api): the inference and deployment endpoints.
