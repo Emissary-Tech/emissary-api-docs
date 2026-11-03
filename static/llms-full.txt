@@ -1289,7 +1289,7 @@ Head to the **Datasets** and **Training** sections of the docs to continue.
 
 ---
 
-# Overview
+# What is a Decision Language Model (Decision LM)?
 
 Source: https://docs.withemissary.com/decision-lm/overview
 
@@ -1350,7 +1350,7 @@ The tradeoffs, including calibration and input brittleness, are covered in [Adva
 
 ---
 
-# How it works
+# How Decision LMs work: classification head and prompts
 
 Source: https://docs.withemissary.com/decision-lm/deep-dive
 
@@ -1530,7 +1530,7 @@ The second is **ease of inference**. Decision LMs built on a shared decoder are 
 
 ---
 
-# Model Routing
+# Decision LM for model routing: pick the right model
 
 Source: https://docs.withemissary.com/decision-lm/use-cases/model-routing
 
@@ -1624,7 +1624,7 @@ print(response.json())
 
 ---
 
-# LLM Judges
+# Decision LM as an LLM judge: cheap, fast scoring
 
 Source: https://docs.withemissary.com/decision-lm/use-cases/llm-judges
 
@@ -1710,7 +1710,7 @@ A high `anger` probability means the judge flagged the message. For a calm input
 
 ---
 
-# Content Classification
+# Content classification with a Decision LM
 
 Source: https://docs.withemissary.com/decision-lm/use-cases/content-classification
 
@@ -1803,7 +1803,7 @@ print(response.json())
 
 ---
 
-# Discover Your Own
+# Find where Decision LMs fit in your AI agent
 
 Source: https://docs.withemissary.com/decision-lm/use-cases/discover-your-own
 
@@ -1919,7 +1919,7 @@ Start with one or two high-traffic items. Verify the thresholds against real inp
 
 ---
 
-# When to train your own
+# When to train your own Decision LM
 
 Source: https://docs.withemissary.com/decision-lm/train-your-own/when-to-train
 
@@ -1975,7 +1975,7 @@ Whichever level you choose, hold back a test set first and measure the result ag
 
 ---
 
-# Quick-train
+# Quick-train a Decision LM in about 20 seconds
 
 Source: https://docs.withemissary.com/decision-lm/train-your-own/quick-train
 
@@ -2039,7 +2039,7 @@ Call a quick-trained version the same way as any zero-shot experiment, with the 
 
 ---
 
-# LoRA fine-tune
+# LoRA fine-tune a Decision LM on your own data
 
 Source: https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune
 
@@ -2331,7 +2331,7 @@ To check calibration, bucket predictions by their top probability and compare ea
 
 ---
 
-# Maintain your model
+# Maintain a trained Decision LM: drift and retraining
 
 Source: https://docs.withemissary.com/decision-lm/train-your-own/maintain
 
@@ -2372,7 +2372,7 @@ A LoRA adapter is trained on a specific base model. When you move to a newer bas
 
 ---
 
-# Costs and FAQ
+# Decision LM costs, deployment and FAQ
 
 Source: https://docs.withemissary.com/decision-lm/costs-and-faq
 
@@ -2426,7 +2426,7 @@ If your labels are really ordered buckets (low, medium, high) and you have enoug
 
 ---
 
-# Comparing Decision LMs
+# Comparing Decision LMs on cost, latency and calibration
 
 Source: https://docs.withemissary.com/decision-lm/compare
 

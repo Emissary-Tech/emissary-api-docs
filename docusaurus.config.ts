@@ -122,6 +122,12 @@ const config: Config = {
           },
           {
             type: "doc",
+            docId: "decision-lm/overview",
+            position: "left",
+            label: "Decision LM",
+          },
+          {
+            type: "doc",
             docId: "routing/what-is-model-routing",
             position: "left",
             label: "Model Routing",
@@ -162,6 +168,7 @@ const config: Config = {
           {
             title: "Docs",
             items: [
+              { label: "Decision LM", to: "/decision-lm/overview" },
               { label: "Model routing", to: "/routing/what-is-model-routing" },
               { label: "Post-training", to: "/fine-tuning/what-is-post-training" },
               { label: "Inference", to: "/inference/what-is-llm-inference" },

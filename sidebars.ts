@@ -27,8 +27,8 @@ const sidebars: SidebarsConfig = {
       {
         type: 'category',
         label: 'Decision LM',
+        link: { type: 'doc', id: 'decision-lm/overview' },
         items: [
-            'decision-lm/overview',
             'decision-lm/deep-dive',
             {
               type: 'category',
