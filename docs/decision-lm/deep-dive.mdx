@@ -1,0 +1,180 @@
+---
+id: deep-dive
+title: 'How it works'
+description: 'How Decision LMs work: the classification head, ways to build one, how classes become prompts, the tradeoffs, and why a decoder LLM.'
+---
+
+# How it works
+
+A Decision LM uses a language model to produce a decision in a single forward pass, without autoregressive text generation. Depending on the implementation, the decision comes from a constrained language-modeling head or a dedicated classification or regression head. There is no sampling loop and no generated text. The model reads the input once and the output is a distribution (or a number) read straight off the final hidden state.
+
+This page is designed for those hoping to understand how the model is built, how your classes reach the model, and what to expect in production. For a high-level introduction, see the [overview](./overview).
+
+---
+
+## The basic mechanism
+
+A standard LLM ends in a language-modeling head: a linear layer that maps the last hidden state to a score for every token in the vocabulary. Generation repeats that step, sampling a token and feeding it back in.
+
+A Decision LM replaces that loop with one step.
+
+```
+input + class definitions
+        │
+        ▼
+  transformer layers      (one forward pass)
+        │
+        ▼
+ last-token hidden state
+        │
+        ▼
+ classification head  / constrained LM head    
+        │
+        ▼
+ softmax / sigmoid / scalar  →  probabilities or a number
+```
+
+The head has one output per class for multi-class tasks, a single logit for binary tasks, and a single scalar for regression. Because the output is read from one position, latency is roughly that of the prompt's prefill, with no decoding at all - your entire latency is roughly equal to TTFT. 
+
+---
+
+## Four ways to build a Decision LM
+
+The interesting design question is how to create this new constrained output space for every request - that is, how the decision gets its meaning while keeping it a single pass. Two choices define how a Decision LM is built:
+
+- **The head.** Reuse the language model's existing head, or give the model a new one.
+- **The LLM.** Use a model as it is, or train it.
+
+Crossing them gives four approaches.
+
+| | **Static head** | **Dynamic head** |
+|---|---|---|
+| **Existing LLM** | 1. Constrained decoding | 2. Semantic initialization |
+| **New (trained) LLM** | 3. Post-trained mappings | 4. Custom Decision LM |
+
+### 1. Constrained decoding
+
+*Existing LLM, existing head.*
+
+Keep the original language-modeling head and restrict it. The class labels are written into the prompt and each maps to an existing token, and decoding is constrained to the label tokens with a maximum of one generated token. The model's probabilities over those tokens become the class probabilities.
+
+- **Pros:** no training and no new weights. It works with any instruction-following model and requires no additional work for any number of classifications. It also allows you to use existing batching logic during inference for high throughput.
+- **Cons:** the model is still, at its core, a generative model. It is very sensitive to label wording and token choice, and you pay for the full ouptut vocabulary projection. Constrained decoding has also been shown to decrease the capability of models in various domains.
+
+This is very likely how Luna's decision API works, and the constrained decoding performance loss explains why just using Luna feels better.
+
+### 2. Semantic initialization
+
+*Existing LLM, new head.*
+
+Build a dedicated classification head whose weights are *initialized from the language-modeling head itself*. For each class, we can take the output-head weights for the tokens that best represent it, so that the new head starts out behaving like the model's own next-token probabilities for those labels. This is the same vocabulary distribution the constrained approach reads, but now it lives in a small head you can control more effectively.
+
+- **Pros:** works zero-shot from class names and descriptions, produces a real head that is cheaper to run, and can be tuned further.
+- **Cons:** zero-shot quality depends on how well the class descriptions line up with what the base model already knows. There is also a small but present memory and latency overhead in generating the new head. 
+
+**This is how Emissary [experiments](/experiment) start.** You provide class names and descriptions, and you get a working zero-shot endpoint in under a second. You can then improve it with [quick-train](/decision-lm/train-your-own/quick-train), which trains just that head on a handful of labeled examples, or go further with a custom head (option 4). See [When to train your own](/decision-lm/train-your-own/when-to-train) to choose.
+
+### 3. Post-training with mapped choices
+
+*New LLM, pre-defined head.* This is the Jev approach. 
+
+The head is a fixed, pre-defined set of answer tokens. Then, you generate a large amount of synthetic data and train with ordinary **cross-entropy** loss. The task has an obvious right answer, so no reward modeling or preference data is needed. This allows you to skip per-question initialization and teach the model the task more generally, with the input rewritten so that classes are mapped to simple answer tokens, such as `A`, `B`, `C`, `D`, or dedicated special tokens:
+
+```
+Which route should handle this query?
+
+A: simple_task    – short factual or lookup questions
+B: complex_task   – multi-step reasoning or code
+C: creative_task  – writing and brainstorming
+
+Query: Design and implement an infrastructure platform
+Answer: A:0.01 B:0.98 C:0.01
+```
+
+**Why there is a maximum number of choices.** The head is a pre-defined set of special tokens, one per possible answer. A prompt can use only as many choices as the model has answer tokens, so the number of classes is capped at the size of that set (255 for Jev-like models). Adding more choices means adding tokens and training again.
+
+- **Pros:** the strongest accuracy floor. The model is trained for exactly this task, and the label tokens are unambiguous. 
+- **Cons:** The high floor is paired with a low ceiling - optimizations on this approach are minimal. The set of answer tokens is fixed, which caps the number of choices and limits regression to a fixed set of levels.  Furthermore, building your own this way is not very feasible: it needs a data-generation pipeline and a training run, with deep upfront capital investment. 
+
+:::note
+The labels don't have to be letters. Special tokens work well because they carry no prior meaning, so the model learns the mapping from scratch rather than fighting what `A` usually means.
+:::
+
+### 4. Custom head
+
+*New LLM, new head.*
+
+This is the most involved approach. Train the model and give it a purpose-built head together. A LoRA adapter updates the model's own representations for your task, and a new classification or regression head reads the decision off the result, with one output per class, or a single scalar for regression. Because the head is part of the model, the classes live in its weights rather than in the prompt. The class descriptions can stay out of the request entirely, so requests are shorter, faster and cheaper. 
+
+- **Pros:** typically the highest quality on a well-defined task, and the lowest cost and latency per request, since the prompt is just the input. Confidence scores are calibrated against your own labels.
+- **Cons:** it is built for one task. A new set of classes means a new head and a new training run. It needs labeled data, and it needs maintaining as your inputs drift or the base model changes.
+
+On Emissary, this is a [LoRA fine-tune](/decision-lm/train-your-own/lora-fine-tune).
+
+### Which should I use?
+
+The first three trade depth for breadth. They are the right choice when you have many different decisions to make, or when the classes change often, because adding a task costs almost nothing. A custom head makes the opposite trade: it gives up breadth for quality and cost. That is worth it for a decision you will make many times with a stable definition, such as routing, moderation, or scoring against your own rubric.
+
+These are not exclusive. A common path is to start with a zero-shot head (option 2), train that head on a few examples, and move to a custom head (option 4) once the task is stable and the volume justifies it. On Emissary, zero-shot experiments and quick-train are option 2, and a LoRA fine-tune is option 4.
+
+---
+
+## How inference works
+
+Your classes are not passed to the model as structured data. They are rendered into the **prompt template** that matches the technique used to build the model, and the model reads them as text.
+
+- With **constrained decoding**, the template lists the labels and the instruction, and the allowed output tokens are restricted to those labels.
+- With **semantic initialization**, the template contains each class's name and description, and the head's rows are tied to those classes.
+- With **post-trained mappings**, the template assigns each class to its answer token (`A: class 1`, `B: class 2`, and so on), exactly as it did during training. The model's probability over those tokens is the decision.
+- With a **custom head**, the template can be just the input. The classes live in the head and adapter, so the descriptions can be left out. If you trained with descriptions in the prompt, serve with them.
+
+Two consequences follow:
+
+1. **The template is part of the model.** A model trained with one template should be served with that template. Changing it at inference time is a distribution shift.
+2. **Class order and wording matter.** Where a class appears in the prompt, and how it is described, can move the probabilities. Keep descriptions specific and mutually exclusive, and test reorderings.
+
+On Emissary the template is applied for you. You supply `classes` when you create an experiment and an `input` when you call the model, and the platform builds the prompt.
+
+---
+
+## Advantages
+
+- **Low latency.** One forward pass with no decoding loop. Emissary returns judgments in tens of milliseconds, against seconds for a frontier model.
+- **Low cost.** Small models, a single pass, and shared GPU serving make each call a fraction of the price of a generative call.
+- **Confidence scores.** You get probabilities, not just a label. Threshold them, escalate low-confidence cases to a bigger model, and log them for monitoring.
+- **Deterministic output shape.** The result is always a valid label or number, so there is no output parsing and no malformed JSON.
+- **Easy to improve.** Because the output is a clean label, training data is cheap to create and evaluation is simple accuracy or error.
+
+---
+
+## Common challenges
+
+Decision LMs are not free of failure modes. Plan for these.
+
+- **Miscalibrated confidence.** A probability of 0.9 doesn't always mean 90% of such cases are correct. Models are often overconfident, especially on out-of-distribution inputs. Measure calibration on your own data and pick thresholds empirically rather than assuming 0.5 is right.
+- **Brittleness to input.** Small changes in phrasing, formatting, or length can shift the output. Test with paraphrases, typos, and different input lengths.
+- **Sensitivity to class definitions.** Vague or overlapping classes produce unstable results. Write each description as a precise criterion. Class definitions / descriptions are your new prompt templates.
+- **Position and label bias.** The order of choices, or the identity of the answer token, can bias the output. Randomize order during training and evaluate with shuffled orderings.
+- **No reasoning.** A single pass can't work through a multi-step problem. If the decision needs real deliberation, route that case to a generative model.
+- **Closed label set.** The model must pick from the classes you defined. Inputs that fit none of them still get a label, so include an `other` or `none` class when that is possible.
+- **Distribution drift.** Inputs change over time. Monitor confidence and class frequency, and re-train when they move.
+- **Long inputs.** Very long inputs can dilute the signal or exceed the context window. Truncate or chunk deliberately.
+- **Threshold maintenance.** Thresholds tuned on one model version may not transfer to the next, so re-check them after every re-train.
+
+A good pattern is to use the confidence score as a gate: act on high-confidence decisions directly, and send the uncertain middle to a stronger model or a human.
+
+---
+
+## Why a decoder LLM? (for MLEs)
+
+Encoders like BERT and ModernBERT, or embeddings with a logistic regression on top, have classified text for years, and they are cheaper per request. A decoder LLM is the better base for two reasons. The first is **sample efficiency and generalization**. A decoder is pretrained on far more data and carries far more background knowledge, so it can work zero-shot from class names and descriptions, and it needs fewer labeled examples to adapt: a quick-train on a few dozen samples, or a fine-tune on around a hundred per class. An encoder or an embedding has far weaker zero-shot performance and less knowledge to draw on, so it needs more labels to reach the same quality and tends to generalize worse to inputs unlike its training data. With enough labeled data and a fixed label set, a fine-tuned encoder closes much of that gap and can be the cheaper choice.
+
+The second is **ease of inference**. Decision LMs built on a shared decoder are served with multi-head and / or multi-LoRA serving: every classifier is a small adapter and head on the same base model, and one engine serves all of them, batching requests across classifiers. Adding a classifier means adding an adapter, not standing up another deployment, so many classifiers get more efficient together and you don't have to plan scaling for each one separately. See [Many models, one engine](/inference/deployments#multiple-deployments-on-one-engine).
+
+---
+
+## Next steps
+
+- Try it: [LLM judge](/quickstart/llm-as-judge) or [router](/quickstart/router) quickstart.
+- Improve it: [when to train your own](/decision-lm/train-your-own/when-to-train), then [quick-train](/decision-lm/train-your-own/quick-train) or [LoRA fine-tune](/decision-lm/train-your-own/lora-fine-tune). Background: [post-training concepts](/fine-tuning/concept) and [datasets](/fine-tuning/datasets).
+- Apply it: [use cases](./use-cases/model-routing).
