@@ -1719,7 +1719,7 @@ Source: https://docs.withemissary.com/decision-lm/train-your-own/quick-train
 
 **Quick-train** adapts a Decision LM to your data using a handful of labeled examples, typically **10 to 50**. It trains only the classification head and leaves the language model underneath frozen, so it needs very little data and finishes in about **20 seconds**.
 
-Use it when zero-shot is close but misses your definitions or edge cases. See [When to train your own](https://docs.withemissary.com/decision-lm/train-your-own/when-to-train) to decide.
+Use it when zero-shot is close but misses your definitions or edge cases. See [When to train your own](https://docs.withemissary.com/decision-lm/train-your-own/when-to-train) to decide, and [Iteratively improve your Decision LM](https://docs.withemissary.com/decision-lm/improve/overview) for the full measure, label, and retrain loop.
 
 ## What it does and doesn't fix
 
@@ -2103,7 +2103,713 @@ A LoRA adapter is trained on a specific base model. When you move to a newer bas
 
 ## Next steps
 
+- [Iteratively improve your Decision LM](https://docs.withemissary.com/decision-lm/improve/overview)
 - [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune)
+
+
+---
+
+# Iteratively improve your Decision LM
+
+Source: https://docs.withemissary.com/decision-lm/improve/overview
+
+# Iteratively improve your Decision LM
+
+A zero-shot Decision LM works in minutes, but your first version is rarely your best one. Its only instructions are your class descriptions, so it can be **inaccurate** on your edge cases, and **inconsistent** on inputs that sit near a class boundary. For a decision that routes traffic, gates content, or judges output, that gap matters.
+
+The fix is a short loop:
+
+1. **Measure** the model against a hold-out set and a target, such as 95% accuracy.
+2. **Label its mistakes**, starting with disagreements and low-confidence answers.
+3. **[Quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train)** a new version in about 20 seconds, and score it again.
+4. **Repeat** until you hit the target. If quick-train plateaus, move to a [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune).
+
+You can start with no data at all, and labeled outputs are optional.
+
+## Choose your path
+
+Both guides walk through the same loop. Pick the one that matches who is doing the work.
+
+- **[For humans](https://docs.withemissary.com/decision-lm/improve/for-humans)**: you drive the loop and call the API yourself, in the Playground or with the code samples.
+- **[For coding agents](https://docs.withemissary.com/decision-lm/improve/for-coding-agents)**: hand the loop to Claude Code or another coding agent. It does the analysis and the API calls, and stops to ask you before it creates an experiment, writes a label, trains, or deploys. You make the decisions and supply the labels.
+
+## Before you start
+
+- An Emissary API key.
+- One sentence on the decision the model makes.
+- A zero-shot experiment. Create one in the [Playground](https://www.withemissary.com/app/playground), or follow [When to train your own](https://docs.withemissary.com/decision-lm/train-your-own/when-to-train) to check that training is the right next step.
+
+The loop covers binary, multi-class, and regression Decision LMs. If one input can carry several labels at once (multi-label), go straight to a [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune).
+
+## After you ship
+
+Improvement doesn't stop at deploy. Production calls are logged, so the low-confidence ones become your next round of labels. See [Maintain your model](https://docs.withemissary.com/decision-lm/train-your-own/maintain) for drift and retraining.
+
+
+---
+
+# Improve your Decision LM step by step (for humans)
+
+Source: https://docs.withemissary.com/decision-lm/improve/for-humans
+
+# Improve your Decision LM: for humans
+
+Start with a zero-shot model, compare it to a reference, label its mistakes, and [quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train) until it hits your target. Move to a [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune) if quick-training stops helping. Real inputs help, but you can start with none, and labeled outputs are optional.
+
+Prefer to hand this to an agent? See [For coding agents](https://docs.withemissary.com/decision-lm/improve/for-coding-agents). For the overview, see [Iteratively improve your Decision LM](https://docs.withemissary.com/decision-lm/improve/overview).
+
+## What you need
+
+- An Emissary API key
+- One sentence on the decision the model makes
+- Whatever examples you have: inputs, outputs, both, or none
+- A target metric, such as accuracy or precision. If you don't have one, Claude Code can suggest one for you to confirm
+
+This loop covers binary classification, multi-class classification, and regression. If one input can carry several labels at once (multi-label), go straight to a [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune).
+
+## Before you start: a hold-out set
+
+You need a ruler to measure your Decision LM against, called a **hold-out set**. It doesn't have to be perfect, and you can start from nothing:
+
+| What you have | What to do |
+| --- | --- |
+| Nothing | Have an AI write inputs and labels from your use case. Skim and approve the sample. |
+| Inputs, but no outputs | Have an AI label them (with Opus), and spot-check the result. |
+| A few examples (fewer than 20) | Have an AI write more in the same style, and approve them. |
+| 20 or more inputs and outputs | Use them as they are. |
+
+If you already have a separate hold-out set, use it in every case. You score on the hold-out and never train on it. Write training data on top of it, never from it.
+
+A hold-out also wears out. Once you've written training data to fix its errors, its score is optimistic. Before you deploy, score the final version on **20 or more fresh inputs**. Made-up examples are a weaker test than real ones, so swap in real data as soon as you have it.
+
+## The steps
+
+### 1. Zero-shot
+
+Write a class name and a description for each class, saying what belongs, what doesn't, and how to break ties. Then create the experiment in the [Playground](https://www.withemissary.com/app/playground), or through the [API](https://docs.withemissary.com/api/create-experiment).
+
+The descriptions are the model's only instructions at this stage, so review the full table before you create the experiment. Save the experiment id straight away, because the API can't list experiments.
+
+```python
+
+exp = requests.post(
+    "https://api.withemissary.com/v1/experiments",
+    headers={"Content-Type": "application/json", "X-API-Key": os.environ["EMISSARY_API_KEY"]},
+    json={
+        "name": "support-triage",
+        "mode": "decision",
+        "classes": [
+            {"name": "billing", "description": "Charges, invoices, refunds or payment methods. A bug on the billing page is bug."},
+            {"name": "bug", "description": "Something in the product is broken or behaves wrongly."},
+            {"name": "feature_request", "description": "Asks for something the product doesn't do yet."},
+        ],
+    },
+).json()
+
+print(exp["id"])  # your <experiment_id>; zero-shot starts at version 0.0.0
+```
+
+### 2. Measure
+
+Run your hold-out set through the model and compare its answers with your outputs. If you have no outputs, have Opus label the inputs using the same class descriptions, and spot-check what it gives you.
+
+```python
+EXPERIMENT_ID = exp["id"]
+
+def classify(text, version="0.0.0"):
+    r = requests.post(
+        "https://api.withemissary.com/v1/classification",
+        headers={"Content-Type": "application/json", "X-API-Key": os.environ["EMISSARY_API_KEY"]},
+        json={"model": f"{EXPERIMENT_ID}/{version}", "input": text, "data_format": "probs"},
+    ).json()
+    probs = r["data"][0]["probs"]
+    top = max(probs, key=probs.get)
+    return top, probs[top]  # predicted class and its confidence
+
+# Every call is logged; those logs are what you label and train on later
+label, confidence = classify("I was charged twice this month")
+```
+
+### 3. Ship or train
+
+Compare the hold-out score with your target, then take one of three paths:
+
+- **Ship** if the score meets the target and fresh inputs confirm it. Deploy the version, pinned (see [Deploy](#deploy)).
+- **Ship with a threshold** if the model is accurate above some confidence level but not below it. Deploy, and send low-confidence answers to a person.
+- **Quick-train** if the score misses the target:
+    1. Look at the mistakes and name the patterns, such as "bare home addresses" or "placeholder SSNs".
+    2. Generate a training set based on those mistakes. Aim for about half on the weak pattern and half near-misses from the class it gets confused with.
+    3. Run it through the current version to label it.
+    4. Manually label the disagreements: wherever the classifier's answer differs from the intended label, plus its low-confidence answers.
+    5. [Quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train) on those labels. You need at least 5, and it takes about 20 seconds. Use the UI or the API.
+    6. Score the new version on the hold-out, and keep it only if it beats the old one. Then decide again: ship or train.
+
+### 4. Repeat
+
+Each quick-train makes a new version. Add inputs for the classes it gets wrong, plus near-misses from the class it confuses them with, label the mistakes, and train again until you hit the target.
+
+```python
+label, confidence = classify("I was charged twice this month", version="0.0.1")  # the version your quick-train returned
+```
+
+### 5. LoRA if it plateaus
+
+When rounds stop improving the score, run a [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune).
+
+- **When to switch:** three quick-train rounds in a row gain less than about 1 point, or make things worse. Quick-train only retrains the classification head, so once the base model's features stop separating your classes, more labels won't help. Also come straight here if one input can carry several labels.
+- **What it needs:** at least 100 labeled examples per class, exported as JSONL (one prompt and its completion per line), plus your hold-out set as a separate test file. The loop above has already produced most of this.
+- **How it runs:**
+    1. Export your labeled logs to JSONL and upload them to a new project.
+    2. Train on `Qwen3-8B` (needed for serverless), then pick a checkpoint. A later one isn't always better, because the model can overfit.
+    3. Deploy to the serverless engine. Switch traffic only if it beats your best quick-train version on the hold-out set.
+
+```python
+
+BASE, AUTH = "https://api.withemissary.com", {"X-API-Key": os.environ["EMISSARY_API_KEY"]}
+
+# 1. Upload your labeled JSONL to a new project
+pid = requests.post(f"{BASE}/v1/projects", headers=AUTH, json={"name": "my-lora"}).json()["id"]
+ds = requests.post(f"{BASE}/v1/projects/{pid}/datasets", headers=AUTH,
+                   files={"file": ("lora_train.jsonl", open("lora_train.jsonl", "rb"), "application/json")},
+                   data={"name": "train"}).json()
+# wait until the dataset is uploaded and profiled
+
+# 2. Train on Qwen3-8B
+job = requests.post(f"{BASE}/v1/projects/{pid}/training-jobs", headers=AUTH, json={
+    "name": "my-lora-v1", "base_model": "Qwen3-8B", "task_type": "classification",
+    "train_dataset_id": ds["id"], "train_test_split_ratio": 20}).json()
+# wait until the job status is "Success", then pick a checkpoint
+
+# 3. Deploy, then call it by its deployment name
+requests.post(f"{BASE}/v1/engines/engine-qwen-3-8b-classification/deploy", headers=AUTH, json={
+    "name": "my-lora-v1", "project_id": pid, "training_id": job["id"], "checkpoint": 3})
+r = requests.post(f"{BASE}/v1/classification", headers=AUTH, json={
+    "model": "my-lora-v1", "input": "I was charged twice", "data_format": "probs"}).json()
+```
+
+## Deploy
+
+Before you deploy, confirm the score on fresh inputs that were never used for training. Pick a confidence threshold from your hold-out results, and send anything below it to a person. Production calls are logged unless you turn on ZDR, so label the low-confidence ones every week or two and run another round. See [Maintain your model](https://docs.withemissary.com/decision-lm/train-your-own/maintain).
+
+### Zero-shot and quick-train versions
+
+Call the experiment as `<experiment_id>/<version>`. Pin the exact version, so a later quick-train doesn't change live behavior:
+
+```python
+requests.post("https://api.withemissary.com/v1/classification",
+    headers={"Content-Type": "application/json", "X-API-Key": API_KEY},
+    json={"model": "<experiment_id>/<version>", "input": "I'm so mad!", "data_format": "probs"})
+```
+
+### LoRA deployments
+
+A LoRA model is deployed on its own, then called by its deployment name instead of an experiment version:
+
+```python
+# Deploy a trained checkpoint to the serverless engine
+dep = requests.post("https://api.withemissary.com/v1/engines/engine-qwen-3-8b-classification/deploy",
+    headers={"X-API-Key": API_KEY},
+    json={"name": "my-lora-v1", "project_id": pid, "training_id": job_id, "checkpoint": 3}).json()
+
+# Wait until GET /v1/projects/{pid}/deployments/{dep['id']} shows "Deployed", then call it
+requests.post("https://api.withemissary.com/v1/classification",
+    headers={"Content-Type": "application/json", "X-API-Key": API_KEY},
+    json={"model": "my-lora-v1", "input": "I'm so mad!", "data_format": "probs"})
+```
+
+The response has the same shape as a zero-shot call. To ship a newer LoRA model, deploy its checkpoint under a new name and point your calls at it.
+
+## Let Claude Code run it
+
+Open [For coding agents](https://docs.withemissary.com/decision-lm/improve/for-coding-agents), copy it into Claude Code, then send this message:
+
+```text
+Follow the guide above to build and improve a Decision LM for my use case.
+Use case: <the decision the model makes, e.g. "route support emails to billing, bug or feature_request">
+What I have: <nothing / inputs only / a few examples / 20+ inputs with outputs>
+My data is in: <path to a CSV/JSONL file, or "none">
+My hold-out set is in: <path, or "none">
+My Emissary API key is in the EMISSARY_API_KEY environment variable.
+```
+
+Claude Code drafts the classes, gets Opus labels, and finds the inputs worth labeling. It stops to ask you before it creates the experiment, writes any label, trains, or deploys. It shows you the full class table and waits for your yes, then asks you to label the inputs it is unsure about, one at a time.
+
+## Next steps
+
+- [Quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train)
+- [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune)
+- [Maintain your model](https://docs.withemissary.com/decision-lm/train-your-own/maintain)
+- [API reference](https://docs.withemissary.com/api/create-experiment)
+
+
+---
+
+# Improve your Decision LM with a coding agent
+
+Source: https://docs.withemissary.com/decision-lm/improve/for-coding-agents
+
+# Improve your Decision LM: for coding agents
+
+This page is written for a coding agent such as Claude Code. Humans: copy it into your agent and send the prompt from [For humans](https://docs.withemissary.com/decision-lm/improve/for-humans#let-claude-code-run-it). For the overview, see [Iteratively improve your Decision LM](https://docs.withemissary.com/decision-lm/improve/overview).
+
+## Your job
+
+You are helping the user build and improve a Decision LM (a classifier) on Emissary. You make the API calls and do the analysis and bookkeeping. **The user makes the decisions and gives the labels.**
+
+Before Step 1, check that you have everything under [What you need to start](#what-you-need-to-start). Ask for anything missing in a single message.
+
+Work through the loop in this order:
+
+1. **Step 0:** work out which of the four starting cases the user is in. Get or generate the data that case needs, and set up the hold-out.
+2. **Step 1:** draft the classes, **show the user a class and description table**, and get an explicit yes. Then create the zero-shot experiment and run every input through it.
+3. **Step 2:** get reference labels (the user's outputs, or Opus) and score the hold-out set.
+4. **Step 3:** if the target is met, deploy. If not, build a labeling queue, have the user label it, [quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train), and score again.
+5. **Step 4:** repeat with fresh inputs until the target is met, then deploy.
+6. **Step 5:** if two rounds in a row barely improve the score, move to a [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune).
+
+## Rules
+
+Follow these at every step.
+
+1. **Stop and ask at every checkpoint.** Do none of these without the user's explicit OK in the conversation:
+    - Creating an experiment. Do this only after the user has **seen the class table (names and descriptions) and said yes**. A draft you wrote earlier, or a script that already contains descriptions, does not count. Show the table again, in the conversation, every time.
+    - Changing class names or descriptions.
+    - Using data you generated (inputs or labels). Show a sample first.
+    - Writing a label to a log (PATCH). Labels come from the user, or from the user approving a batch you proposed.
+    - Starting a quick-train or a LoRA training job.
+    - Deploying, or telling the user a version is ready for production.
+2. **Ask the user to label; don't label for them.** Use the labeling queue format in Step 3. When the user approves labels you proposed in bulk, record that in the labeling log (`source: "claude_proposed_user_approved"`).
+3. **Never print, log or commit the API key.** Read it from `EMISSARY_API_KEY`.
+4. **Keep state on disk** in a `decision_lm/` folder so the work survives a restart:
+
+    | File | What it holds |
+    | --- | --- |
+    | `state.json` | Experiment id, classes, starting case, current version, every version tried with its hold-out score, the target, `holdout_source`, `holdout_status` |
+    | `train.jsonl` | Training inputs, with the log id each one produced |
+    | `holdout.jsonl` | Hold-out inputs with their ground-truth label |
+    | `reference_labels.jsonl` | Opus labels, if Opus is the reference |
+    | `eval_<version>.json` | Hold-out results for each version |
+    | `labeling_log.jsonl` | Every label: log id, input, old label, new label, date, source |
+
+5. **Write the experiment id to `state.json` the moment you create the experiment**, before any long loop. The API has no endpoint for listing experiments (`GET /v1/experiments` returns 405). A crash after creation would leave an orphan experiment you can't find.
+6. **Report in plain words after each step:** a short scorecard (accuracy, weakest class, number of disagreements) and the one decision you need from the user next.
+7. **If an API call fails with a schema error,** open the API reference page linked in the [cheat sheet](#api-cheat-sheet) and fix the call. Don't keep guessing field names.
+
+## What you need to start
+
+| Input | Required? | Notes |
+| --- | --- | --- |
+| Emissary API key | Yes | Set it as `EMISSARY_API_KEY` |
+| One sentence on the decision | Yes | What is being decided, and what happens downstream of each answer |
+| Which starting case the user is in | Yes | Nothing, inputs only, a few examples, or 20+ inputs with outputs (Step 0). Ask if it isn't clear |
+| Where the data is | If they have any | A path to a CSV or JSONL file, or another source |
+| Hold-out set | No | If the user has one, use it in every case |
+| Class names | No | You propose them; the user must confirm them |
+| A target | Yes, but the user doesn't have to bring one | Use the user's if they give one. If not, suggest one in Step 1 and get their OK. For example "90% accuracy on the hold-out set" or "95% recall on `pii`" |
+
+This loop covers single-label decisions (one class per input, including binary). If one input can carry several labels at once, go straight to the LoRA fine-tune in Step 5.
+
+## Step 0: Work out what the user has
+
+Pick the case that matches what the user gave you. Record it in `state.json` as `starting_case`, with the matching `holdout_source`.
+
+| Case | What the user has | What you do | Hold-out | `holdout_source` |
+| --- | --- | --- | --- | --- |
+| 1 | Nothing | Generate inputs and output labels ("From nothing" below) | 20 or more of the approved examples | `synthetic` |
+| 2 | Inputs, no outputs | Generate output labels ("Labels for the user's inputs" below), then measure where the model disagrees with them | The user's inputs, with labels the user has spot-checked | `user_inputs_reference_labels` |
+| 3 | A few inputs and/or outputs (under 20) | Expand them in the same style ("Expanding a few examples" below) | The user's real examples, topped up to 20 with approved examples in the same style | `user_plus_synthetic` |
+| 4 | Inputs and outputs, 20 or more | Ask the user to point you at the source, and read it | The whole batch. With 100+, split off 20% (at least 20) before looking at any results, and use the rest for training | `user_first_batch` or `user_split` |
+
+**If the user also gave a separate hold-out set,** use it as the hold-out in any case (`holdout_source: "user_holdout"`), and treat everything else as training data.
+
+**Case 2 with fewer than 20 inputs** is also Case 3: label what they have, then expand it.
+
+**Keep the hold-out clean.** When the whole batch is the hold-out (Cases 2 to 4), don't carve it into train and test. Build separate training data on top of it instead ("Building training data on top of the hold-out" below). Then:
+
+- Run the whole hold-out through the zero-shot model and score it. This is the baseline.
+- Never write generated data into the user's real examples, and never PATCH a hold-out log.
+
+### The hold-out gets "used up"
+
+A hold-out is only a fair test if you haven't designed the training data around its failures. If you look at hold-out errors and then write training data to fix those exact patterns, the hold-out score becomes optimistic.
+
+- Set `"holdout_status": "diagnosed"` in `state.json` once you have used the hold-out errors to decide what training data to write.
+- While the status is `diagnosed`, tell the user every time you report a hold-out score: "this hold-out was used to design the training data, so treat the score as optimistic."
+- **Before deploying, get a fresh, untouched set:** 20 or more new inputs (real if possible, otherwise written by you and shown to the user) that were never used for training or diagnosis. Score the final version on it, and use that number for the deploy decision.
+
+## Generating data
+
+### From nothing (Case 1)
+
+When the user has no data at all, build everything from the use case.
+
+1. Offer to write 30 to 50 realistic inputs, each with the class you intend for it. Cover **every class**, and include the hard cases: near-boundary inputs, tricky wording, placeholder or fake values, and negatives that look like positives.
+2. **Show the user a sample** (at least 10 inputs, each with its intended class) and get approval before you use any of them. Revise until they say yes.
+3. Split the approved examples. Put 20 or more in the hold-out, and make the rest the first training pool.
+4. **Label with the user, not for the user.** Show your proposed labels in the labeling queue format. The user corrects them. If they approve a whole batch, log it as `claude_proposed_user_approved`.
+5. Tell the user plainly that generated data is a weaker test than real data. Ask them to swap in or add real inputs as soon as they have any, and to re-score the final version on real inputs before deploying.
+6. Never mix generated training inputs into the hold-out after the first split.
+
+### Labels for the user's inputs (Case 2)
+
+The user has inputs but no outputs, so you produce the outputs.
+
+1. Label every input with the Opus prompt in Step 2b, using the class descriptions the user confirmed in Step 1.
+2. **Have the user spot-check the labels.** Show at least 10, plus every label where Opus's top probability is below 0.7, in the labeling queue format. Their corrections win.
+3. The checked labels are the hold-out's ground truth.
+4. Run the inputs through the zero-shot model and **measure where it disagrees with those labels**. The disagreements are your first look at the model's weak spots and feed the labeling queue.
+
+### Expanding a few examples (Case 3)
+
+The user has fewer than 20 examples (inputs, outputs or both). Treat them as the style guide.
+
+1. Study them: length, tone, format, vocabulary and the kinds of entities that appear. If the user gave only outputs, work out what inputs would produce them.
+2. Write new examples that match that style, covering **every class** and the hard cases.
+3. No new example may duplicate or closely paraphrase one of the user's. Check this in code.
+4. **Show the user a sample** (10 or so, each with its intended class) and get approval before you use any of them.
+5. The user's real examples are the hold-out. If there are fewer than 20, top them up with approved examples, and keep the rest for training.
+
+### Building training data on top of the hold-out
+
+Use this whenever you have to write the training data yourself (all cases except a large split set).
+
+1. Read the hold-out errors and the model's weak spots, and name the patterns. Examples: "bare home addresses," "placeholder SSNs," "sample or mockup text."
+2. Write **a balanced set** that covers every class. Make about half of it target the weak pattern. Make the other half the *nearest boundary cases from the other side*, so the model learns the edge from both directions. For example, put business addresses beside home addresses.
+3. No input may duplicate or closely paraphrase a hold-out input. Check this in code.
+4. **Show the user a sample (10 or so) and the pattern groups before you classify anything.** Get an OK.
+5. Run all of it through the newest version to create logs. Save the log ids in `train.jsonl`.
+6. Mark the hold-out as `diagnosed` (Step 0).
+7. Build the labeling queue (Step 3) and have the user label it. Generated examples where the model already agrees with your proposed label can go to the user as one batch for approval. **Do not label the rest for them.**
+
+## Step 1: Zero-shot an experiment
+
+With no training data, you get a working classifier in minutes. At this stage the class descriptions are the model's only instructions, so most of the effort goes into them.
+
+1. **Set up the hold-out as in Step 0.** In Cases 1 to 3, generating data needs the classes, so do steps 2 and 3 below first, then generate the data, then create the experiment.
+2. **Draft the classes.** Read the use case and the user's examples (up to 20), then propose class names (snake_case, mutually exclusive) with a description for each. A good description says what belongs, what doesn't, and how to break a tie with the nearest class. For example:
+    - `billing`: questions or complaints about charges, invoices, refunds or payment methods. A bug on the billing page is `bug`, not `billing`.
+3. **Show the class table and get an explicit yes (checkpoint).** This step is mandatory.
+    - Show a table in the conversation with each class's **name, full description, and 2 or 3 sample inputs you would put in it**.
+    - Also show the **target** (for example "0.90 accuracy, 0.95 recall on `pii`"), the starting case, and the hold-out plan. If the user didn't give a target, suggest one that fits the use case here (for example, high recall on the class that is costly to miss) and get their OK.
+    - Ask what is missing, overlapping or misnamed. Revise until the user says yes.
+    - Don't create the experiment until you have that yes. A draft file, an earlier script, or a vague "go ahead and run it" is not approval of the descriptions. If the user says "just run it," show the table first and ask for a one-word confirm.
+4. **Create the experiment** and write its id to `state.json` immediately. Then read it back to check the classes and get the starting version.
+
+    ```python
+    import os, json, requests
+
+    BASE = "https://api.withemissary.com"
+    HEADERS = {"Content-Type": "application/json", "X-API-Key": os.environ["EMISSARY_API_KEY"]}
+
+    classes = [
+        {"name": "billing", "description": "..."},
+        {"name": "bug", "description": "..."},
+        {"name": "feature_request", "description": "..."},
+    ]
+
+    exp = requests.post(f"{BASE}/v1/experiments", headers=HEADERS, json={
+        "name": "support-triage",
+        "mode": "decision",
+        "classes": classes,
+    }).json()
+    EXPERIMENT_ID = exp["id"]
+
+    # Save the id NOW (the API can't list experiments, so a crash here leaves an orphan)
+    state = {"experiment_id": EXPERIMENT_ID, "classes": [c["name"] for c in classes], "status": "experiment created"}
+    json.dump(state, open("state.json", "w"), indent=2)
+
+    info = requests.get(f"{BASE}/v1/experiments/{EXPERIMENT_ID}", headers=HEADERS).json()
+    print(info["classes"], info["latest_version"])  # zero-shot starts at 0.0.0
+    ```
+
+    If the API rejects the body, check [Create experiment](https://docs.withemissary.com/api/create-experiment) in the API reference for the exact field names.
+
+5. **Run every input through it,** training and hold-out alike. Every call is logged, and those logs are what you label and train on later. Save the returned id (`classify-…`) next to each input as `log_id`.
+
+    ```python
+    def classify(text, version):
+        r = requests.post(f"{BASE}/v1/classification", headers=HEADERS, json={
+            "model": f"{EXPERIMENT_ID}/{version}",
+            "input": text,
+            "data_format": "probs",
+        }).json()
+        probs = r["data"][0]["probs"]
+        top = max(probs, key=probs.get)
+        return {"log_id": r["id"], "label": top, "confidence": probs[top], "probs": probs}
+    ```
+
+Need to change a class or description later? There is no endpoint for editing them. Create a new experiment with the revised classes after the user confirms the new table, and rerun the inputs.
+
+## Step 2: Measure it against a reference
+
+Compare the model's answers to a reference: the user's own outputs if they have them (2a), or Opus labels if not (2b). Score the hold-out for the headline numbers. Use the training data to find inputs worth labeling.
+
+### 2a. The user has correct outputs
+
+Those are the ground truth. Go straight to the scorecard.
+
+### 2b. No outputs: use Opus as the reference labeler
+
+Give Opus the same class descriptions and have it answer in the Decision LM's own shape: a one-hot completion, probabilities and a one-line reasoning. Treat Opus labels as a strong reference, not as truth. Ask the user to spot-check the hold-out labels before you trust any score, especially where Opus is unsure (top probability below 0.7).
+
+```text
+You are a strict classifier. Decide which ONE class the input belongs to.
+
+Task: {one-sentence description of the decision}
+
+Classes:
+- {class_1}: {description_1}
+- {class_2}: {description_2}
+
+Rules:
+- Choose exactly one class from the list. Never invent a class.
+- Judge only by the class descriptions above, not by what seems sensible to you.
+- If two classes fit, follow the tie-breakers in the descriptions. If none applies, pick the closer class and lower your confidence.
+- Give a probability for every class. Probabilities must sum to 1.
+
+<input>
+{input}
+</input>
+
+Respond with JSON only, no other text:
+{"completion": {"{class_1}": 0 or 1, "{class_2}": 0 or 1},
+ "probabilities": {"{class_1}": 0.00, "{class_2}": 0.00},
+ "reasoning": "<one sentence>"}
+```
+
+When `ANTHROPIC_API_KEY` is set, run the prompt through the Anthropic API with the latest Opus model. Otherwise apply the prompt yourself, 20 inputs at a time, and save the results to `reference_labels.jsonl`. These only count as Opus labels if you are running on Opus.
+
+### The scorecard (required, all rows)
+
+A run doesn't count as scored until every one of these is shown:
+
+| Measure | What it tells you |
+| --- | --- |
+| Hold-out accuracy (agreement with the reference) | The headline number to compare against the target |
+| Precision and recall per class | Which class is weak |
+| The 3 most-confused class pairs | Usually a sign that two descriptions overlap |
+| Accuracy above vs below 0.8 confidence | Whether a confidence threshold could reach the target without retraining |
+| Disagreements and low-confidence cases in the training data | The labeling queue for Step 3 |
+| Hold-out status (`clean` or `diagnosed`) | How much to trust the number |
+
+Save the results to `eval_<version>.json` and show the user the scorecard.
+
+## Step 3: Ship it, or fix the errors and quick-train
+
+If the scorecard meets the target and the hold-out is clean, deploy (end of Step 4). If it doesn't, have the user label the model's mistakes, [quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train) a new version on those labels (about 20 seconds), and score again.
+
+There is also a middle option. If accuracy is high above some confidence level, you can deploy with a threshold and send everything below it to a person or a fallback.
+
+### The labeling queue
+
+The queue is how the user's judgment gets into the model, so do it carefully and make it pleasant.
+
+**What goes in the queue.** Draw only from the training data, never the hold-out. In priority order:
+
+1. Disagreements with the reference (the user's outputs, Opus, or your proposed labels).
+2. Low-confidence predictions: top probability below 0.6, or the top two classes within 0.15 of each other. This includes cases where the model *agrees* with the reference but is unsure.
+3. Inputs from the weakest class on the scorecard.
+
+Leave out everything the model already gets right with high confidence. Offer those items to the user as a single batch for approval, with a count, a pointer to the file and the class balance. *Don't pretend the user reviewed them one by one.*
+
+**How to present it.** Show **one item at a time**, in groups of 5 to 10. Use `AskUserQuestion` with the class names as the options (plus `skip` if the question allows it). Show every item like this:
+
+```text
+[3/10]  log classify-28ab3f56…
+Input:  "I was charged twice and the app crashed when I tried to cancel"
+Model:  billing (0.54)    Reference: bug (0.71)
+Why they disagree: it mentions both a charge and a crash.
+Correct class?  billing / bug / feature_request / skip
+```
+
+Each card must carry:
+
+- the **input**, verbatim
+- the **model's prediction and confidence**
+- the **reference or proposed label**, if there is one
+- **one line on why the two disagree**, or on why the model is unsure if they agree
+
+Keep the card short. Don't show the probability for every class, and don't explain the whole class description each time. If the user's answers keep contradicting a class description, the description is wrong. Propose a rewrite and get the user's OK before changing anything, as in Rule 1.
+
+**Ask for the next step in the same message as the last card,** so the user isn't pinged twice: ask them to approve the bulk batch of easy items, and to approve the quick-train.
+
+### Write the labels
+
+A PATCH replaces the log's completion and marks the log as labeled. Send exactly the keys the log already has, or the call fails. Record every change in `labeling_log.jsonl` with a `source` of `user` or `claude_proposed_user_approved`. Try one log first, then the rest. Never PATCH a log whose id appears in `holdout.jsonl`: assert this in code.
+
+```python
+LOGS = f"{BASE}/v1/experiments/{EXPERIMENT_ID}/logs"
+
+def find_logs(text, version=None):
+    params = {"q": text[:100], "limit": 5}
+    if version:
+        params["version"] = version
+    return requests.get(LOGS, headers=HEADERS, params=params).json()["data"]
+
+def label_log(log, correct_class):
+    completion = {k: int(k == correct_class) for k in log["completion"]}  # same keys, new values
+    r = requests.patch(f"{LOGS}/{log['id']}", headers=HEADERS, json={"completion": completion})
+    r.raise_for_status()
+    return r.json()["is_labeled"]
+```
+
+### Quick-train (checkpoint)
+
+You need at least 5 labeled logs. Aim for 10 to 50, with every class covered and the hard cases included. Quick-train trains only the classification head; the base model stays frozen.
+
+```python
+r = requests.post(f"{BASE}/v1/experiments/{EXPERIMENT_ID}/train", headers=HEADERS,
+                  json={"only_labeled_data": True}).json()
+NEW_VERSION = r["version"]  # e.g. "0.0.1"; r also has sample_count and training_id
+```
+
+Usually keep `only_labeled_data: true`. Without it, training also uses unreviewed auto labels and the logs from your hold-out inputs. If the user wants, train once with each setting and compare the two on the hold-out.
+
+### Compare
+
+Run the hold-out through the new version and the previous one, then show a table:
+
+| Version | Hold-out accuracy | Weakest class (recall) | Labeled samples |
+| --- | --- | --- | --- |
+| 0.0.0 (zero-shot) | … | … | 0 |
+| 0.0.1 | … | … | … |
+
+Keep the new version only if it is better on the hold-out. A better version should also be more confident when it's right. If the hold-out is `diagnosed`, say so beside the table.
+
+## Step 4: Keep iterating, then deploy
+
+Every quick-train creates a new version and keeps the old ones. Keep going round the loop while hold-out scores improve.
+
+### One round
+
+1. **Get fresh inputs.** Use training inputs that aren't labeled yet. When those run out, write 10 to 20 realistic new inputs for the weakest class and for the class it gets confused with, so the model learns the boundary from both sides. In Case 3, match the style of the user's examples. Show the user a sample first. Never put made-up inputs in the original hold-out.
+2. Run them through the newest version, and get reference labels.
+3. Build the labeling queue (disagreements, then low-confidence cases, then the weak class).
+4. The user labels the queue, and you PATCH the labels.
+5. Quick-train, then compare on the hold-out (both checkpoints).
+
+To see where things stand, `GET /v1/experiments/{id}` lists every version with its `sample_count`. `GET …/logs?version=0.0.2` shows what a given version did.
+
+### When to stop
+
+| Situation | Next move |
+| --- | --- |
+| Hold-out meets the target, and a fresh untouched set confirms it | Deploy (below) |
+| Hold-out meets the target, but the hold-out is `diagnosed` | Get a fresh untouched set and score on it first |
+| Two rounds in a row gain less than about 1 point, or get worse | Quick-train has plateaued. Go to Step 5 |
+| The user needs several labels per input | Go to Step 5 (multi-label needs LoRA) |
+
+The 1-point rule is a rule of thumb. Decide the real cutoff with the user.
+
+### Deploy (checkpoint)
+
+Show the user the final scorecard, including the fresh-set score and the hold-out status, and get a yes. Then call the experiment with the version pinned:
+
+```python
+response = requests.post(
+    "https://api.withemissary.com/v1/classification",
+    headers={"Content-Type": "application/json", "X-API-Key": os.environ["EMISSARY_API_KEY"]},
+    data=json.dumps({
+        "model": "ex-ahejacuehandheha/0.0.3",  # <experiment_id>/<version>
+        "input": "I'm so mad!",
+        "data_format": "probs",
+    }),
+)
+```
+
+In production:
+
+- **Pin the exact version** so a later quick-train doesn't change live behavior.
+- **Set a confidence threshold** from the hold-out results. Send anything below it to a person or a fallback.
+- **Keep improving.** Production calls are logged too. Every week or two, pull the newest low-confidence logs (`sort=newest`), have the user label them, and run another round. See [Maintain your model](https://docs.withemissary.com/decision-lm/train-your-own/maintain).
+
+## Step 5: LoRA fine-tune when quick-train plateaus
+
+Quick-train only changes the classification head. A [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune) also trains an adapter on the model, so it can learn distinctions the base model misses. It needs much more data: at least 100 labeled samples per class.
+
+1. **Grow the labeled set** to at least 100 per class, using the same loop. To go faster, the user can approve reference labels in bulk where the model and the reference agree with high confidence, and review only the rest (checkpoint).
+2. **Export the labeled logs to JSONL,** one `{"prompt": …, "completion": {…}}` per line. Export the hold-out separately as a test file.
+3. **Create a project and upload the dataset.** Wait until `is_uploaded` and `is_profiled` are both true.
+4. **Start a training job (checkpoint)** with `base_model: "Qwen3-8B"` (needed for serverless; not `Qwen3-8B-Base`) and `task_type: "classification"`. Pass the hold-out as `test_dataset_id`, or set `train_test_split_ratio`.
+5. **Poll** until the status is `Success`. Then pick a checkpoint: a later one is not always better, because the model can overfit.
+6. **Deploy (checkpoint)** to the serverless engine and poll until the status is `Deployed`.
+7. **Score the same hold-out** with `model` set to the deployment name. Compare it against the best quick-train version before switching traffic.
+
+```python
+
+# 2. Export labeled logs, newest label per input
+rows, offset = {}, 0
+while True:
+    page = requests.get(f"{BASE}/v1/experiments/{EXPERIMENT_ID}/logs", headers=HEADERS,
+                        params={"label": "labeled", "sort": "oldest", "limit": 200, "offset": offset}).json()
+    for log in page["data"]:
+        rows[log["input"]] = log["completion"]
+    offset += 200
+    if offset >= page["total"]:
+        break
+with open("lora_train.jsonl", "w") as f:
+    for text, completion in rows.items():
+        f.write(json.dumps({"prompt": text, "completion": completion}) + "\n")
+
+# 3. Project + dataset
+AUTH = {"X-API-Key": os.environ["EMISSARY_API_KEY"]}
+pid = requests.post(f"{BASE}/v1/projects", headers=AUTH, json={"name": "support-triage"}).json()["id"]
+with open("lora_train.jsonl", "rb") as f:
+    ds = requests.post(f"{BASE}/v1/projects/{pid}/datasets", headers=AUTH,
+                       files={"file": ("train.jsonl", f, "application/json")}, data={"name": "train"}).json()
+while not (ds.get("is_uploaded") and ds.get("is_profiled")):
+    time.sleep(2)
+    ds = requests.get(f"{BASE}/v1/projects/{pid}/datasets/{ds['id']}", headers=AUTH).json()
+
+# 4-5. Train and wait
+job = requests.post(f"{BASE}/v1/projects/{pid}/training-jobs", headers=AUTH, json={
+    "name": "support-triage-lora-v1", "base_model": "Qwen3-8B", "task_type": "classification",
+    "train_dataset_id": ds["id"], "train_test_split_ratio": 20,
+    "test_functions": ["sample match combined metric shared"],
+}).json()
+while True:
+    st = requests.get(f"{BASE}/v1/projects/{pid}/training-jobs/{job['id']}", headers=AUTH).json()
+    if st["status"] in ("Success", "Failed", "TimedOut", "Cancelled"):
+        break
+    time.sleep(30)
+
+# 6. Deploy a chosen checkpoint (serverless)
+dep = requests.post(f"{BASE}/v1/engines/engine-qwen-3-8b-classification/deploy", headers=AUTH, json={
+    "name": "support-triage-lora-v1", "project_id": pid, "training_id": job["id"], "checkpoint": 3,
+}).json()
+# poll GET /v1/projects/{pid}/deployments/{dep['id']} until "Deployed"
+```
+
+Send the same prompt format at inference that you trained on. Here that is the raw input text, with no class descriptions.
+
+## API cheat sheet
+
+Every call goes to `https://api.withemissary.com` with an `X-API-Key` header.
+
+| Action | Method and path | Notes |
+| --- | --- | --- |
+| Create experiment | `POST /v1/experiments` | Zero-shot; classes with descriptions ([reference](https://docs.withemissary.com/api/create-experiment)) |
+| Get experiment | `GET /v1/experiments/{id}` | `classes`, `latest_version`, `versions[{version, created_at, sample_count}]` |
+| List experiments | `GET /v1/experiments` | **Not supported (405).** Save the experiment id yourself |
+| Classify | `POST /v1/classification` | `model` = `<experiment_id>/<version>` or a LoRA deployment name; `data_format: "probs"` ([reference](https://docs.withemissary.com/api/get-classification-from-deployment)) |
+| List logs | `GET /v1/experiments/{id}/logs` | Filters: `q`, `label` (`labeled` or `auto`), `version`, `sort`, `limit` (1 to 200), `offset` |
+| Label a log | `PATCH /v1/experiments/{id}/logs/{log_id}` | Body `{"completion": {…}}` with exactly the log's existing keys |
+| Quick-train | `POST /v1/experiments/{id}/train` | `{"only_labeled_data": true}`; needs at least 5 labeled; returns `version`, `sample_count`, `training_id` |
+| Create project | `POST /v1/projects` | LoRA only |
+| Upload dataset | `POST /v1/projects/{pid}/datasets` | Multipart JSONL; poll until profiled |
+| Start training job | `POST /v1/projects/{pid}/training-jobs` | `base_model: "Qwen3-8B"` for serverless |
+| Training status | `GET /v1/projects/{pid}/training-jobs/{job_id}` | Ends in `Success`, `Failed`, `TimedOut` or `Cancelled` |
+| Deploy LoRA | `POST /v1/engines/engine-qwen-3-8b-classification/deploy` | `name`, `project_id`, `training_id`, `checkpoint` |
+| Deployment status | `GET /v1/projects/{pid}/deployments/{dep_id}` | Wait for `Deployed` |
+
+## Sources
+
+- [Create experiment (API reference)](https://docs.withemissary.com/api/create-experiment)
+- [Get classification (API reference)](https://docs.withemissary.com/api/get-classification-from-deployment)
+- [Quick-train](https://docs.withemissary.com/decision-lm/train-your-own/quick-train)
+- [LoRA fine-tune](https://docs.withemissary.com/decision-lm/train-your-own/lora-fine-tune)
+- [Maintain your model](https://docs.withemissary.com/decision-lm/train-your-own/maintain)
+- [Playground](https://www.withemissary.com/app/playground)
 
 
 ---

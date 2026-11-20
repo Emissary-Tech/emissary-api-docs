@@ -50,6 +50,15 @@ const sidebars: SidebarsConfig = {
                   'decision-lm/train-your-own/maintain',
               ],
             },
+            {
+              type: 'category',
+              label: 'Improve your Decision LM',
+              link: { type: 'doc', id: 'decision-lm/improve/overview' },
+              items: [
+                  'decision-lm/improve/for-humans',
+                  'decision-lm/improve/for-coding-agents',
+              ],
+            },
             'decision-lm/costs-and-faq',
             'decision-lm/compare',
         ],
