@@ -1,0 +1,38 @@
+---
+id: overview
+title: 'Iteratively improve your Decision LM'
+sidebar_label: 'Improve your Decision LM'
+description: 'A zero-shot Decision LM is a starting point. Measure it, label its mistakes, and quick-train until it hits your target accuracy and consistency.'
+---
+
+# Iteratively improve your Decision LM
+
+A zero-shot Decision LM works in minutes, but your first version is rarely your best one. Its only instructions are your class descriptions, so it can be **inaccurate** on your edge cases, and **inconsistent** on inputs that sit near a class boundary. For a decision that routes traffic, gates content, or judges output, that gap matters.
+
+The fix is a short loop:
+
+1. **Measure** the model against a hold-out set and a target, such as 95% accuracy.
+2. **Label its mistakes**, starting with disagreements and low-confidence answers.
+3. **[Quick-train](../train-your-own/quick-train)** a new version in about 20 seconds, and score it again.
+4. **Repeat** until you hit the target. If quick-train plateaus, move to a [LoRA fine-tune](../train-your-own/lora-fine-tune).
+
+You can start with no data at all, and labeled outputs are optional.
+
+## Choose your path
+
+Both guides walk through the same loop. Pick the one that matches who is doing the work.
+
+- **[For humans](./for-humans)**: you drive the loop and call the API yourself, in the Playground or with the code samples.
+- **[For coding agents](./for-coding-agents)**: hand the loop to Claude Code or another coding agent. It does the analysis and the API calls, and stops to ask you before it creates an experiment, writes a label, trains, or deploys. You make the decisions and supply the labels.
+
+## Before you start
+
+- An Emissary API key.
+- One sentence on the decision the model makes.
+- A zero-shot experiment. Create one in the [Playground](https://www.withemissary.com/app/playground), or follow [When to train your own](../train-your-own/when-to-train) to check that training is the right next step.
+
+The loop covers binary, multi-class, and regression Decision LMs. If one input can carry several labels at once (multi-label), go straight to a [LoRA fine-tune](../train-your-own/lora-fine-tune).
+
+## After you ship
+
+Improvement doesn't stop at deploy. Production calls are logged, so the low-confidence ones become your next round of labels. See [Maintain your model](../train-your-own/maintain) for drift and retraining.
