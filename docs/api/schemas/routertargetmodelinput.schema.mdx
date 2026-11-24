@@ -1,0 +1,46 @@
+---
+id: routertargetmodelinput
+title: "RouterTargetModelInput"
+description: "A model for the router to route across."
+sidebar_label: "RouterTargetModelInput"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"name":"deepseek-v4-flash","provider":"openrouter","model_id":"deepseek/deepseek-v4-flash","enabled":true,"input_per_mtok":0.14,"output_per_mtok":0.28,"cache_read_per_mtok":0.028,"cache_write_per_mtok":0.14,"context_window":1000000,"supports_vision":true,"effort_routing_enabled":false,"extra_fields":{}}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"RouterTargetModelInput"}
+>
+</Heading>
+
+
+
+A model for the router to route across.
+
+**Required:** `name`, and on a gateway router, `provider` for every enabled model.
+
+**Everything else is optional.** A field you leave out (or send as null) gets Emissary's default for the model: its entry in the router model's catalog, which `GET /v1/router-models` lists under `router_models[].models`. Send a field only to override that default, for example your own negotiated prices.
+
+| Field | Default when left out |
+| --- | --- |
+| `model_id` | Proposal Mode router: the model's `name`. Gateway router: the model's id at `provider`, from the catalog entry's `providers`. No default when the catalog has no id for the provider (`litellm`), so send it. |
+| `input_per_mtok`, `output_per_mtok`, `cache_read_per_mtok`, `cache_write_per_mtok` | The catalog entry's prices |
+| `context_window`, `supports_vision` | The catalog entry's values |
+| `enabled` | `true` |
+| `effort_routing_enabled` | `false` |
+
+Defaults are copied into the router when it's saved, and the response shows every field as saved. A later change to the catalog doesn't change a saved router.
+
+<Schema
+  {...require("./routertargetmodelinput.Schema.json")}
+>
+  
+</Schema>
+            

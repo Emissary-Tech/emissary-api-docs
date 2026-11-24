@@ -1,0 +1,70 @@
+---
+id: gateway-messages
+title: "Messages"
+description: "Anthropic-compatible Messages API through a gateway router. Set `model` to the router's name: the router picks one of its models, Emissary calls it with the router's provider key, and returns the provider's answer in Messages format. With `stream: true` the answer streams as server-sent events, as Anthropic streams them. If the picked model's provider fails, the router's default model serves instead."
+sidebar_label: "Messages"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Messages"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/gateway/v1/messages"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Anthropic-compatible Messages API through a gateway router. Set `model` to the router's name: the router picks one of its models, Emissary calls it with the router's provider key, and returns the provider's answer in Messages format. With `stream: true` the answer streams as server-sent events, as Anthropic streams them. If the picked model's provider fails, the router's default model serves instead.
+
+With the Anthropic SDK, set the base URL to `https://api.withemissary.com/gateway` and the API key to your Emissary API key. For Claude Code, set `ANTHROPIC_BASE_URL` to the same URL.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails>
+  
+</ParamsDetails>
+
+<RequestSchema
+  {...require("./gateway-messages.RequestSchema.json")}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  {...require("./gateway-messages.StatusCodes.json")}
+>
+  
+</StatusCodes>
+
+
+      

@@ -1,0 +1,1 @@
+{"schema":{"type":"object","properties":{"error":{"type":"string","example":"`router`: Field required"}},"title":"ApiErrorMessage"},"schemaType":"response"}

@@ -1,0 +1,32 @@
+---
+id: routercreate
+title: "RouterCreate"
+description: ""
+sidebar_label: "RouterCreate"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"name":"prod","mode":"proposal","router_model":"emissary-model-router-shared-v3","default":"claude-haiku-4.5","confidence":0.65,"is_zdr":true,"target_models":[{"name":"deepseek-v4-flash","provider":"openrouter","model_id":"deepseek/deepseek-v4-flash","enabled":true,"input_per_mtok":0.14,"output_per_mtok":0.28,"cache_read_per_mtok":0.028,"cache_write_per_mtok":0.14,"context_window":1000000,"supports_vision":true,"effort_routing_enabled":false,"extra_fields":{}}],"providers":[{"name":"openrouter","api_base_url":"https://litellm.example.com/v1"}]}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"RouterCreate"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  {...require("./routercreate.Schema.json")}
+>
+  
+</Schema>
+            

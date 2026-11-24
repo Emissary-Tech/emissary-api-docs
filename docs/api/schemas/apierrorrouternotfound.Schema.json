@@ -1,0 +1,1 @@
+{"schema":{"type":"object","properties":{"error":{"type":"string","example":"No router named \"staging\""}},"title":"ApiErrorRouterNotFound"},"schemaType":"response"}

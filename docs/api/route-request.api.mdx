@@ -1,0 +1,72 @@
+---
+id: route-request
+title: "Route a request"
+description: "Ask a Proposal Mode router which model should serve a request. Put the request in `body` exactly as you'd send it to the provider (OpenAI Chat Completions, OpenAI Responses or Anthropic Messages). The router scores it and returns its candidates, most recommended first; nothing is sent to any provider."
+sidebar_label: "Route a request"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Route a request"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/route"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Ask a Proposal Mode router which model should serve a request. Put the request in `body` exactly as you'd send it to the provider (OpenAI Chat Completions, OpenAI Responses or Anthropic Messages). The router scores it and returns its candidates, most recommended first; nothing is sent to any provider.
+
+Your app then calls the first candidate's `model_id` with its own provider key (at the candidate's `effort`, when it has one), moves down the list if that call fails, and reports what the provider answered to `POST /v1/route/{decision_id}/usage`.
+
+Routing is cache-aware within a session: send `session_id`, or the end client's headers in `headers` (where Claude Code, Codex and other known clients carry theirs), so a conversation's later turns can stay on the model whose prompt cache is warm.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails>
+  
+</ParamsDetails>
+
+<RequestSchema
+  {...require("./route-request.RequestSchema.json")}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  {...require("./route-request.StatusCodes.json")}
+>
+  
+</StatusCodes>
+
+
+      
