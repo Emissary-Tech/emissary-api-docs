@@ -1,0 +1,72 @@
+---
+id: gateway-chat-completions
+title: "Chat Completions"
+description: "OpenAI-compatible Chat Completions through a gateway router. Set `model` to the router's name: the router picks one of its models, Emissary calls it with the router's provider key, and returns the provider's answer in Chat Completions format. The response's `model` is the id of the model that served it. With `stream: true` the answer streams as server-sent events, as OpenAI streams them. If the picked model's provider fails, the router's default model serves instead."
+sidebar_label: "Chat Completions"
+hide_title: true
+hide_table_of_contents: true
+api: eJztWG1vGzcS/isDfnELrCTbzX1ZFEUVn6/wpU0M20Hu4BjWaHekZb1LbkiuZJ2g/34YkrtavdhoEfRDgeRDonD5MvPMM88MuRYO51ak9+IXdLTElXhIRE42M7J2UiuRig81qfHVINNVjU5OS4KLAh1c6KouiedYcIXRzbwAhHnYBYxuHJkh3JKDSaVzKifgNLiC4qcTCworSntDUMvsyYJWBHoG0lnwC20Cl5W0Fs0KMixLC9LBUrpid7fa6IXMycATrRJAlYMh1xhvHXVfTyygsksyINWhHzNtKnRDuOONydZaWTqxnQMy7CVzto9/+XFwvI0ls6AcpBvCJ7ZtYp0hrFJwpqGJnx0PDh8soA2LzMCSckALUs4mPBwQ7ya6gqohXIUjGSPKw8l9r2coGakdSHKaYVO6aKY/zIJU1hHmw8/qs/rUohhPvP3nuwQsOT82RUvw8eZXjtukcK626WiEtRwy9hQjMsx0NYpBHy3OJh54Xj2+vuJI8OKVbsw2hPFDALmli8MnCuDyGqlg8p/B+Ppq8I5WE9CGQUGYEhoy4PQTKfhuMm5coY38H3LsUngbvv74RKufJt8nsCxkVnDICr3c8xEsqZxp5EG40Y2Tas5TM8wKGuASDXmGSQUIlqz1J3Q/mQH8ScHkeRDHBjKfQEGYk0nYYqn8oWHEwkWJTU5woXNK/N/PHintCmas0ksFWSmZAd64BJ6IanY602pBxnonTyyUyIkSeK1Vj4TLQltP86p2wQ92aImmGopE6JqM3+IqF6mIqDP9e+wXiTD0pSHr3up8JdK1/680lIuUSZyITCtHyvEnrOtSZn7L0e+WdWItbFZQhfzLrWoSqdDT3ylzYl9QxqqNxUECRgOGcI0GK3IMndIOSmkd5VCQIeDg1Ggt5a2idEngU0q5YXQl2H4vPEIiERVZi3OyrHGY55LPxPLaMDpOkm39rHsj67h665V1Rqq5SAQ9I1suUl6QDyKqB+4yz1nqWDSitvmM2JVKKzY9A7enoTF+T+mossewfdmRzSYRQUN666Zal4TKW+nVQaQzLC3x3MDkR5kf8/bQqT41g/CE6MGUSq3mFpzmNCQFSsdEgAyNkeRzD24Ic5iu/NIWDE4KDriXxL3wDgV75KTzmP9ylMQ3wQQGswtPF8L9OG3hvl8Lo/22jSUjelQXn4x0BAgFyqcGcKob50Mm1XwoNg+JqPD50WuSFen56elmw1a21cOH7Pz0lP85RPCgKiWvlCXxFQn4Gtv/gFmtmgVD2urXJeuV+7M1UhzE8SYCFmJMz27kC+JgS+AD716g5gF8WdGoJ5sETnk+9slqia0Px4QexTRsBdvx5qXAtYszVCfM99a1KEAJIwWRgDClDBtLvqOZ6nwF0vIqhH/ffngPIUZcMloIWSxY+jlU2mIJv+m8repfQ4JdWSNjtHld1ibhzEkK/5JU5tBpaj8Px7W85K1+C8m0l3nxFHETOrzPPgU/C6bJcQcTsHpHEQLEHl+vGhdYll0HeP3h9g5Gi7ORX+wLb2YIfcLu6itHlrvHrlftnTHswn12GO6PCmOjQTkEd74iBv2yZB26hstu2PVhP0Lx+3YXqRzNPQeiIvihH877QXtzerZJ/khw+34dDejehADQ+SFA/+ViVhuqUeaMfs485yJNzwU2XLf/OtK+MC0K+yEA7KYfOPKh5pZj++V+C5pqylI8bNiL/NjaTR++0Np4BI/nQs+8Y9jBFEtUmW/fOgSH8LZZdeDq0AFyA4iN0wNDWYFmTp7jWjmpGvIS29LGNrOZzLi9fPzSaIei85Zda/3anRgP89750P9wXArbRl+GTm2BpcyFX/DmcMH7fgMUGx8oMNQM3yRx7x908O8qde91KznsUA4n1uFcqvlJ2q87vWtl1fieCQ6xCaUgEuwfxwC9ayts/y6Yy5w1M/Qg37Lvxexj8Jo6lP7Yp/Qx9HyOIMJ33K3eyYp0477vJZcLQ6JLonbDx/ZLTKCu3d4P4ViFsgIzo6tty9QLaNLdd2Lt8rWPlSCUCN81c2fx17SI0YGKXKH5+lhr64OOrhCp6N3+R1mBbpTtXCnDE0dosRvDTfhrTwkHzdzOs0HYyzfdlrLGSLfy+2ItH5+Ifz/0v92yr4GS3YztvaqW74gB4xQTqejeG/iuxSeHC4vPfwbvZns1vvxTFwtvUWxi/U1r96LVSwGpZtpbGLnc9/0AmMXp8Gx4yjwkU9kPs1syC5lRD9/lcnn4VONnD/RsYOP8wBjMPGOoQsnuxKGfD8KzSUQpM+I+PV230I1r/9xw7s3ZxjiagP7rUJv5KC61o1+vLi7f314Ozoenw8JVJe/LLAmuBc9YE7R1FareUfu9/T4s697F7du75bd3y2/vln/vd8u2yPJ7QF2iVCwLXmLWsf7ci63sLs5Yzor4VLIViYdEFFyz0nuxXjM9Pppys+HhLw0ZXzcSsUAjccrCe8/NRpR/Li++cIiLICyDOzaJp5dNqCN7RXaTtCvGWUa1e3XuQ6+s8l1WJGIaH1+r0E4YXPK1EZciFf4hN7jEr7M8thYlqnkT+pmwJ//5P0KfFyU=
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Chat Completions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/gateway/v1/chat/completions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+OpenAI-compatible Chat Completions through a gateway router. Set `model` to the router's name: the router picks one of its models, Emissary calls it with the router's provider key, and returns the provider's answer in Chat Completions format. The response's `model` is the id of the model that served it. With `stream: true` the answer streams as server-sent events, as OpenAI streams them. If the picked model's provider fails, the router's default model serves instead.
+
+With the OpenAI SDK, set the base URL to `https://api.withemissary.com/gateway/v1` and the API key to your Emissary API key. The gateway takes the key in `X-API-Key` or as a bearer token (`Authorization: Bearer <key>`), which is how the OpenAI SDK sends it.
+
+Routing is cache-aware within a session: a session id in an `x-session-id` header, or in the headers Claude Code, Codex and other known clients send, keeps a conversation's later turns on the model whose prompt cache is warm.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails>
+  
+</ParamsDetails>
+
+<RequestSchema
+  {...require("./gateway-chat-completions.RequestSchema.json")}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  {...require("./gateway-chat-completions.StatusCodes.json")}
+>
+  
+</StatusCodes>
+
+
+      

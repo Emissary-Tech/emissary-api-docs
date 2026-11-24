@@ -1,0 +1,1 @@
+{"schema":{"type":"object","properties":{"error":{"type":"object","properties":{"message":{"type":"string"},"type":{"type":"string"},"param":{"type":["string","null"]},"code":{"type":"string"}}}},"title":"OpenAIError"},"schemaType":"response"}

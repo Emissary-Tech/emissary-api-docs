@@ -1,0 +1,1 @@
+{"parameters":[{"name":"decision_id","in":"path","required":true,"description":"The `decision_id` that `POST /v1/route` returned","schema":{"type":"string","example":"dec-2b7e1f0c-9a4d-4c3e-8f5a-6d1b2c3e4f5a"}}]}

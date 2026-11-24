@@ -155,9 +155,24 @@ const sidebars: SidebarsConfig = {
             "The Emissary API is a RESTful API that provides endpoints for interacting with the Emissary platform.",
         slug: "/api"
       },
-      items: require("./docs/api/sidebar.ts")
+      items: nestUnder(require("./docs/api/sidebar.ts"), "Routers", ["Proposal Mode", "Gateway"])
     }
   ]
 };
+
+// The OpenAPI plugin groups operations by tag, one level deep: move the given tags'
+// categories into their parent's, after its own operations.
+function nestUnder(items, parent, children) {
+  const nested = children
+    .map((label) => items.find((item) => item.type === "category" && item.label === label))
+    .filter(Boolean);
+  return items
+    .filter((item) => !nested.includes(item))
+    .map((item) =>
+      item.type === "category" && item.label === parent
+        ? { ...item, items: [...item.items, ...nested] }
+        : item
+    );
+}
 
 export default sidebars;

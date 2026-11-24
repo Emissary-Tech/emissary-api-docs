@@ -1,0 +1,70 @@
+---
+id: gateway-responses
+title: "Responses"
+description: "OpenAI-compatible Responses API through a gateway router. Set `model` to the router's name: the router picks one of its models, Emissary calls it with the router's provider key, and returns the provider's answer in Responses format. With `stream: true` the answer streams as server-sent events. If the picked model's provider fails, the router's default model serves instead."
+sidebar_label: "Responses"
+hide_title: true
+hide_table_of_contents: true
+api: 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
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Responses"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/gateway/v1/responses"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+OpenAI-compatible Responses API through a gateway router. Set `model` to the router's name: the router picks one of its models, Emissary calls it with the router's provider key, and returns the provider's answer in Responses format. With `stream: true` the answer streams as server-sent events. If the picked model's provider fails, the router's default model serves instead.
+
+With the OpenAI SDK (or Codex), set the base URL to `https://api.withemissary.com/gateway/v1` and the API key to your Emissary API key. The gateway takes the key in `X-API-Key` or as a bearer token (`Authorization: Bearer <key>`), which is how the OpenAI SDK sends it.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails>
+  
+</ParamsDetails>
+
+<RequestSchema
+  {...require("./gateway-responses.RequestSchema.json")}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  {...require("./gateway-responses.StatusCodes.json")}
+>
+  
+</StatusCodes>
+
+
+      

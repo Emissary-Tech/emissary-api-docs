@@ -1,0 +1,1 @@
+{"schema":{"type":"object","additionalProperties":true,"description":"The provider's answer in the format of the request. Its `model` is the id of the model that served it.","title":"GatewayResponse"},"schemaType":"response"}
