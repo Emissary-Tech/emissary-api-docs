@@ -1,0 +1,1 @@
+{"parameters":[{"name":"router_name","in":"path","required":true,"description":"The router's name, URL-encoded (`team%2Fprod%20v2` for \"team/prod v2\")","schema":{"type":"string"}}]}

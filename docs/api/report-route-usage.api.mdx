@@ -1,0 +1,72 @@
+---
+id: report-route-usage
+title: "Report usage"
+description: "Report what the provider answered for a request your app served: the candidate it called, and the provider's `usage` object as the provider returned it (Anthropic Messages, OpenAI Chat Completions or OpenAI Responses). The decision is then priced, with its savings against the router's most expensive model, and shown with its cost on the dashboard."
+sidebar_label: "Report usage"
+hide_title: true
+hide_table_of_contents: true
+api: eJztV21v2zYQ/isEv6QFJFt2nL7407wgw7KtTZCkwIA0iC/i2WIjkRxJ2fUM/ffhKFmW7aQtin7ZMH+xwJfjc889dzyuuYe54+Nbfmm10Q5y9k4L5HcRF+hSK42XWvExv0KjrWfLDDzzGTJj9UIKtAyUW6JFwWbaMmAW/yrRebbSpWVgDHNoFyjGYVMKSkgBHpn0LIU8RxExUGLH4pFj09LBHKdMP3zC1DNwu0da9KVVKMjKi4nymdVGpuwdOtrmInZhUE3O2SmBPdWFyZG8cEzbzdQVOqOVQ/eyx24yZAJT6aRWTIazFDNWpoRuKX3GpHfMwUKquWMwB6lcTYLVpQ+AC+08w88GlZMLZIUWmNeeuUwv1dZKSgu1CrsFuOxBgxW9j+qjmrQYjhwL/hMWi6m2AgXTKsUemzCLBsGjoA8KiHTMeZnnDNIUDU28GCbDl+HsNAM1R8eU9plU84g5TdzZlVRz2gj5Elbk2Qx7POLaoAUi6lzwMa/tX5GHHwgNj7gBCwV6tCSYNVdQIB/zDex7KXjEJYnFgM94xEkL0qLgY29L3FcU0T7tbJ4yT/GaXl5c37D+YtAP7E7baPOIuzTDAvh4zf3K0NnOW6nmPOL4GSjMNZx4+PAaB7Mkjd/CSMSj9BjjN7MTiF+JwcMwPcbR7AR4Vd3VENH5n7VYkdl9xKlWHpWnKTAml2ngp//JkQfrQzy1YHdcv+VBDTziIaiUWcYS1V6io6319Fd8QuMQH+PFKJ7l4LI4eX084E8yGsxNmZ7tZdxeQvJqA+gJ9CCEJJuQX3agPhfEZxM3osyV/sfmKwF3HnzpOsil8jhH2yVtmCRfAfvrzc0la0xVVcS99IHtIPe63tFhjcVwnDaoQIbQl0UBdsXH/DnwZZM1C8hL7AT6+Wi28TBWF8bfe/2IyvHxaDAkKW5Mt+NvX0Xcaw95O3KSvOnQM0wS8gs2jO/iPgzE85DTHEqBcQbysYxHvZMuWKlMucU6eHOcRFyXvjs4HCURTyHN8N4iiPu9LcMkaedTiyHH9tYk+27Rj9KskQUBGSZD+tu/t+oCGpGY2moKOeFYUXhHSXK4i5TSFlh15Bmw364v3re63mSZdKyQzoXiqm0r/82euoy3afXd1WS3YKC12n65YEzrm2k6Zr9IzAVry1FX5xMjz8hUE/6O1jun8MbVJyxVgb3BIXsfFJQ+01b+jYLVdn5QKW0kEDXoDmrpFwrDTNsCfD10POyyNUoGVfQtrHb9epLJvQU1QcdPy2tyec4ecUUSUtqzBeRS1HocHW54r7cdip6FWu5YFvoi6Vi4eP+V4ur6dUQ3d5IkyRGb6VLVBFYRL9BnmjoSo13AS83FmLcdQn/daSKq/qaGhWuu6VRKS0Us8964cb8PRvaoIUNKXbCrXqqLg7v0rJkMcaptcWoYHKallX4V7IKR949I33fduWviuqazXdESCkb+jisebdqnP+PJ5XlcD4XmKUMQdFgVcQre1bZDOdsS+M13yV7dpDNmOsBpAtV19ICFRdIb9BIecY+2cBeza7QLmWKHzOVyeUBmP6yO9Sx2zfpanpAGeWIBMlwq9dBPB7GoIp7LFJULrjY8TQzdD2wY4GwD2kCAMNvTdt5vtrr+H+enZ++vz+JhL+llvsjJLkmidq32rIqCrApQnaOat85GSTuUrLeJ9v+b6L//JmqS1uNn3zc5SBX6Zhv69boQ3fIF5Vtwm0d8vPscanv+jIrX+Jav1w/g8IPNq4qG/yrRhvpBTZeV8EA5ebvmQjr6Fnw8g9ztt91dEb64asrvS/YdL6on/dtUKrXa9oKcRzwUsp33XnVXRZuCRbDrFac1uPiG7GwtHFxLVbTZMQmB+uLau85NQA7xiD80rzaSFr1YYUmBgGWNVgeyQhUOY2ueg5qXoSzy2ib9/gHpH+XN
+sidebar_class_name: "post api-method"
+info_path: api/emissary-api
+custom_edit_url: null
+hide_send_button: true
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+import Translate from "@docusaurus/Translate";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Report usage"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/v1/route/{decision_id}/usage"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Report what the provider answered for a request your app served: the candidate it called, and the provider's `usage` object as the provider returned it (Anthropic Messages, OpenAI Chat Completions or OpenAI Responses). The decision is then priced, with its savings against the router's most expensive model, and shown with its cost on the dashboard.
+
+A decision's usage is recorded once. A repeated report is still accepted (202) and changes nothing, so retrying is always safe.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+>
+  <Translate id="theme.openapi.request.title">Request</Translate>
+</Heading>
+
+<ParamsDetails
+  {...require("./report-route-usage.ParamsDetails.json")}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  {...require("./report-route-usage.RequestSchema.json")}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  {...require("./report-route-usage.StatusCodes.json")}
+>
+  
+</StatusCodes>
+
+
+      
